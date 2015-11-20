@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.WordAnalyser;
 import com.swayam.ocr.core.util.BinaryImage;
@@ -34,8 +35,7 @@ import com.swayam.ocr.core.util.Rectangle;
  */
 public class LeftToRightWordAnalyser implements WordAnalyser {
 
-    private static final Logger LOG = Logger
-            .getLogger(LeftToRightWordAnalyser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LeftToRightWordAnalyser.class);
 
     /**
      * Length of the a side of the next square to compare
@@ -45,7 +45,8 @@ public class LeftToRightWordAnalyser implements WordAnalyser {
     private static final int INITIAL_LENGTH = 10;
 
     /**
-     * Minimum no. of white cells that should be present for it to qualify as a glyph
+     * Minimum no. of white cells that should be present for it to qualify as a
+     * glyph
      */
     private static final int MINIMUM_WHITE_COUNT = 20;
 
@@ -156,7 +157,8 @@ public class LeftToRightWordAnalyser implements WordAnalyser {
             } else if (intersectsX(startX,
                     Math.min(startY + height, imageHeight - 1), width)) {
 
-                // the bottom horizontal line of the area intersects as white... increase the height
+                // the bottom horizontal line of the area intersects as white...
+                // increase the height
 
                 int nextHeight = Math.min(height + NEXT_SQUARE_LENGTH,
                         imageHeight);
@@ -175,7 +177,8 @@ public class LeftToRightWordAnalyser implements WordAnalyser {
             } else if (intersectsY(Math.min(startX + width, imageWidth - 1),
                     startY, height)) {
 
-                // the left verticaal line of the area intersects as white... increase the width
+                // the left verticaal line of the area intersects as white...
+                // increase the width
 
                 int nextWidth = Math
                         .min(width + NEXT_SQUARE_LENGTH, imageWidth);
@@ -299,7 +302,8 @@ public class LeftToRightWordAnalyser implements WordAnalyser {
 
                 mergedArea = new Rectangle(Math.min(area.x, newArea.x),
                         Math.min(area.y, newArea.y), Math.max(area.width,
-                                newArea.width), Math.max(area.height,
+                                newArea.width),
+                        Math.max(area.height,
                                 newArea.height));
 
                 itr.remove();

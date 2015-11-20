@@ -15,7 +15,8 @@
 
 package com.swayam.ocr.core.impl;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.Rectangle;
@@ -26,7 +27,7 @@ import com.swayam.ocr.core.util.Rectangle;
  */
 public class ImageSearcher {
 
-    private static final Logger LOG = Logger.getLogger(ImageSearcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImageSearcher.class);
 
     private static final int DEVIATION_TOLERANCE_PERCENT = 10;
 
@@ -127,7 +128,8 @@ public class ImageSearcher {
 
     }
 
-    // private boolean matchByJOpenSurf(BinaryImage image1, BinaryImage image2) {
+    // private boolean matchByJOpenSurf(BinaryImage image1, BinaryImage image2)
+    // {
     //
     // return new Surf(image1.getImage()).isEquivalentTo(new Surf(image2
     // .getImage()));

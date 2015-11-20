@@ -44,7 +44,8 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.WordAnalyser;
 import com.swayam.ocr.core.impl.BanglaLetterAnalyser;
@@ -66,14 +67,15 @@ public class OcrWorkBench extends JFrame {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOG = Logger.getLogger(OcrWorkBench.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OcrWorkBench.class);
 
     private static final boolean MARK_WORD_BOUNDS = false;
 
     private static final boolean MARK_MATRAS = false;
 
     /**
-     * The value of color above which it is considered white and below which it is considered black
+     * The value of color above which it is considered white and below which it
+     * is considered black
      */
     public static final int COLOR_THRESHOLD = 80;
 
@@ -176,15 +178,15 @@ public class OcrWorkBench extends JFrame {
 
         JMenu trainingMenu = new JMenu("Training");
         menuBar.add(trainingMenu);
-        
+
         JMenuItem showBinaryImageMenuItem = new JMenuItem("Show Binary Image");
         trainingMenu.add(showBinaryImageMenuItem);
         showBinaryImageMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.BINARY_IMAGE_ONLY));
-        
+
         JMenuItem edgeDetectionMenuItem = new JMenuItem("Edge Detection");
         trainingMenu.add(edgeDetectionMenuItem);
         edgeDetectionMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.EDGE_DETECTION));
-        
+
         JMenuItem markCharacterMenuItem = new JMenuItem("Mark Character");
         trainingMenu.add(markCharacterMenuItem);
         markCharacterMenuItem.addActionListener(new ActionListener() {
@@ -215,7 +217,7 @@ public class OcrWorkBench extends JFrame {
 
         JMenuItem storeCharacterMenuItem = new JMenuItem("Store Character");
         trainingMenu.add(storeCharacterMenuItem);
-        
+
         storeCharacterMenuItem.addActionListener(new StoreCharacterActionListener());
 
         JMenuItem showGlyphDbMenuItem = new JMenuItem("Show Glyph DB");
@@ -231,8 +233,9 @@ public class OcrWorkBench extends JFrame {
                     @Override
                     public void run() {
 
-//                        JDialog dialog = new JDialog(OcrWorkBench.this, true);
-                    	JFrame frame = new JFrame();
+                        // JDialog dialog = new JDialog(OcrWorkBench.this,
+                        // true);
+                        JFrame frame = new JFrame();
                         GuiUtils.centerWindow(frame, 500, 800);
                         frame.getContentPane().add(new GlyphDatabaseViewer());
                         frame.setVisible(true);
@@ -298,7 +301,8 @@ public class OcrWorkBench extends JFrame {
                                 JOptionPane.showMessageDialog(
                                         OcrWorkBench.this,
                                         "Image saved successfully to "
-                                                + imagePath, "Success!",
+                                                + imagePath,
+                                        "Success!",
                                         JOptionPane.INFORMATION_MESSAGE);
                             } catch (IOException e) {
                                 JOptionPane.showMessageDialog(
@@ -318,7 +322,7 @@ public class OcrWorkBench extends JFrame {
             }
 
         });
-        
+
         JMenuItem storeCharacterPopupMenuItem = new JMenuItem("Store Character");
         saveImagePopup.add(storeCharacterPopupMenuItem);
         storeCharacterPopupMenuItem.addActionListener(new StoreCharacterActionListener());
@@ -326,7 +330,7 @@ public class OcrWorkBench extends JFrame {
         imagePanel.addMouseListener(new MouseAdapter() {
 
             public void mouseReleased(MouseEvent e) {
-            	
+
                 if (e.isMetaDown()) {
                     saveImagePopup.show(e.getComponent(), e.getX(), e.getY());
                 }
@@ -357,73 +361,73 @@ public class OcrWorkBench extends JFrame {
     }
 
     private BufferedImage textImageManipulation(ProcessImageOption option) {
-    	
-    	BufferedImage filteredImage;
-    	
-    	switch (option) {
-		case EDGE_DETECTION:
-			
-			binaryImage = new BinaryImage(currentImage, COLOR_THRESHOLD, true);
-			binaryImage = ImageUtils.applyRobertsonEdgeDetection(binaryImage);
-			filteredImage = binaryImage.getImage();
-			
-			break;
-		default:
-		case BINARY_IMAGE_ONLY:
-					
-			binaryImage = new BinaryImage(currentImage, COLOR_THRESHOLD, true);
-			filteredImage = binaryImage.getImage();
-			
-			break;
-					
-		case OCR:
-			
-	        binaryImage = new BinaryImage(currentImage, COLOR_THRESHOLD, true);
 
-	        WordAnalyser wordAnalyser = new LeftToRightWordAnalyser(binaryImage);
-	        filteredImage = binaryImage.getImage();
+        BufferedImage filteredImage;
 
-	        List<Rectangle> areasFound = wordAnalyser.getWordBoundaries();
+        switch (option) {
+        case EDGE_DETECTION:
 
-	        Graphics g = filteredImage.getGraphics();
+            binaryImage = new BinaryImage(currentImage, COLOR_THRESHOLD, true);
+            binaryImage = ImageUtils.applyRobertsonEdgeDetection(binaryImage);
+            filteredImage = binaryImage.getImage();
 
-	        for (Rectangle area : areasFound) {
+            break;
+        default:
+        case BINARY_IMAGE_ONLY:
 
-	            if (MARK_WORD_BOUNDS) {
-	                g.setColor(Color.GREEN);
-	                g.drawRect(area.getX(), area.getY(), area.getWidth(),
-	                        area.getHeight());
-	            }
+            binaryImage = new BinaryImage(currentImage, COLOR_THRESHOLD, true);
+            filteredImage = binaryImage.getImage();
 
-	            BinaryImage word = wordAnalyser.getWordMatrix(area);
-	 
-	            matchImage(word);
+            break;
 
-	             if (MARK_MATRAS) {
-	            
-		             BanglaLetterAnalyser letterAnalyser = new BanglaLetterAnalyser(
-		             word);
-		            
-		             List<Rectangle> matras = letterAnalyser.getMatras();
-		            
-		             LOG.debug("matras:" + matras);
-		            
-		             for (Rectangle rect : matras) {
-		            
-			             int x = area.getX() + rect.x;
-			             int y = area.getY() + rect.y;
-			            
-			             g.setColor(Color.BLACK);
-			             g.fillRect(x, y, rect.width, rect.height);
-		            
-		             }
-	            
-	             }
-	        }
-			
-			break;
-		
-		}
+        case OCR:
+
+            binaryImage = new BinaryImage(currentImage, COLOR_THRESHOLD, true);
+
+            WordAnalyser wordAnalyser = new LeftToRightWordAnalyser(binaryImage);
+            filteredImage = binaryImage.getImage();
+
+            List<Rectangle> areasFound = wordAnalyser.getWordBoundaries();
+
+            Graphics g = filteredImage.getGraphics();
+
+            for (Rectangle area : areasFound) {
+
+                if (MARK_WORD_BOUNDS) {
+                    g.setColor(Color.GREEN);
+                    g.drawRect(area.getX(), area.getY(), area.getWidth(),
+                            area.getHeight());
+                }
+
+                BinaryImage word = wordAnalyser.getWordMatrix(area);
+
+                matchImage(word);
+
+                if (MARK_MATRAS) {
+
+                    BanglaLetterAnalyser letterAnalyser = new BanglaLetterAnalyser(
+                            word);
+
+                    List<Rectangle> matras = letterAnalyser.getMatras();
+
+                    LOG.debug("matras:" + matras);
+
+                    for (Rectangle rect : matras) {
+
+                        int x = area.getX() + rect.x;
+                        int y = area.getY() + rect.y;
+
+                        g.setColor(Color.BLACK);
+                        g.fillRect(x, y, rect.width, rect.height);
+
+                    }
+
+                }
+            }
+
+            break;
+
+        }
 
         return filteredImage;
 
@@ -431,9 +435,9 @@ public class OcrWorkBench extends JFrame {
 
     private void matchImage(BinaryImage wordImage) {
 
-    	GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
+        GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
 
-    	List<Glyph> glyphs = glyphDB.getGlyphs(Script.BANGLA);
+        List<Glyph> glyphs = glyphDB.getGlyphs(Script.BANGLA);
 
         for (Glyph glyph : glyphs) {
 
@@ -462,70 +466,70 @@ public class OcrWorkBench extends JFrame {
         });
 
     }
-    
+
     private class StoreCharacterActionListener implements ActionListener {
-    	
+
         @Override
         public void actionPerformed(ActionEvent e) {
-        	
-        	EventQueue.invokeLater(new Runnable() {
-				
-				@Override
-				public void run() {
 
-		            Rectangle trainingChar = imagePanel.getTrainingCharacter();
+            EventQueue.invokeLater(new Runnable() {
 
-		            if (binaryImage == null || trainingChar == null) {
+                @Override
+                public void run() {
 
-		                JOptionPane
-		                        .showMessageDialog(OcrWorkBench.this,
-		                                "Please mark a character first",
-		                                "No character marked!",
-		                                JOptionPane.WARNING_MESSAGE);
+                    Rectangle trainingChar = imagePanel.getTrainingCharacter();
 
-		            } else {
+                    if (binaryImage == null || trainingChar == null) {
 
-		                if (currentImage.getWidth() < trainingChar.width
-		                        || currentImage.getHeight() < trainingChar.height
-		                        || currentImage.getWidth() < trainingChar.x
-		                        || currentImage.getHeight() < trainingChar.y) {
+                        JOptionPane
+                                .showMessageDialog(OcrWorkBench.this,
+                                        "Please mark a character first",
+                                        "No character marked!",
+                                        JOptionPane.WARNING_MESSAGE);
 
-		                    JOptionPane.showMessageDialog(OcrWorkBench.this,
-		                            "Marked image out of bounds", "Out of bounds!",
-		                            JOptionPane.ERROR_MESSAGE);
+                    } else {
 
-		                } else {
+                        if (currentImage.getWidth() < trainingChar.width
+                                || currentImage.getHeight() < trainingChar.height
+                                || currentImage.getWidth() < trainingChar.x
+                                || currentImage.getHeight() < trainingChar.y) {
 
-		                    JDialog dialog = new CharacterTrainingDialog(
-		                            binaryImage.getSubImage(trainingChar));
-		                    dialog.setVisible(true);
+                            JOptionPane.showMessageDialog(OcrWorkBench.this,
+                                    "Marked image out of bounds", "Out of bounds!",
+                                    JOptionPane.ERROR_MESSAGE);
 
-		                }
+                        } else {
 
-		            }
-					
-				}
-				
-			});
+                            JDialog dialog = new CharacterTrainingDialog(
+                                    binaryImage.getSubImage(trainingChar));
+                            dialog.setVisible(true);
+
+                        }
+
+                    }
+
+                }
+
+            });
 
         }
-        
+
     }
-    
+
     private enum ProcessImageOption {
-		
-		BINARY_IMAGE_ONLY, EDGE_DETECTION, OCR;
-		
-	}
-    
+
+        BINARY_IMAGE_ONLY, EDGE_DETECTION, OCR;
+
+    }
+
     private class ProcessImageActionListener implements ActionListener {
-    	
-    	private final ProcessImageOption option;
-    	
-    	ProcessImageActionListener(ProcessImageOption option) {
-    		this.option = option;
-    	}
-    	
+
+        private final ProcessImageOption option;
+
+        ProcessImageActionListener(ProcessImageOption option) {
+            this.option = option;
+        }
+
         @Override
         public void actionPerformed(ActionEvent e) {
 
@@ -566,7 +570,7 @@ public class OcrWorkBench extends JFrame {
             }
 
         }
-        
+
     }
 
 }

@@ -20,7 +20,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.GeometryUtils;
@@ -33,8 +34,7 @@ import com.swayam.ocr.core.util.Rectangle;
  */
 public class BanglaLetterAnalyser {
 
-    private static final Logger LOG = Logger
-            .getLogger(BanglaLetterAnalyser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BanglaLetterAnalyser.class);
 
     private static final int MIN_WORD_SIZE = 5;
 
