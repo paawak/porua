@@ -12,38 +12,69 @@ import org.junit.Test;
 public class BasicTesseractExampleTest {
 
 	@Test
-	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed()
+	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_eng()
 			throws Exception {
-		// System.setProperty("TESSDATA_PREFIX",
-		// "/usr/share/tesseract/tessdata");
-
-		BytePointer outText;
-
-		TessBaseAPI api = new TessBaseAPI();
-		// api.ReadConfigFile("/usr/share/tesseract/tessdata/configs/api_config");
-		// api.SetVariable("TESSDATA_PREFIX", "/usr/share/tesseract/tessdata");
-		// Initialize tesseract-ocr with English, without specifying tessdata
-		// path
-		if (api.Init("/usr/share/tesseract/", "ben+eng") != 0) {
-			System.err.println("Could not initialize tesseract.");
-			System.exit(1);
-		}
 
 		// Open input image with leptonica library
 		String imageFile = BasicTesseractExampleTest.class.getResource(
-				"/test.png").getPath();
+				"/com/swayam/ocr/porua/res/test-english.png").getPath();
 		PIX image = pixRead(imageFile);
-		api.SetImage(image);
-		// Get OCR result
-		outText = api.GetUTF8Text();
-		String string = outText.getString();
-		assertTrue(!string.isEmpty());
-		System.out.println("OCR output:\n" + string);
+		BytePointer outText = null;
 
-		// Destroy used object and release memory
-		api.End();
-		api.close();
-		outText.deallocate();
-		pixDestroy(image);
+		try (TessBaseAPI api = new TessBaseAPI();) {
+			if (api.Init("/usr/share/tesseract/", "eng") != 0) {
+				System.err.println("Could not initialize tesseract.");
+				System.exit(1);
+			}
+
+			api.SetImage(image);
+			// Get OCR result
+			outText = api.GetUTF8Text();
+			String string = outText.getString();
+			assertTrue(!string.isEmpty());
+			System.out.println("OCR output:\n" + string);
+
+			// Destroy used object and release memory
+			api.End();
+
+		} finally {
+			outText.deallocate();
+			pixDestroy(image);
+		}
+
 	}
+
+	@Test
+	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_ben()
+			throws Exception {
+
+		// Open input image with leptonica library
+		String imageFile = BasicTesseractExampleTest.class.getResource(
+				"/com/swayam/ocr/porua/res/Bangla-300-short.png").getPath();
+		PIX image = pixRead(imageFile);
+		BytePointer outText = null;
+
+		try (TessBaseAPI api = new TessBaseAPI();) {
+			if (api.Init("/usr/share/tesseract/", "ben") != 0) {
+				System.err.println("Could not initialize tesseract.");
+				System.exit(1);
+			}
+
+			api.SetImage(image);
+			// Get OCR result
+			outText = api.GetUTF8Text();
+			String string = outText.getString();
+			assertTrue(!string.isEmpty());
+			System.out.println("OCR output:\n" + string);
+
+			// Destroy used object and release memory
+			api.End();
+
+		} finally {
+			outText.deallocate();
+			pixDestroy(image);
+		}
+
+	}
+
 }
