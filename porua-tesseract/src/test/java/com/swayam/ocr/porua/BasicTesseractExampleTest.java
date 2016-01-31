@@ -89,7 +89,7 @@ public class BasicTesseractExampleTest {
 
 	}
 
-	private String readFile(String path) {
+	private String readFile(String path) throws IOException {
 
 		StringBuilder allLines = new StringBuilder(200);
 
@@ -99,8 +99,6 @@ public class BasicTesseractExampleTest {
 				allLines.append(line).append("\n");
 			});
 
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
 
 		return allLines.toString().trim();
