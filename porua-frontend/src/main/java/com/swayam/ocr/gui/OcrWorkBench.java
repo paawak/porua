@@ -70,7 +70,7 @@ public class OcrWorkBench extends JFrame {
 
     private static final Logger LOG = LoggerFactory.getLogger(OcrWorkBench.class);
 
-    private static final boolean MARK_WORD_BOUNDS = false;
+    private static final boolean MARK_WORD_BOUNDS = true;
 
     private static final boolean MARK_MATRAS = false;
 
