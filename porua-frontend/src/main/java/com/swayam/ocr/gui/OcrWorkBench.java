@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -44,6 +45,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingWorker;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -505,7 +507,7 @@ public class OcrWorkBench extends JFrame {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent evt) {
 
 	    if (currentImage == null) {
 
@@ -517,24 +519,31 @@ public class OcrWorkBench extends JFrame {
 
 		OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-		EventQueue.invokeLater(new Runnable() {
+		SwingWorker<Long, Void> imageProcessor = new SwingWorker<Long, Void>() {
 
 		    @Override
-		    public void run() {
-
+		    protected Long doInBackground() {
 			long startTime = System.currentTimeMillis();
-
 			setImageInFrame(textImageManipulation(option));
-
-			long endTime = System.currentTimeMillis();
-
-			OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-
-			setStatusString("The last operation took " + (endTime - startTime) + " ms");
-
+			long timeTaken = System.currentTimeMillis() - startTime;
+			LOG.info("The image processing took {} millis", timeTaken);
+			return timeTaken;
 		    }
 
-		});
+		    @Override
+		    protected void done() {
+			try {
+			    long timeTake = get();
+			    setStatusString("The last operation took " + timeTake + " ms");
+			} catch (InterruptedException | ExecutionException e) {
+			    LOG.error("error processing image", e);
+			}
+			OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+		    }
+		};
+
+		imageProcessor.execute();
 
 	    }
 
