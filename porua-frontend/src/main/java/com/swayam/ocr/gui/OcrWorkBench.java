@@ -76,6 +76,8 @@ public class OcrWorkBench extends JFrame {
 
     private static final boolean MARK_MATRAS = false;
 
+    private static final boolean MATCH_IMAGE = false;
+
     private static final String PREFERRED_IMAGE_DIRECTORY_KEY = "PREFERRED_IMAGE_DIRECTORY_KEY";
 
     /**
@@ -387,7 +389,9 @@ public class OcrWorkBench extends JFrame {
 
 		BinaryImage word = wordAnalyser.getWordMatrix(area);
 
-		matchImage(word);
+		if (MATCH_IMAGE) {
+		    matchImage(word);
+		}
 
 		if (MARK_MATRAS) {
 
