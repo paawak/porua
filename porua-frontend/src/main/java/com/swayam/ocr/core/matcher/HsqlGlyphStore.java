@@ -25,6 +25,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.swayam.ocr.core.model.WordImage;
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.Glyph;
 import com.swayam.ocr.core.util.HsqlConnectionUtil;
@@ -54,6 +55,8 @@ public class HsqlGlyphStore implements GlyphStore {
 	private static final String INSERT_SCRIPT = "INSERT INTO script VALUES (DEFAULT, ?)";
 
 	private static final String INSERT_WORD_IMAGE = "INSERT INTO word_image (id, image_name, tesseract_value) VALUES (DEFAULT, ?, ?)";
+
+	private static final String GET_WORD_IMAGES = "SELECT id, image_name, tesseract_value, actual_value FROM word_image ORDER BY id";
 
 	public static final GlyphStore INSTANCE = new HsqlGlyphStore();
 
@@ -143,6 +146,33 @@ public class HsqlGlyphStore implements GlyphStore {
 			LOG.error("could not add word image", e);
 		}
 
+	}
+
+	@Override
+	public List<WordImage> getWordImages() {
+		List<WordImage> wordImages = new ArrayList<WordImage>();
+
+		try (Connection con = getDbConnection(); PreparedStatement queryStat = con.prepareStatement(GET_WORD_IMAGES);) {
+			ResultSet res = queryStat.executeQuery();
+
+			while (res.next()) {
+
+				WordImage wordImage = new WordImage();
+				wordImage.setId(res.getLong("id"));
+				wordImage.setImageFileName(res.getString("image_name"));
+				wordImage.setTesseractValue(res.getString("tesseract_value"));
+				wordImage.setActualVale(res.getString("actual_value"));
+
+				wordImages.add(wordImage);
+
+			}
+
+			res.close();
+		} catch (SQLException e) {
+			LOG.error("could not query word images", e);
+		}
+
+		return wordImages;
 	}
 
 	private Connection getDbConnection() throws SQLException {

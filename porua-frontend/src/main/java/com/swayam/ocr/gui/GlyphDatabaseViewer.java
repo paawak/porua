@@ -18,9 +18,12 @@ package com.swayam.ocr.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -30,12 +33,12 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-import com.swayam.ocr.core.ImageDigester;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.swayam.ocr.core.matcher.GlyphStore;
 import com.swayam.ocr.core.matcher.HsqlGlyphStore;
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.Glyph;
-import com.swayam.ocr.core.util.Script;
+import com.swayam.ocr.core.model.WordImage;
 
 /**
  * 
@@ -43,105 +46,114 @@ import com.swayam.ocr.core.util.Script;
  */
 public class GlyphDatabaseViewer extends JPanel {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public GlyphDatabaseViewer() {
-        init();
-    }
+	private static final Logger LOG = LoggerFactory.getLogger(GlyphDatabaseViewer.class);
 
-    private void init() {
+	// FIXME: externalise the below
+	private static final String IMAGE_DIR = "/home/paawak/kaaj/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/05-03-2016_10-55-14/";
 
-        setLayout(new BorderLayout());
+	public GlyphDatabaseViewer() {
+		init();
+	}
 
-        JScrollPane scrpn = new JScrollPane();
-        add(scrpn, BorderLayout.CENTER);
-        JTable table = new JTable(getTableData());
-        scrpn.setViewportView(table);
+	private void init() {
 
-        table.setDefaultRenderer(BufferedImage.class, new GlyphRenderer());
-        table.setRowHeight(60);
+		setLayout(new BorderLayout());
 
-    }
+		JScrollPane scrpn = new JScrollPane();
+		add(scrpn, BorderLayout.CENTER);
+		JTable table = new JTable(getTableData());
+		scrpn.setViewportView(table);
 
-    private TableModel getTableData() {
+		table.setDefaultRenderer(BufferedImage.class, new GlyphRenderer());
+		table.setRowHeight(60);
 
-    	GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
+	}
 
-        List<Object[]> tableData = new ArrayList<Object[]>();
-        
-        List<Glyph> glyphs = glyphDB.getGlyphs(Script.BANGLA);
+	private TableModel getTableData() {
 
-        for (Glyph glyph : glyphs) {
+		GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
 
-            Object[] row = new Object[4];
-            row[0] = glyph.getId();
-            row[1] = glyph.getUnicodeText();
-            BinaryImage glyphImage = glyph.getImage();
-            row[2] = glyphImage.getImage();
-            row[3] = new ImageDigester(glyphImage).digest().getImage();
-            tableData.add(row);
+		List<Object[]> tableData = new ArrayList<Object[]>();
 
-        }
+		List<WordImage> wordImages = glyphDB.getWordImages();
 
-        return new DefaultTableModel(tableData.toArray(new Object[0][0]),
-                new String[] { "Id", "Character", "Glyph", "Skeleton"}) {
+		for (WordImage wordImage : wordImages) {
 
-            private static final long serialVersionUID = 1L;
+			Object[] row = new Object[4];
+			row[0] = wordImage.getId();
+			row[1] = wordImage.getTesseractValue();
+			try {
+				row[2] = ImageIO.read(new File(IMAGE_DIR, wordImage.getImageFileName()));
+			} catch (IOException e) {
+				LOG.error("could not read image file " + wordImage.getImageFileName(), e);
+			}
+			row[3] = wordImage.getActualVale();
+			tableData.add(row);
 
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                return getValueAt(0, columnIndex).getClass();
-            }
+		}
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
-            }
+		return new DefaultTableModel(tableData.toArray(new Object[0][0]), new String[] { "Id", "Tesseract Value", "Image", "Actual Value" }) {
 
-        };
+			private static final long serialVersionUID = 1L;
 
-    }
+			@Override
+			public Class<?> getColumnClass(int columnIndex) {
+				Object value = getValueAt(0, columnIndex);
+				if (value == null) {
+					return String.class;
+				}
+				return value.getClass();
+			}
 
-    private static class GlyphRenderer implements TableCellRenderer {
+			@Override
+			public boolean isCellEditable(int rowIndex, int columnIndex) {
+				return false;
+			}
 
-        @Override
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
+		};
 
-            JLabel label = new JLabel();
-            label.setOpaque(true);
+	}
 
-            BufferedImage img = (BufferedImage) value;
-            label.setIcon(new ImageIcon(img));
+	private static class GlyphRenderer implements TableCellRenderer {
 
-            return label;
+		@Override
+		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-        }
+			JLabel label = new JLabel();
+			label.setOpaque(true);
 
-    }
+			BufferedImage img = (BufferedImage) value;
+			label.setIcon(new ImageIcon(img));
 
-    // private static class ButtonRenderer implements TableCellRenderer {
-    //
-    // @Override
-    // public Component getTableCellRendererComponent(JTable table,
-    // Object value, boolean isSelected, boolean hasFocus, int row,
-    // int column) {
-    //
-    // JButton button = new JButton("Delete");
-    //
-    // button.addActionListener(new ActionListener() {
-    //
-    // @Override
-    // public void actionPerformed(ActionEvent e) {
-    // // table.getv
-    // }
-    //
-    // });
-    //
-    // return button;
-    //
-    // }
-    // }
+			return label;
+
+		}
+
+	}
+
+	// private static class ButtonRenderer implements TableCellRenderer {
+	//
+	// @Override
+	// public Component getTableCellRendererComponent(JTable table,
+	// Object value, boolean isSelected, boolean hasFocus, int row,
+	// int column) {
+	//
+	// JButton button = new JButton("Delete");
+	//
+	// button.addActionListener(new ActionListener() {
+	//
+	// @Override
+	// public void actionPerformed(ActionEvent e) {
+	// // table.getv
+	// }
+	//
+	// });
+	//
+	// return button;
+	//
+	// }
+	// }
 
 }
