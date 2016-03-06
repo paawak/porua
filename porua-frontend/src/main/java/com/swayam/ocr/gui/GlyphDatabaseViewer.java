@@ -83,18 +83,18 @@ public class GlyphDatabaseViewer extends JPanel {
 
 			Object[] row = new Object[4];
 			row[0] = wordImage.getId();
-			row[1] = wordImage.getTesseractValue();
 			try {
-				row[2] = ImageIO.read(new File(IMAGE_DIR, wordImage.getImageFileName()));
+				row[1] = ImageIO.read(new File(IMAGE_DIR, wordImage.getImageFileName()));
 			} catch (IOException e) {
 				LOG.error("could not read image file " + wordImage.getImageFileName(), e);
 			}
+			row[2] = wordImage.getTesseractValue();
 			row[3] = wordImage.getActualVale();
 			tableData.add(row);
 
 		}
 
-		return new DefaultTableModel(tableData.toArray(new Object[0][0]), new String[] { "Id", "Tesseract Value", "Image", "Actual Value" }) {
+		return new DefaultTableModel(tableData.toArray(new Object[0][0]), new String[] { "Id", "Image", "Tesseract Value", "Actual Value" }) {
 
 			private static final long serialVersionUID = 1L;
 
