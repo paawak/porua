@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
@@ -406,18 +407,18 @@ public class OcrWorkBench extends JFrame {
 					throw new RuntimeException("Could not initialize tesseract with Bangla");
 				}
 
-				for (File wordImageFile : imageTempDirectory.listFiles()) {
+				Arrays.asList(imageTempDirectory.listFiles()).stream().forEach((File wordImageFile) -> {
 					PIX image = pixRead(wordImageFile.getPath());
 					tessBaseApi.SetImage(image);
 					// Get OCR result
-					BytePointer outText = tessBaseApi.GetUTF8Text();
-					String ocrText = outText.getString().trim();
+						BytePointer outText = tessBaseApi.GetUTF8Text();
+						String ocrText = outText.getString().trim();
 
-					LOG.info("from tesseract: {}", ocrText);
+						LOG.info("from tesseract: {}", ocrText);
 
-					outText.deallocate();
-					pixDestroy(image);
-				}
+						outText.deallocate();
+						pixDestroy(image);
+					});
 
 				tessBaseApi.End();
 				try {
