@@ -14,16 +14,11 @@
  */
 package com.swayam.ocr.core.matcher;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.Glyph;
+import com.swayam.ocr.core.util.HsqlConnectionUtil;
 import com.swayam.ocr.core.util.Script;
 import com.swayam.ocr.core.util.Typeface;
 
@@ -42,210 +38,175 @@ import com.swayam.ocr.core.util.Typeface;
  */
 public class HsqlGlyphStore implements GlyphStore {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HsqlGlyphStore.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HsqlGlyphStore.class);
 
-    private static final String GET_GLYPHS_QUERY = "SELECT gl.id, tp.name, gl.binary_image, gl.unicode, gl.description FROM script sc, typeface tp, glyph gl WHERE "
-            + " sc.id = tp.script_id AND tp.id = gl.typeface_id AND sc.name = ? ORDER BY gl.unicode";
+	private static final String GET_GLYPHS_QUERY = "SELECT gl.id, tp.name, gl.binary_image, gl.unicode, gl.description FROM script sc, typeface tp, glyph gl WHERE "
+			+ " sc.id = tp.script_id AND tp.id = gl.typeface_id AND sc.name = ? ORDER BY gl.unicode";
 
-    private static final String TYPEFACE_QUERY = "SELECT id FROM typeface WHERE name = ?";
+	private static final String TYPEFACE_QUERY = "SELECT id FROM typeface WHERE name = ?";
 
-    private static final String INSERT_GLYPH = "INSERT INTO glyph VALUES (DEFAULT, ?, ?, ?, (" + TYPEFACE_QUERY + "))";
+	private static final String INSERT_GLYPH = "INSERT INTO glyph VALUES (DEFAULT, ?, ?, ?, (" + TYPEFACE_QUERY + "))";
 
-    private static final String INSERT_TYPEFACE = "INSERT INTO typeface VALUES (DEFAULT, ?, ?, (SELECT id FROM script WHERE name = ?))";
+	private static final String INSERT_TYPEFACE = "INSERT INTO typeface VALUES (DEFAULT, ?, ?, (SELECT id FROM script WHERE name = ?))";
 
-    private static final String SCRIPT_QUERY = "SELECT id FROM script WHERE name = ?";
+	private static final String SCRIPT_QUERY = "SELECT id FROM script WHERE name = ?";
 
-    private static final String INSERT_SCRIPT = "INSERT INTO script VALUES (DEFAULT, ?)";
+	private static final String INSERT_SCRIPT = "INSERT INTO script VALUES (DEFAULT, ?)";
 
-    private static final String INIT_SCRIPT = "/com/swayam/ocr/res/sql/CreateTable.sql";
+	private static final String INSERT_WORD_IMAGE = "INSERT INTO word_image (id, image_name, tesseract_value) VALUES (DEFAULT, ?, ?)";
 
-    public static final GlyphStore INSTANCE = new HsqlGlyphStore();
+	public static final GlyphStore INSTANCE = new HsqlGlyphStore();
 
-    private HsqlGlyphStore() {
+	private HsqlGlyphStore() {
 
-        InputStream is = HsqlGlyphStore.class.getResourceAsStream(INIT_SCRIPT);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+	}
 
-        StringBuilder sb = new StringBuilder();
+	@Override
+	public List<Glyph> getGlyphs(Script script) {
 
-        try {
+		List<Glyph> glyphs = new ArrayList<Glyph>();
 
-            while (true) {
+		try {
 
-                String line = reader.readLine();
+			Connection con = getDbConnection();
 
-                if (line == null) {
-                    break;
-                }
+			PreparedStatement pstat = con.prepareStatement(GET_GLYPHS_QUERY);
+			pstat.setString(1, script.name());
 
-                sb.append(line).append('\n');
+			ResultSet res = pstat.executeQuery();
 
-            }
+			while (res.next()) {
 
-        } catch (IOException e) {
-            LOG.error("could not read init script", e);
-        }
+				int glyphId = res.getInt(1);
+				String typefaceName = res.getString(2);
+				BinaryImage binaryImage = (BinaryImage) res.getObject(3);
+				String unicodeString = res.getString(4);
+				String desc = res.getString(5);
 
-        if (sb.length() > 0) {
+				Typeface typeFace = new Typeface();
+				typeFace.setScript(script);
+				typeFace.setName(typefaceName);
 
-            try {
+				Glyph glyph = new Glyph(glyphId, typeFace, unicodeString, binaryImage, desc);
+				glyphs.add(glyph);
 
-                Connection con = getDbConnection();
-                Statement stat = con.createStatement();
+			}
 
-                String sql = sb.toString();
+			res.close();
+			pstat.close();
+			con.close();
 
-                stat.execute(sql);
+		} catch (SQLException e) {
+			LOG.error("could not get glyphs", e);
+		}
 
-                stat.close();
-                con.close();
+		return glyphs;
+	}
 
-            } catch (SQLException e) {
-                LOG.error("could not execute init script", e);
-            }
+	@Override
+	public void addGlyph(Glyph glyph) {
 
-        }
+		try {
 
-    }
+			checkAndInsertTypeface(glyph);
 
-    @Override
-    public List<Glyph> getGlyphs(Script script) {
+			Connection con = getDbConnection();
 
-        List<Glyph> glyphs = new ArrayList<Glyph>();
+			PreparedStatement pstat = con.prepareStatement(INSERT_GLYPH);
 
-        try {
+			pstat.setObject(1, glyph.getImage());
+			pstat.setString(2, glyph.getUnicodeText());
+			pstat.setString(3, glyph.getDescription());
+			pstat.setString(4, glyph.getTypeface().getName());
 
-            Connection con = getDbConnection();
+			pstat.executeUpdate();
 
-            PreparedStatement pstat = con.prepareStatement(GET_GLYPHS_QUERY);
-            pstat.setString(1, script.name());
+			pstat.close();
+			con.close();
 
-            ResultSet res = pstat.executeQuery();
+		} catch (SQLException e) {
+			LOG.error("could not add glyph", e);
+		}
 
-            while (res.next()) {
+	}
 
-                int glyphId = res.getInt(1);
-                String typefaceName = res.getString(2);
-                BinaryImage binaryImage = (BinaryImage) res.getObject(3);
-                String unicodeString = res.getString(4);
-                String desc = res.getString(5);
+	@Override
+	public void addWordImage(File imageFile, String tesseractValue) {
+		try (Connection con = getDbConnection(); PreparedStatement insertStat = con.prepareStatement(INSERT_WORD_IMAGE);) {
 
-                Typeface typeFace = new Typeface();
-                typeFace.setScript(script);
-                typeFace.setName(typefaceName);
+			insertStat.setString(1, imageFile.getName());
+			insertStat.setString(2, tesseractValue);
 
-                Glyph glyph = new Glyph(glyphId, typeFace, unicodeString, binaryImage, desc);
-                glyphs.add(glyph);
+			insertStat.executeUpdate();
 
-            }
+		} catch (SQLException e) {
+			LOG.error("could not add word image", e);
+		}
 
-            res.close();
-            pstat.close();
-            con.close();
+	}
 
-        } catch (SQLException e) {
-            LOG.error("could not get glyphs", e);
-        }
+	private Connection getDbConnection() throws SQLException {
+		return HsqlConnectionUtil.INSTANCE.getDbConnection();
+	}
 
-        return glyphs;
-    }
+	private void checkAndInsertTypeface(Glyph glyph) throws SQLException {
 
-    @Override
-    public void addGlyph(Glyph glyph) {
+		checkAndInsertScript(glyph);
 
-        try {
+		Connection con = getDbConnection();
 
-            checkAndInsertTypeface(glyph);
+		String typefaceName = glyph.getTypeface().getName();
 
-            Connection con = getDbConnection();
+		PreparedStatement queryStat = con.prepareStatement(TYPEFACE_QUERY);
 
-            PreparedStatement pstat = con.prepareStatement(INSERT_GLYPH);
+		queryStat.setString(1, typefaceName);
 
-            pstat.setObject(1, glyph.getImage());
-            pstat.setString(2, glyph.getUnicodeText());
-            pstat.setString(3, glyph.getDescription());
-            pstat.setString(4, glyph.getTypeface().getName());
+		ResultSet res = queryStat.executeQuery();
 
-            pstat.executeUpdate();
+		if (!res.next()) {
 
-            pstat.close();
-            con.close();
+			PreparedStatement insertStat = con.prepareStatement(INSERT_TYPEFACE);
+			insertStat.setString(1, typefaceName);
+			insertStat.setString(2, glyph.getTypeface().getDescription());
+			insertStat.setString(3, glyph.getTypeface().getScript().name());
+			insertStat.executeUpdate();
 
-        } catch (SQLException e) {
-            LOG.error("could not add glyph", e);
-        }
+			insertStat.close();
 
-    }
+		}
 
-    private void checkAndInsertTypeface(Glyph glyph) throws SQLException {
+		res.close();
+		queryStat.close();
+		con.close();
 
-        checkAndInsertScript(glyph);
+	}
 
-        Connection con = getDbConnection();
+	private void checkAndInsertScript(Glyph glyph) throws SQLException {
 
-        String typefaceName = glyph.getTypeface().getName();
+		Connection con = getDbConnection();
 
-        PreparedStatement queryStat = con.prepareStatement(TYPEFACE_QUERY);
+		String scriptName = glyph.getTypeface().getScript().name();
 
-        queryStat.setString(1, typefaceName);
+		PreparedStatement queryStat = con.prepareStatement(SCRIPT_QUERY);
 
-        ResultSet res = queryStat.executeQuery();
+		queryStat.setString(1, scriptName);
 
-        if (!res.next()) {
+		ResultSet res = queryStat.executeQuery();
 
-            PreparedStatement insertStat = con.prepareStatement(INSERT_TYPEFACE);
-            insertStat.setString(1, typefaceName);
-            insertStat.setString(2, glyph.getTypeface().getDescription());
-            insertStat.setString(3, glyph.getTypeface().getScript().name());
-            insertStat.executeUpdate();
+		if (!res.next()) {
 
-            insertStat.close();
+			PreparedStatement insertStat = con.prepareStatement(INSERT_SCRIPT);
+			insertStat.setString(1, scriptName);
+			insertStat.executeUpdate();
 
-        }
+			insertStat.close();
 
-        res.close();
-        queryStat.close();
-        con.close();
+		}
 
-    }
+		res.close();
+		queryStat.close();
+		con.close();
 
-    private void checkAndInsertScript(Glyph glyph) throws SQLException {
-
-        Connection con = getDbConnection();
-
-        String scriptName = glyph.getTypeface().getScript().name();
-
-        PreparedStatement queryStat = con.prepareStatement(SCRIPT_QUERY);
-
-        queryStat.setString(1, scriptName);
-
-        ResultSet res = queryStat.executeQuery();
-
-        if (!res.next()) {
-
-            PreparedStatement insertStat = con.prepareStatement(INSERT_SCRIPT);
-            insertStat.setString(1, scriptName);
-            insertStat.executeUpdate();
-
-            insertStat.close();
-
-        }
-
-        res.close();
-        queryStat.close();
-        con.close();
-
-    }
-
-    private Connection getDbConnection() throws SQLException {
-
-        String dbLoc = System.getProperty("user.home") + "/.ocr/db/ocrdb";
-
-        Connection con = DriverManager.getConnection("jdbc:hsqldb:file:" + dbLoc +
-                ";shutdown=true", "SA", "");
-
-        return con;
-
-    }
+	}
 
 }

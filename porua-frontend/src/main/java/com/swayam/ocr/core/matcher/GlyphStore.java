@@ -14,6 +14,7 @@
  */
 package com.swayam.ocr.core.matcher;
 
+import java.io.File;
 import java.util.List;
 
 import com.swayam.ocr.core.util.Glyph;
@@ -25,9 +26,11 @@ import com.swayam.ocr.core.util.Script;
  *
  */
 public interface GlyphStore {
-	
+
 	List<Glyph> getGlyphs(Script script);
-	
+
 	void addGlyph(Glyph glyph);
+
+	void addWordImage(File imageFile, String tesseractValue);
 
 }

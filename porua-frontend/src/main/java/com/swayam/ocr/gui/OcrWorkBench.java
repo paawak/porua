@@ -402,6 +402,8 @@ public class OcrWorkBench extends JFrame {
 				return String.format("X_%s_Y_%s.%s", area.x, area.y, imageFormat.name().toLowerCase());
 			});
 
+			GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
+
 			try (TessBaseAPI tessBaseApi = new TessBaseAPI();) {
 				if (tessBaseApi.Init("/usr/share/tesseract/", "ben") != 0) {
 					throw new RuntimeException("Could not initialize tesseract with Bangla");
@@ -418,6 +420,9 @@ public class OcrWorkBench extends JFrame {
 
 						outText.deallocate();
 						pixDestroy(image);
+
+						glyphDB.addWordImage(wordImageFile, ocrText);
+
 					});
 
 				tessBaseApi.End();

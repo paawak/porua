@@ -16,3 +16,13 @@ CREATE MEMORY TABLE IF NOT EXISTS glyph (
 	typeface_id INTEGER,
 	FOREIGN KEY (typeface_id) REFERENCES typeface (id)
 );
+
+CREATE MEMORY TABLE IF NOT EXISTS word_image ( 
+	id INTEGER GENERATED ALWAYS AS IDENTITY(START WITH 1) PRIMARY KEY, 
+	image_name VARCHAR(100) NOT NULL,
+	tesseract_value VARCHAR(200),
+	actual_value VARCHAR(100)
+);
+
+--the below applies for TEXT tables
+--SET TABLE word_image SOURCE "word_image.hsql;fs=,"
