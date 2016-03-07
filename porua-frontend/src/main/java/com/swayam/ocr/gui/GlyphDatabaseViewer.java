@@ -50,7 +50,9 @@ public class GlyphDatabaseViewer extends JPanel {
     private static final Logger LOG = LoggerFactory.getLogger(GlyphDatabaseViewer.class);
 
     // FIXME: externalise the below
-    private static final String IMAGE_DIR = "D:/personal/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/05-03-2016_10-55-14/";
+    // private static final String IMAGE_DIR =
+    // "D:/personal/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/05-03-2016_10-55-14/";
+    private static final String IMAGE_DIR = "/home/paawak/kaaj/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/05-03-2016_10-55-14/";
 
     public GlyphDatabaseViewer() {
 	init();
