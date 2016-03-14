@@ -13,22 +13,23 @@ import java.io.IOException;
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.lept.PIX;
 import org.bytedeco.javacpp.tesseract.TessBaseAPI;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class BasicTesseractExampleTest {
 
+	private static final String TESSDATA = "/home/paawak/kaaj/code/porua/tesseract-configs";
+
 	@Test
-	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_eng()
-			throws Exception {
+	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_eng() throws Exception {
 
 		// Open input image with leptonica library
-		String imageFile = BasicTesseractExampleTest.class.getResource(
-				"/com/swayam/ocr/porua/res/test-english.png").getPath();
+		String imageFile = BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/test-english.png").getPath();
 		PIX image = pixRead(imageFile);
 		BytePointer outText = null;
 
 		TessBaseAPI api = new TessBaseAPI();
-		if (api.Init("/usr/share/tesseract/", "eng") != 0) {
+		if (api.Init(TESSDATA, "eng") != 0) {
 			fail("Could not initialize tesseract.");
 		}
 
@@ -46,25 +47,21 @@ public class BasicTesseractExampleTest {
 		System.out.printf("OCR output:%s\n", ocrText);
 		assertTrue(!ocrText.isEmpty());
 
-		String expected = readFile(BasicTesseractExampleTest.class.getResource(
-				"/com/swayam/ocr/porua/res/test-english.txt").getPath());
+		String expected = readFile(BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/test-english.txt").getPath());
 
 		assertEquals(expected, ocrText);
 
 	}
 
 	@Test
-	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_ben()
-			throws Exception {
-
+	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_ben() throws Exception {
 		// Open input image with leptonica library
-		String imageFile = BasicTesseractExampleTest.class.getResource(
-				"/com/swayam/ocr/porua/res/Bangla-300-short.png").getPath();
+		String imageFile = BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/Bangla-300-short.png").getPath();
 		PIX image = pixRead(imageFile);
 		BytePointer outText = null;
 
 		TessBaseAPI api = new TessBaseAPI();
-		if (api.Init("/usr/share/tesseract/", "ben") != 0) {
+		if (api.Init(TESSDATA, "ben") != 0) {
 			fail("Could not initialize tesseract.");
 		}
 
@@ -82,10 +79,39 @@ public class BasicTesseractExampleTest {
 		System.out.printf("OCR output:%s\n", ocrText);
 		assertTrue(!ocrText.isEmpty());
 
-		String expected = readFile(BasicTesseractExampleTest.class.getResource(
-				"/com/swayam/ocr/porua/res/Bangla-300-short.txt").getPath());
+		String expected = readFile(BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/Bangla-300-short.txt").getPath());
 
 		assertEquals(expected, ocrText);
+	}
+
+	@Ignore
+	@Test
+	public void givenTessBaseApi_rajshekhar_basu_mahabharat() throws Exception {
+
+		// Open input image with leptonica library
+		String imageFile = "/home/paawak/kaaj/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
+		PIX image = pixRead(imageFile);
+		BytePointer outText = null;
+
+		TessBaseAPI api = new TessBaseAPI();
+		if (api.Init(TESSDATA, "ben") != 0) {
+			fail("Could not initialize tesseract.");
+		}
+
+		api.SetImage(image);
+		// Get OCR result
+		outText = api.GetUTF8Text();
+		String ocrText = outText.getString().trim();
+
+		// Destroy used object and release memory
+		api.End();
+		api.close();
+		outText.deallocate();
+		pixDestroy(image);
+
+		assertTrue(!ocrText.isEmpty());
+
+		System.out.println(ocrText.replaceAll("\\s", "\n"));
 
 	}
 
