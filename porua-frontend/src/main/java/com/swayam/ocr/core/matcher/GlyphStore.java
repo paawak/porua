@@ -36,4 +36,6 @@ public interface GlyphStore {
 
 	List<WordImage> getWordImages();
 
+	void setActualValue(long id, String actualValue);
+
 }

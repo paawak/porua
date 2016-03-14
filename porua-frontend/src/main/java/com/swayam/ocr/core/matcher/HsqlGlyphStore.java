@@ -58,6 +58,8 @@ public class HsqlGlyphStore implements GlyphStore {
 
 	private static final String GET_WORD_IMAGES = "SELECT id, image_name, tesseract_value, actual_value FROM word_image ORDER BY id";
 
+	private static final String SET_ACTUAL_VALUE = "UPDATE word_image SET actual_value = ? WHERE id = ?";
+
 	public static final GlyphStore INSTANCE = new HsqlGlyphStore();
 
 	private HsqlGlyphStore() {
@@ -173,6 +175,18 @@ public class HsqlGlyphStore implements GlyphStore {
 		}
 
 		return wordImages;
+	}
+
+	@Override
+	public void setActualValue(long id, String actualValue) {
+		try (Connection con = getDbConnection(); PreparedStatement updateStat = con.prepareStatement(SET_ACTUAL_VALUE);) {
+			updateStat.setString(1, actualValue);
+			updateStat.setLong(2, id);
+			updateStat.executeUpdate();
+		} catch (SQLException e) {
+			LOG.error("could not update actual value", e);
+		}
+
 	}
 
 	private Connection getDbConnection() throws SQLException {
