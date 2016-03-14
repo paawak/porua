@@ -21,7 +21,8 @@ CREATE MEMORY TABLE IF NOT EXISTS word_image (
 	id INTEGER GENERATED ALWAYS AS IDENTITY(START WITH 1) PRIMARY KEY, 
 	image_name VARCHAR(100) NOT NULL,
 	tesseract_value VARCHAR(200),
-	actual_value VARCHAR(100)
+	actual_value VARCHAR(100),
+	is_error BOOLEAN
 );
 
 --the below applies for TEXT tables
