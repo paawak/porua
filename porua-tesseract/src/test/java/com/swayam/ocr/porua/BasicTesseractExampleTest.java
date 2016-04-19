@@ -92,6 +92,7 @@ public class BasicTesseractExampleTest {
 		assertEquals(expected, ocrText);
 	}
 
+	@Ignore
 	@Test
 	public void givenTessBaseApi_GetComponentImages() throws Exception {
 		String imageFile = "/home/paawak/kaaj/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
