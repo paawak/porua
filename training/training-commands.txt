@@ -1,0 +1,64 @@
+--Automated method (new in 3.03) https://github.com/tesseract-ocr/tesseract/wiki/TrainingTesseract#automated-method-new-in-303
+
+--tolist all bengali fonts
+--text2image --text=bengali-training.txt --outputbase=ben --fonts_dir=/usr/share/fonts  --find_fonts --min_coverage=1.0 --render_per_font=false
+
+--set1 for solaimanlipi
+text2image --text=bengali-training.txt --outputbase=ben.solaimanlipi.set1 --font='SolaimanLipi' --fonts_dir=/usr/share/fonts/bangla
+
+--set1 for akaash
+text2image --text=bengali-training.txt --outputbase=ben.akaash.set1 --font='Akaash Medium' --fonts_dir=/usr/share/fonts/bangla
+
+--set1 for apona-lohit
+text2image --text=bengali-training.txt --outputbase=ben.aponalohit.set1 --font='AponaLohit' --fonts_dir=/usr/share/fonts/bangla
+
+--set1 for Lohit Bengali
+text2image --text=bengali-training.txt --outputbase=ben.lohitbengali.set1 --font='Lohit Bengali' --fonts_dir=/usr/share/fonts
+
+--Run Tesseract for Training:  https://github.com/tesseract-ocr/tesseract/wiki/TrainingTesseract#run-tesseract-for-training
+
+tesseract ben.solaimanlipi.set1.tif ben.solaimanlipi.set1 box.train
+
+tesseract ben.akaash.set1.tif ben.akaash.set1 box.train
+
+tesseract ben.aponalohit.set1.tif ben.aponalohit.set1 box.train
+
+tesseract ben.lohitbengali.set1.tif ben.lohitbengali.set1 box.train
+
+--Compute the Character Set
+unicharset_extractor ben.solaimanlipi.set1.box ben.akaash.set1.box ben.aponalohit.set1.box ben.lohitbengali.set1.box
+
+set_unicharset_properties -U raw-unicharset -O unicharset --script_dir=/home/paawak/kaaj/code/langdata
+
+--Clustering
+--shapeclustering (new in 3.02)
+
+shapeclustering -F font_properties -U unicharset ben.solaimanlipi.set1.tr ben.akaash.set1.tr ben.aponalohit.set1.tr ben.lohitbengali.set1.tr
+
+--mftraining
+mftraining -F font_properties -U unicharset -O ben.unicharset ben.solaimanlipi.set1.tr ben.akaash.set1.tr ben.aponalohit.set1.tr ben.lohitbengali.set1.tr
+
+
+--cntraining
+
+cntraining ben.solaimanlipi.set1.tr ben.akaash.set1.tr ben.aponalohit.set1.tr ben.lohitbengali.set1.tr
+
+--Putting it all together
+--That is all there is to it! All you need to do now is collect together all the files (shapetable, normproto, inttemp, pffmtable) and rename them with a lang. prefix
+
+combine_tessdata ben.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
