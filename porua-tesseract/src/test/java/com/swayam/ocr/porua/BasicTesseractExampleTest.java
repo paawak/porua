@@ -26,7 +26,8 @@ import org.junit.Test;
 
 public class BasicTesseractExampleTest {
 
-	private static final String TESSDATA = "/home/paawak/kaaj/code/porua/tesseract-configs";
+	private static final String TESSDATA = "/kaaj/BanglaOCR/tesseract/tessdata";
+	private static final String BANGLA_IMAGE_FILE =  "/kaaj/github/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
 
 	@Test
 	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_eng() throws Exception {
@@ -95,7 +96,7 @@ public class BasicTesseractExampleTest {
 	@Ignore
 	@Test
 	public void givenTessBaseApi_GetComponentImages() throws Exception {
-		String imageFile = "/home/paawak/kaaj/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
+		String imageFile = "/kaaj/github/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
 		PIX image = pixRead(imageFile);
 
 		TessBaseAPI api = new TessBaseAPI();
@@ -127,8 +128,7 @@ public class BasicTesseractExampleTest {
 
 	@Test
 	public void givenTessBaseApi_ResultIterator() throws Exception {
-		String imageFile = "/home/paawak/kaaj/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
-		PIX image = pixRead(imageFile);
+		PIX image = pixRead(BANGLA_IMAGE_FILE);
 
 		TessBaseAPI api = new TessBaseAPI();
 		if (api.Init(TESSDATA, "ben") != 0) {
@@ -166,8 +166,7 @@ public class BasicTesseractExampleTest {
 	public void givenTessBaseApi_rajshekhar_basu_mahabharat() throws Exception {
 
 		// Open input image with leptonica library
-		String imageFile = "/home/paawak/kaaj/code/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
-		PIX image = pixRead(imageFile);
+		PIX image = pixRead(BANGLA_IMAGE_FILE);
 		BytePointer outText = null;
 
 		TessBaseAPI api = new TessBaseAPI();
