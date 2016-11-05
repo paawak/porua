@@ -15,7 +15,6 @@
 
 package com.swayam.ocr.engine.api;
 
-import java.io.File;
 import java.util.List;
 
 /**
@@ -24,6 +23,6 @@ import java.util.List;
  */
 public interface TextBoundaryDetector {
 
-    List<Rectangle> getTextBoundaries(File image);
+    List<Rectangle> getTextBoundaries();
 
 }

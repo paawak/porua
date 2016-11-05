@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.engine.api.Rectangle;
 import com.swayam.ocr.engine.api.TextBoundaryDetector;
+import com.swayam.ocr.engine.impl.porua.TextBoundaryDetectorImplPorua;
 import com.swayam.ocr.engine.impl.tesseract.TextBoundaryDetectorImplTesseract;
 import com.swayam.ocr.engine.old.core.ImageFormat;
 import com.swayam.ocr.engine.old.core.WordAnalyser;
@@ -439,13 +440,18 @@ public class OcrWorkBench extends JFrame {
                     binaryImage);
             filteredImage = binaryImage.getImage();
 
-            // List<Rectangle> areasFound = wordAnalyser.getWordBoundaries();
+            TextBoundaryDetector textBoundaryDetector;
 
-            TextBoundaryDetector textBoundaryDetector = new TextBoundaryDetectorImplTesseract(
-                    TESSDATA, "ben");
+            if (false) {
+                textBoundaryDetector = new TextBoundaryDetectorImplTesseract(
+                        TESSDATA, "ben", currentImageFile);
+            } else {
+                textBoundaryDetector = new TextBoundaryDetectorImplPorua(
+                        binaryImage);
+            }
 
             List<Rectangle> areasFound = textBoundaryDetector
-                    .getTextBoundaries(currentImageFile);
+                    .getTextBoundaries();
 
             ImageUtils.splitImageIntoSubImages(currentImageBufferedImage,
                     areasFound, imageTempDirectory, ImageFormat.PNG,

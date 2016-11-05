@@ -17,7 +17,6 @@ package com.swayam.ocr.engine.impl.tesseract;
 
 import static org.bytedeco.javacpp.lept.pixDestroy;
 import static org.bytedeco.javacpp.lept.pixRead;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.nio.IntBuffer;
@@ -49,13 +48,17 @@ public class TextBoundaryDetectorImplTesseract implements TextBoundaryDetector {
     // TODO language should be an enum
     private final String language;
 
-    public TextBoundaryDetectorImplTesseract(String tessdata, String language) {
+    private final File image;
+
+    public TextBoundaryDetectorImplTesseract(String tessdata, String language,
+            File image) {
         this.tessdata = tessdata;
         this.language = language;
+        this.image = image;
     }
 
     @Override
-    public List<Rectangle> getTextBoundaries(File image) {
+    public List<Rectangle> getTextBoundaries() {
 
         List<Rectangle> bounds = new ArrayList<>();
 
@@ -63,7 +66,12 @@ public class TextBoundaryDetectorImplTesseract implements TextBoundaryDetector {
 
         TessBaseAPI api = new TessBaseAPI();
         if (api.Init(tessdata, language) != 0) {
-            fail("Could not initialize tesseract.");
+            try {
+                api.close();
+            } catch (Exception e) {
+                LOGGER.warn("error closing the tesseract API", e);
+            }
+            throw new RuntimeException("Could not initialize tesseract.");
         }
 
         api.SetImage(tessImage);
