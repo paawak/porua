@@ -18,8 +18,8 @@ package com.swayam.ocr.engine.old.core.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.swayam.ocr.engine.api.Rectangle;
 import com.swayam.ocr.engine.old.core.util.BinaryImage;
-import com.swayam.ocr.engine.old.core.util.Rectangle;
 
 /**
  * 

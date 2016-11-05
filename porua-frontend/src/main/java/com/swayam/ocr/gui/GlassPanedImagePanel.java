@@ -22,7 +22,7 @@ import java.awt.event.MouseMotionListener;
 
 import javax.swing.SwingUtilities;
 
-import com.swayam.ocr.engine.old.core.util.Rectangle;
+import com.swayam.ocr.engine.api.Rectangle;
 
 /**
  * 

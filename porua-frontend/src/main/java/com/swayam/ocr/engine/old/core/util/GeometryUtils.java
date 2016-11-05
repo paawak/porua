@@ -17,6 +17,8 @@ package com.swayam.ocr.engine.old.core.util;
 
 import java.util.List;
 
+import com.swayam.ocr.engine.api.Rectangle;
+
 /**
  * 
  * @author paawak

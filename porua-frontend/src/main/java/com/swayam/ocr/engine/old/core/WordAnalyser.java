@@ -17,8 +17,8 @@ package com.swayam.ocr.engine.old.core;
 
 import java.util.List;
 
+import com.swayam.ocr.engine.api.Rectangle;
 import com.swayam.ocr.engine.old.core.util.BinaryImage;
-import com.swayam.ocr.engine.old.core.util.Rectangle;
 
 /**
  * Given an image, this analyses and breaks it down into words.

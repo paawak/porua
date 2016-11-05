@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.Serializable;
 
+import com.swayam.ocr.engine.api.Rectangle;
+
 /**
  * 
  * @author paawak

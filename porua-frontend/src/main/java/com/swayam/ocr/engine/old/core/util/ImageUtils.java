@@ -23,6 +23,7 @@ import java.util.function.BiFunction;
 
 import javax.imageio.ImageIO;
 
+import com.swayam.ocr.engine.api.Rectangle;
 import com.swayam.ocr.engine.old.core.ImageFormat;
 
 /**

@@ -23,10 +23,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.swayam.ocr.engine.api.Rectangle;
 import com.swayam.ocr.engine.old.core.util.BinaryImage;
 import com.swayam.ocr.engine.old.core.util.GeometryUtils;
 import com.swayam.ocr.engine.old.core.util.PixelNeighbours;
-import com.swayam.ocr.engine.old.core.util.Rectangle;
 
 /**
  * 

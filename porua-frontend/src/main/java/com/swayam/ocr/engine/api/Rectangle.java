@@ -13,7 +13,7 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.engine.old.core.util;
+package com.swayam.ocr.engine.api;
 
 import java.io.Serializable;
 
