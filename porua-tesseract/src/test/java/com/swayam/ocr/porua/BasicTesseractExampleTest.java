@@ -96,8 +96,7 @@ public class BasicTesseractExampleTest {
 	@Ignore
 	@Test
 	public void givenTessBaseApi_GetComponentImages() throws Exception {
-		String imageFile = "/kaaj/github/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
-		PIX image = pixRead(imageFile);
+		PIX image = pixRead(BANGLA_IMAGE_FILE);
 
 		TessBaseAPI api = new TessBaseAPI();
 		if (api.Init(TESSDATA, "ben") != 0) {

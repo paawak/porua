@@ -13,13 +13,13 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.core.impl;
+package com.swayam.ocr.engine.old.core.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.Rectangle;
+import com.swayam.ocr.engine.old.core.util.BinaryImage;
+import com.swayam.ocr.engine.old.core.util.Rectangle;
 
 /**
  * 

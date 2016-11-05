@@ -13,7 +13,7 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.core.impl;
+package com.swayam.ocr.engine.old.core.impl;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -22,10 +22,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.WordAnalyser;
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.GeometryUtils;
-import com.swayam.ocr.core.util.Rectangle;
+import com.swayam.ocr.engine.old.core.WordAnalyser;
+import com.swayam.ocr.engine.old.core.util.BinaryImage;
+import com.swayam.ocr.engine.old.core.util.GeometryUtils;
+import com.swayam.ocr.engine.old.core.util.Rectangle;
 
 /**
  * 

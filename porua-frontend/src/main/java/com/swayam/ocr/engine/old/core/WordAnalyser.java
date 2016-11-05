@@ -13,12 +13,12 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.core;
+package com.swayam.ocr.engine.old.core;
 
 import java.util.List;
 
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.Rectangle;
+import com.swayam.ocr.engine.old.core.util.BinaryImage;
+import com.swayam.ocr.engine.old.core.util.Rectangle;
 
 /**
  * Given an image, this analyses and breaks it down into words.

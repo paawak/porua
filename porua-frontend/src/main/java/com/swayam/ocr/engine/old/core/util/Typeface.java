@@ -12,7 +12,7 @@
  * adapted or reproduced in any form or disclosed or
  * issued to any third party.
  */
-package com.swayam.ocr.core.util;
+package com.swayam.ocr.engine.old.core.util;
 
 import java.io.Serializable;
 

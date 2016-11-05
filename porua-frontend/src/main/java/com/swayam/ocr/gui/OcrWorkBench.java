@@ -59,18 +59,18 @@ import org.bytedeco.javacpp.tesseract.TessBaseAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.ImageFormat;
-import com.swayam.ocr.core.WordAnalyser;
-import com.swayam.ocr.core.impl.BanglaLetterAnalyser;
-import com.swayam.ocr.core.impl.ImageSearcher;
-import com.swayam.ocr.core.impl.LeftToRightWordAnalyser;
-import com.swayam.ocr.core.matcher.GlyphStore;
-import com.swayam.ocr.core.matcher.HsqlGlyphStore;
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.Glyph;
-import com.swayam.ocr.core.util.ImageUtils;
-import com.swayam.ocr.core.util.Rectangle;
-import com.swayam.ocr.core.util.Script;
+import com.swayam.ocr.engine.old.core.ImageFormat;
+import com.swayam.ocr.engine.old.core.WordAnalyser;
+import com.swayam.ocr.engine.old.core.impl.BanglaLetterAnalyser;
+import com.swayam.ocr.engine.old.core.impl.ImageSearcher;
+import com.swayam.ocr.engine.old.core.impl.LeftToRightWordAnalyser;
+import com.swayam.ocr.engine.old.core.matcher.GlyphStore;
+import com.swayam.ocr.engine.old.core.matcher.HsqlGlyphStore;
+import com.swayam.ocr.engine.old.core.util.BinaryImage;
+import com.swayam.ocr.engine.old.core.util.Glyph;
+import com.swayam.ocr.engine.old.core.util.ImageUtils;
+import com.swayam.ocr.engine.old.core.util.Rectangle;
+import com.swayam.ocr.engine.old.core.util.Script;
 
 /**
  * 

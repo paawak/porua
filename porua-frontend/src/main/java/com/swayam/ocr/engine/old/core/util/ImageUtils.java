@@ -13,7 +13,7 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.core.util;
+package com.swayam.ocr.engine.old.core.util;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -23,7 +23,7 @@ import java.util.function.BiFunction;
 
 import javax.imageio.ImageIO;
 
-import com.swayam.ocr.core.ImageFormat;
+import com.swayam.ocr.engine.old.core.ImageFormat;
 
 /**
  * 

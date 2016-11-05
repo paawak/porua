@@ -1,4 +1,4 @@
-package com.swayam.ocr.core.util;
+package com.swayam.ocr.engine.old.core.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

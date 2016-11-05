@@ -1,7 +1,7 @@
 /*
- * Language.java
+ * Channel.java
  *
- * Created on Oct 19, 2011 7:44:48 PM
+ * Created on Aug 4, 2011 1:23:46 PM
  *
  * Copyright (c) 2002 - 2011 : Swayam Inc.
  *
@@ -13,21 +13,14 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.core.util;
-
-import java.io.Serializable;
+package com.swayam.ocr.engine.old.core.util;
 
 /**
  * 
  * @author paawak
  */
-public enum Script implements Serializable {
+public enum Channel {
 
-    BANGLA, DEVNAGARI, ROMAN;
-    
-    @Override
-	public String toString() {
-		return name();
-	}
+    RED, GREEN, BLUE;
 
 }

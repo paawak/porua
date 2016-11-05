@@ -34,9 +34,9 @@ import javax.swing.table.TableModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.matcher.GlyphStore;
-import com.swayam.ocr.core.matcher.HsqlGlyphStore;
-import com.swayam.ocr.core.model.WordImage;
+import com.swayam.ocr.engine.old.core.matcher.GlyphStore;
+import com.swayam.ocr.engine.old.core.matcher.HsqlGlyphStore;
+import com.swayam.ocr.engine.old.core.model.WordImage;
 import com.swayam.ocr.gui.table.ImageTableCellRenderer;
 import com.swayam.ocr.gui.table.IndicTableCellEditor;
 import com.swayam.ocr.gui.table.IndicTableCellRenderer;

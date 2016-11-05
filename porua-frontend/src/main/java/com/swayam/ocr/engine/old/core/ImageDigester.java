@@ -12,10 +12,10 @@
  * adapted or reproduced in any form or disclosed or
  * issued to any third party.
  */
-package com.swayam.ocr.core;
+package com.swayam.ocr.engine.old.core;
 
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.ImageUtils;
+import com.swayam.ocr.engine.old.core.util.BinaryImage;
+import com.swayam.ocr.engine.old.core.util.ImageUtils;
 
 /**
  * 

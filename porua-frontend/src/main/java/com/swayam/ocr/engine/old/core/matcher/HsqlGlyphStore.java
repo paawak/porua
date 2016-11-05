@@ -12,7 +12,7 @@
  * adapted or reproduced in any form or disclosed or
  * issued to any third party.
  */
-package com.swayam.ocr.core.matcher;
+package com.swayam.ocr.engine.old.core.matcher;
 
 import java.io.File;
 import java.sql.Connection;
@@ -25,12 +25,12 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.model.WordImage;
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.Glyph;
-import com.swayam.ocr.core.util.HsqlConnectionUtil;
-import com.swayam.ocr.core.util.Script;
-import com.swayam.ocr.core.util.Typeface;
+import com.swayam.ocr.engine.old.core.model.WordImage;
+import com.swayam.ocr.engine.old.core.util.BinaryImage;
+import com.swayam.ocr.engine.old.core.util.Glyph;
+import com.swayam.ocr.engine.old.core.util.HsqlConnectionUtil;
+import com.swayam.ocr.engine.old.core.util.Script;
+import com.swayam.ocr.engine.old.core.util.Typeface;
 
 /**
  * 

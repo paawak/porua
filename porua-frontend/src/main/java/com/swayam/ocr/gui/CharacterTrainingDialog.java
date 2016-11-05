@@ -40,12 +40,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 
-import com.swayam.ocr.core.matcher.GlyphStore;
-import com.swayam.ocr.core.matcher.HsqlGlyphStore;
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.Glyph;
-import com.swayam.ocr.core.util.Script;
-import com.swayam.ocr.core.util.Typeface;
+import com.swayam.ocr.engine.old.core.matcher.GlyphStore;
+import com.swayam.ocr.engine.old.core.matcher.HsqlGlyphStore;
+import com.swayam.ocr.engine.old.core.util.BinaryImage;
+import com.swayam.ocr.engine.old.core.util.Glyph;
+import com.swayam.ocr.engine.old.core.util.Script;
+import com.swayam.ocr.engine.old.core.util.Typeface;
 
 /**
  * 

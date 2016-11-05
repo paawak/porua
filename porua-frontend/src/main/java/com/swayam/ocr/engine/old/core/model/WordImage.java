@@ -1,4 +1,4 @@
-package com.swayam.ocr.core.model;
+package com.swayam.ocr.engine.old.core.model;
 
 public class WordImage {
 

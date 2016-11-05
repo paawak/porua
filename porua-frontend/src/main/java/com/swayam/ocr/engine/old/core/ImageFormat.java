@@ -1,4 +1,4 @@
-package com.swayam.ocr.core;
+package com.swayam.ocr.engine.old.core;
 
 public enum ImageFormat {
 

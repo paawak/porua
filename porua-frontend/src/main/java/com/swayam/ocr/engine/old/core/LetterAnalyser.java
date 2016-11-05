@@ -13,7 +13,7 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.core;
+package com.swayam.ocr.engine.old.core;
 
 import java.util.List;
 

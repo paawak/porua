@@ -12,14 +12,14 @@
  * adapted or reproduced in any form or disclosed or
  * issued to any third party.
  */
-package com.swayam.ocr.core.matcher;
+package com.swayam.ocr.engine.old.core.matcher;
 
 import java.io.File;
 import java.util.List;
 
-import com.swayam.ocr.core.model.WordImage;
-import com.swayam.ocr.core.util.Glyph;
-import com.swayam.ocr.core.util.Script;
+import com.swayam.ocr.engine.old.core.model.WordImage;
+import com.swayam.ocr.engine.old.core.util.Glyph;
+import com.swayam.ocr.engine.old.core.util.Script;
 
 /**
  * 

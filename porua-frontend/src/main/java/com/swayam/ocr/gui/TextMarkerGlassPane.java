@@ -20,7 +20,7 @@ import java.awt.Graphics;
 
 import javax.swing.JComponent;
 
-import com.swayam.ocr.core.util.Rectangle;
+import com.swayam.ocr.engine.old.core.util.Rectangle;
 
 /**
  * 
