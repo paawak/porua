@@ -17,24 +17,28 @@ package com.swayam.ocr.dict.scraper.impl;
 
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.swayam.ocr.dict.scraper.api.RawTextHandler;
 
 /**
  * 
  * @author paawak
  */
-public class LinkHandler implements RawTextHandler {
+public class HrefFinder implements RawTextHandler {
+
+    private static final Logger LOGGER = LoggerFactory
+            .getLogger(HrefFinder.class);
 
     // <a href="http://hayyan.com.jo/images/index.php">
-
     private static final String HREF_FRAGMENT = "[\\s\\w=\"]*";
     private final Pattern linkPattern = Pattern.compile("<a" + HREF_FRAGMENT
             + "href=\"[\\w\\:\\/\\.\\-]*\"" + HREF_FRAGMENT + ">");
 
     @Override
     public void handleRawText(String text) {
-        // TODO Auto-generated method stub
-
+        LOGGER.debug("{}", text);
     }
 
     // method added for testing only

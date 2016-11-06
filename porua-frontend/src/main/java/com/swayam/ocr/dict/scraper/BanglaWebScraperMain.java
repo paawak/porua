@@ -19,6 +19,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import com.swayam.ocr.dict.scraper.api.WebScraper;
+import com.swayam.ocr.dict.scraper.impl.HrefFinder;
 import com.swayam.ocr.dict.scraper.impl.WebScraperImpl;
 
 /**
@@ -32,6 +33,11 @@ public class BanglaWebScraperMain {
         Executor executor = Executors.newCachedThreadPool();
 
         WebScraper webScraper = new WebScraperImpl(executor);
+
+        webScraper.addTextHandler(new HrefFinder());
+
+        webScraper.startScraping(
+                "http://www.rabindra-rachanabali.nltr.org/node/1");
 
     }
 

@@ -35,7 +35,7 @@ import org.junit.Test;
  * 
  * @author paawak
  */
-public class LinkHandlerTest {
+public class HrefFinderTest {
 
     private String sampleHtmlContents;
 
@@ -43,7 +43,7 @@ public class LinkHandlerTest {
     public void readSampleHtml() throws IOException {
 
         try (Reader reader = new InputStreamReader(
-                LinkHandlerTest.class.getResourceAsStream(
+                HrefFinderTest.class.getResourceAsStream(
                         "/com/swayam/ocr/test/res/sample-html.txt"),
                 "utf8");) {
 
@@ -68,7 +68,7 @@ public class LinkHandlerTest {
     @Test
     public void testLinkPattern_1() {
         // given
-        LinkHandler testClass = new LinkHandler();
+        HrefFinder testClass = new HrefFinder();
         Pattern linkPattern = testClass.getLinkPattern();
 
         // when
@@ -84,7 +84,7 @@ public class LinkHandlerTest {
     @Test
     public void testLinkPattern_2() {
         // given
-        LinkHandler testClass = new LinkHandler();
+        HrefFinder testClass = new HrefFinder();
         Pattern linkPattern = testClass.getLinkPattern();
 
         // when
@@ -103,7 +103,7 @@ public class LinkHandlerTest {
         // given
         List<String> expectedLinks = new ArrayList<>();
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                LinkHandlerTest.class.getResourceAsStream(
+                HrefFinderTest.class.getResourceAsStream(
                         "/com/swayam/ocr/test/res/urls-in-sample-html.txt"),
                 "utf8"));) {
             while (true) {
@@ -119,7 +119,7 @@ public class LinkHandlerTest {
 
         List<String> result = new ArrayList<>();
 
-        LinkHandler testClass = new LinkHandler();
+        HrefFinder testClass = new HrefFinder();
         Pattern linkPattern = testClass.getLinkPattern();
 
         // when
