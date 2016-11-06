@@ -1,7 +1,7 @@
 /*
- * BanglaWebScraper.java
+ * TextHandler.java
  *
- * Created on 06-Nov-2016 5:41:14 PM
+ * Created on 06-Nov-2016 5:44:01 PM
  *
  * Copyright (c) 2002 - 2008 : Swayam Inc.
  *
@@ -19,6 +19,8 @@ package com.swayam.ocr.dict.scraper.api;
  * 
  * @author paawak
  */
-public interface BanglaWebScraper {
+public interface RawTextHandler {
+
+    void handleRawText(String text);
 
 }

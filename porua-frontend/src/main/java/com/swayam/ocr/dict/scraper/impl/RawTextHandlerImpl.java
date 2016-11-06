@@ -1,7 +1,7 @@
 /*
- * TextHandler.java
+ * RawTextHandlerImpl.java
  *
- * Created on 06-Nov-2016 5:44:01 PM
+ * Created on 06-Nov-2016 10:53:54 PM
  *
  * Copyright (c) 2002 - 2008 : Swayam Inc.
  *
@@ -13,14 +13,20 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.dict.scraper.api;
+package com.swayam.ocr.dict.scraper.impl;
+
+import com.swayam.ocr.dict.scraper.api.RawTextHandler;
 
 /**
  * 
  * @author paawak
  */
-public interface TextHandler {
+public class RawTextHandlerImpl implements RawTextHandler {
 
-    void handleText(String text);
+    @Override
+    public void handleRawText(String text) {
+        // TODO Auto-generated method stub
+
+    }
 
 }

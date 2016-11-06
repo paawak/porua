@@ -43,6 +43,8 @@ import org.junit.Test;
  */
 public class HttpClientTest {
 
+    // private static final String BANGLA_URL =
+    // "http://www.rabindra-rachanabali.nltr.org/themes/rabindra/images/head.png";
     private static final String BANGLA_URL = "http://www.rabindra-rachanabali.nltr.org/node/1";
 
     @Test
@@ -114,10 +116,10 @@ public class HttpClientTest {
         // Start the client
         httpclient.start();
 
-        final CountDownLatch latch2 = new CountDownLatch(1);
-        final HttpGet request3 = new HttpGet(BANGLA_URL);
-        HttpAsyncRequestProducer producer3 = HttpAsyncMethods.create(request3);
-        AsyncCharConsumer<HttpResponse> consumer3 = new AsyncCharConsumer<HttpResponse>() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        final HttpGet request = new HttpGet(BANGLA_URL);
+        HttpAsyncRequestProducer producer = HttpAsyncMethods.create(request);
+        AsyncCharConsumer<HttpResponse> consumer = new AsyncCharConsumer<HttpResponse>() {
 
             @Override
             protected void onCharReceived(CharBuffer buf, IOControl ioctrl)
@@ -142,6 +144,10 @@ public class HttpClientTest {
                 if (response.getStatusLine().getStatusCode() == 200) {
                     Header header = response.getFirstHeader("content-type");
                     System.out.println("content-type: " + header.getValue());
+
+                    if (!header.getValue().contains("text")) {
+                        request.abort();
+                    }
                 }
             }
 
@@ -153,34 +159,34 @@ public class HttpClientTest {
             }
 
         };
-        httpclient.execute(producer3, consumer3,
+        httpclient.execute(producer, consumer,
                 new FutureCallback<HttpResponse>() {
 
                     @Override
-                    public void completed(final HttpResponse response3) {
+                    public void completed(final HttpResponse response) {
 
                         System.out.println("***********************");
 
-                        latch2.countDown();
+                        latch.countDown();
                     }
 
                     @Override
                     public void failed(final Exception ex) {
                         System.out
-                                .println(request3.getRequestLine() + "->" + ex);
+                                .println(request.getRequestLine() + "->" + ex);
 
-                        latch2.countDown();
+                        latch.countDown();
                     }
 
                     @Override
                     public void cancelled() {
                         System.out.println(
-                                request3.getRequestLine() + " cancelled");
-                        latch2.countDown();
+                                request.getRequestLine() + " cancelled");
+                        latch.countDown();
                     }
 
                 });
-        latch2.await();
+        latch.await();
     }
 
     private String read(InputStream instream) throws IOException {

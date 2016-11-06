@@ -1,7 +1,7 @@
 /*
- * LinkHandler.java
+ * BanglaWebScraper.java
  *
- * Created on 06-Nov-2016 5:42:25 PM
+ * Created on 06-Nov-2016 5:41:14 PM
  *
  * Copyright (c) 2002 - 2008 : Swayam Inc.
  *
@@ -19,8 +19,10 @@ package com.swayam.ocr.dict.scraper.api;
  * 
  * @author paawak
  */
-public interface LinkHandler {
+public interface WebScraper {
 
-    void linkEncountered(String url);
+    void startScraping(String url);
+
+    void addTextHandler(RawTextHandler textHandler);
 
 }
