@@ -15,11 +15,20 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -27,6 +36,34 @@ import org.junit.Test;
  * @author paawak
  */
 public class LinkHandlerTest {
+
+    private String sampleHtmlContents;
+
+    @Before
+    public void readSampleHtml() throws IOException {
+
+        try (Reader reader = new InputStreamReader(
+                LinkHandlerTest.class.getResourceAsStream(
+                        "/com/swayam/ocr/test/res/sample-html.txt"),
+                "utf8");) {
+
+            StringBuilder sb = new StringBuilder();
+
+            int c;
+            while (true) {
+                c = reader.read();
+
+                if (c == -1) {
+                    break;
+                }
+
+                sb.append((char) c);
+            }
+
+            sampleHtmlContents = sb.toString();
+        }
+
+    }
 
     @Test
     public void testLinkPattern_1() {
@@ -59,6 +96,42 @@ public class LinkHandlerTest {
         // then
         assertFalse(result);
 
+    }
+
+    @Test
+    public void testLinkPattern_3() throws IOException {
+        // given
+        List<String> expectedLinks = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                LinkHandlerTest.class.getResourceAsStream(
+                        "/com/swayam/ocr/test/res/urls-in-sample-html.txt"),
+                "utf8"));) {
+            while (true) {
+                String link = reader.readLine();
+                if (link == null) {
+                    break;
+                }
+
+                expectedLinks.add(link);
+            }
+
+        }
+
+        List<String> result = new ArrayList<>();
+
+        LinkHandler testClass = new LinkHandler();
+        Pattern linkPattern = testClass.getLinkPattern();
+
+        // when
+        Matcher matcher = linkPattern.matcher(sampleHtmlContents);
+        while (matcher.find()) {
+            String link = matcher.group();
+            System.out.println("**** " + link);
+            result.add(link);
+        }
+
+        // then
+        assertEquals(expectedLinks, result);
     }
 
 }

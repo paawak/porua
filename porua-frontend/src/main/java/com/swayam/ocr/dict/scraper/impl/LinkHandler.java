@@ -26,8 +26,10 @@ import com.swayam.ocr.dict.scraper.api.RawTextHandler;
 public class LinkHandler implements RawTextHandler {
 
     // <a href="http://hayyan.com.jo/images/index.php">
-    private final Pattern linkPattern = Pattern
-            .compile("<a[\\s\\w]*href=\"[\\w\\:\\/\\.]*\">");
+
+    private static final String HREF_FRAGMENT = "[\\s\\w=\"]*";
+    private final Pattern linkPattern = Pattern.compile("<a" + HREF_FRAGMENT
+            + "href=\"[\\w\\:\\/\\.\\-]*\"" + HREF_FRAGMENT + ">");
 
     @Override
     public void handleRawText(String text) {
