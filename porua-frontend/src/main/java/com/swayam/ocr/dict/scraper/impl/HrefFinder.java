@@ -42,8 +42,8 @@ public class HrefFinder extends AbstractTokenHandler {
 
     @Override
     protected String processRawToken(String rawToken) {
-        // TODO Auto-generated method stub
-        return null;
+        String hrefWithClosingQuotes = rawToken.split("href=\"")[1];
+        return hrefWithClosingQuotes.split("\"")[0];
     }
 
 }

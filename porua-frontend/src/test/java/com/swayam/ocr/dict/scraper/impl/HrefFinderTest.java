@@ -134,4 +134,34 @@ public class HrefFinderTest {
         assertEquals(expectedLinks, result);
     }
 
+    @Test
+    public void testProcessRawToken_1() {
+        // given
+        HrefFinder testClass = new HrefFinder(null, null);
+
+        // when
+        String result = testClass.processRawToken(
+                "<a href=\"http://www.nltr.org/download/windows/Baishakhi_2.0.0.42_x86_x64.exe\" target=\"_self\">");
+
+        // then
+        assertEquals(
+                "http://www.nltr.org/download/windows/Baishakhi_2.0.0.42_x86_x64.exe",
+                result);
+
+    }
+
+    @Test
+    public void testProcessRawToken_2() {
+        // given
+        HrefFinder testClass = new HrefFinder(null, null);
+
+        // when
+        String result = testClass.processRawToken(
+                "<a href=\"http://hayyan.com.jo/images/index.php\">");
+
+        // then
+        assertEquals("http://hayyan.com.jo/images/index.php", result);
+
+    }
+
 }
