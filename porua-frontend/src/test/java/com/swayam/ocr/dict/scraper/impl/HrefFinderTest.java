@@ -140,7 +140,7 @@ public class HrefFinderTest {
         HrefFinder testClass = new HrefFinder(null, null);
 
         // when
-        String result = testClass.processRawToken(
+        String result = testClass.processRawToken(null,
                 "<a href=\"http://www.nltr.org/download/windows/Baishakhi_2.0.0.42_x86_x64.exe\" target=\"_self\">");
 
         // then
@@ -156,11 +156,25 @@ public class HrefFinderTest {
         HrefFinder testClass = new HrefFinder(null, null);
 
         // when
-        String result = testClass.processRawToken(
+        String result = testClass.processRawToken(null,
                 "<a href=\"http://hayyan.com.jo/images/index.php\">");
 
         // then
         assertEquals("http://hayyan.com.jo/images/index.php", result);
+
+    }
+
+    @Test
+    public void testProcessRawToken_3() {
+        // given
+        HrefFinder testClass = new HrefFinder(null, null);
+
+        // when
+        String result = testClass.processRawToken("http://hayyan.com.jo",
+                "<a href=\"/node/16141\">");
+
+        // then
+        assertEquals("http://hayyan.com.jo/node/16141", result);
 
     }
 

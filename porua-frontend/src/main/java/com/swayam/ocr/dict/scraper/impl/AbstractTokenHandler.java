@@ -50,7 +50,7 @@ public abstract class AbstractTokenHandler implements RawTextHandler {
 
         while (matcher.find()) {
             String rawToken = matcher.group();
-            String token = processRawToken(rawToken);
+            String token = processRawToken(baseUrl, rawToken);
             notifyTokenFound(token);
         }
 
@@ -58,7 +58,7 @@ public abstract class AbstractTokenHandler implements RawTextHandler {
 
     protected abstract Pattern getRegex();
 
-    protected abstract String processRawToken(String rawToken);
+    protected abstract String processRawToken(String baseUrl, String rawToken);
 
     private void notifyTokenFound(String token) {
         executor.execute(() -> {

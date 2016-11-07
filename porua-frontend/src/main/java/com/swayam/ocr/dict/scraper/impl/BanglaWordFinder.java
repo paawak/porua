@@ -26,8 +26,9 @@ import com.swayam.ocr.dict.scraper.api.TokenHandler;
  */
 public class BanglaWordFinder extends AbstractTokenHandler {
 
+    // exclude numbers
     private final Pattern banglaWordPattern = Pattern
-            .compile("[\u0980-\u09ff]+");
+            .compile("[\u0980-\u09e5\u09f0-\u09ff]+");
 
     public BanglaWordFinder(Executor executor, TokenHandler tokenHandler) {
         super(executor, tokenHandler);
@@ -39,7 +40,7 @@ public class BanglaWordFinder extends AbstractTokenHandler {
     }
 
     @Override
-    protected String processRawToken(String rawToken) {
+    protected String processRawToken(String baseUrl, String rawToken) {
         return rawToken;
     }
 

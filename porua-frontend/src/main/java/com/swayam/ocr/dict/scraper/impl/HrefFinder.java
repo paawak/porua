@@ -41,9 +41,16 @@ public class HrefFinder extends AbstractTokenHandler {
     }
 
     @Override
-    protected String processRawToken(String rawToken) {
+    protected String processRawToken(String baseUrl, String rawToken) {
         String hrefWithClosingQuotes = rawToken.split("href=\"")[1];
-        return hrefWithClosingQuotes.split("\"")[0];
+        String href = hrefWithClosingQuotes.split("\"")[0];
+
+        if (href.startsWith("http://")) {
+            return href;
+        }
+
+        return baseUrl + href;
+
     }
 
 }
