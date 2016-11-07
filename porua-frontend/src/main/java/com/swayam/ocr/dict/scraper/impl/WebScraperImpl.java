@@ -107,19 +107,28 @@ public class WebScraperImpl implements WebScraper {
                     }
                 }
 
-                countDownLatch.countDown();
-
+                close();
             }
 
             @Override
             public void cancelled() {
                 LOGGER.info("request cancelled");
-                countDownLatch.countDown();
+                close();
             }
 
             @Override
             public void failed(Exception e) {
                 LOGGER.error("request failed", e);
+                close();
+            }
+
+            private void close() {
+                try {
+                    httpclient.close();
+                    request.completed();
+                } catch (IOException e) {
+                    LOGGER.error("error closing http-client", e);
+                }
                 countDownLatch.countDown();
             }
         });
