@@ -101,7 +101,7 @@ public class WebScraperImpl implements WebScraper {
                         }
 
                         if (rawText != null) {
-                            dispatchRawText(rawText);
+                            dispatchRawText(url, rawText);
                         }
 
                     }
@@ -136,10 +136,10 @@ public class WebScraperImpl implements WebScraper {
         textHandlers.add(textHandler);
     }
 
-    private void dispatchRawText(String rawText) {
+    private void dispatchRawText(String baseUrl, String rawText) {
         textHandlers.forEach((RawTextHandler textHandler) -> {
             executor.execute(() -> {
-                textHandler.handleRawText(rawText);
+                textHandler.handleRawText(baseUrl, rawText);
             });
         });
     }

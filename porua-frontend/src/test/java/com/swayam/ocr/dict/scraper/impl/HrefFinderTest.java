@@ -68,8 +68,8 @@ public class HrefFinderTest {
     @Test
     public void testLinkPattern_1() {
         // given
-        HrefFinder testClass = new HrefFinder();
-        Pattern linkPattern = testClass.getLinkPattern();
+        HrefFinder testClass = new HrefFinder(null, null);
+        Pattern linkPattern = testClass.getRegex();
 
         // when
         boolean result = linkPattern
@@ -84,8 +84,8 @@ public class HrefFinderTest {
     @Test
     public void testLinkPattern_2() {
         // given
-        HrefFinder testClass = new HrefFinder();
-        Pattern linkPattern = testClass.getLinkPattern();
+        HrefFinder testClass = new HrefFinder(null, null);
+        Pattern linkPattern = testClass.getRegex();
 
         // when
         boolean result = linkPattern
@@ -119,8 +119,8 @@ public class HrefFinderTest {
 
         List<String> result = new ArrayList<>();
 
-        HrefFinder testClass = new HrefFinder();
-        Pattern linkPattern = testClass.getLinkPattern();
+        HrefFinder testClass = new HrefFinder(null, null);
+        Pattern linkPattern = testClass.getRegex();
 
         // when
         Matcher matcher = linkPattern.matcher(sampleHtmlContents);

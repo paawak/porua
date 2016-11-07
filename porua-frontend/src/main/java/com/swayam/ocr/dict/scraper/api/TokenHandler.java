@@ -1,7 +1,7 @@
 /*
- * RawTextHandlerImpl.java
+ * Action.java
  *
- * Created on 06-Nov-2016 10:53:54 PM
+ * Created on 07-Nov-2016 10:51:46 PM
  *
  * Copyright (c) 2002 - 2008 : Swayam Inc.
  *
@@ -13,20 +13,14 @@
  * issued to any third party.
  */
 
-package com.swayam.ocr.dict.scraper.impl;
-
-import com.swayam.ocr.dict.scraper.api.RawTextHandler;
+package com.swayam.ocr.dict.scraper.api;
 
 /**
  * 
  * @author paawak
  */
-public class RawTextHandlerImpl implements RawTextHandler {
+public interface TokenHandler {
 
-    @Override
-    public void handleRawText(String text) {
-        // TODO Auto-generated method stub
-
-    }
+    void handleToken(String token);
 
 }

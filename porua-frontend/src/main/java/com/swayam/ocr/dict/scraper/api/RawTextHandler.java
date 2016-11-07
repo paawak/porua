@@ -21,6 +21,6 @@ package com.swayam.ocr.dict.scraper.api;
  */
 public interface RawTextHandler {
 
-    void handleRawText(String text);
+    void handleRawText(String baseUrl, String text);
 
 }

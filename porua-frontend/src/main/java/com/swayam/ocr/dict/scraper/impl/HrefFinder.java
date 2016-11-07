@@ -15,35 +15,35 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
+import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.swayam.ocr.dict.scraper.api.RawTextHandler;
+import com.swayam.ocr.dict.scraper.api.TokenHandler;
 
 /**
  * 
  * @author paawak
  */
-public class HrefFinder implements RawTextHandler {
-
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(HrefFinder.class);
+public class HrefFinder extends AbstractTokenHandler {
 
     // <a href="http://hayyan.com.jo/images/index.php">
     private static final String HREF_FRAGMENT = "[\\s\\w=\"]*";
     private final Pattern linkPattern = Pattern.compile("<a" + HREF_FRAGMENT
             + "href=\"[\\w\\:\\/\\.\\-]*\"" + HREF_FRAGMENT + ">");
 
-    @Override
-    public void handleRawText(String text) {
-        LOGGER.debug("{}", text);
+    public HrefFinder(Executor executor, TokenHandler tokenHandler) {
+        super(executor, tokenHandler);
     }
 
-    // method added for testing only
-    Pattern getLinkPattern() {
+    @Override
+    public Pattern getRegex() {
         return linkPattern;
+    }
+
+    @Override
+    protected String processRawToken(String rawToken) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

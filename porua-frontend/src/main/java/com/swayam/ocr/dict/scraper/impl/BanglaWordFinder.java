@@ -15,33 +15,32 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
+import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.swayam.ocr.dict.scraper.api.RawTextHandler;
+import com.swayam.ocr.dict.scraper.api.TokenHandler;
 
 /**
  * 
  * @author paawak
  */
-public class BanglaWordFinder implements RawTextHandler {
-
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(BanglaWordFinder.class);
+public class BanglaWordFinder extends AbstractTokenHandler {
 
     private final Pattern banglaWordPattern = Pattern
             .compile("[\u0980-\u09ff]+");
 
-    @Override
-    public void handleRawText(String text) {
-        LOGGER.debug("{}", text);
+    public BanglaWordFinder(Executor executor, TokenHandler tokenHandler) {
+        super(executor, tokenHandler);
     }
 
-    // method added for testing only
-    Pattern getBanglaWordPattern() {
+    @Override
+    public Pattern getRegex() {
         return banglaWordPattern;
+    }
+
+    @Override
+    protected String processRawToken(String rawToken) {
+        return rawToken;
     }
 
 }
