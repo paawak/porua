@@ -28,7 +28,7 @@ public class BanglaWordFinder extends AbstractTokenHandler {
 
     // exclude numbers
     private final Pattern banglaWordPattern = Pattern
-            .compile("[\u0980-\u09e5\u09f0-\u09ff]+");
+            .compile("[\u0980-\u09e5\u09f0-\u09ff]{2,}");
 
     public BanglaWordFinder(Executor executor, TokenHandler tokenHandler) {
         super(executor, tokenHandler);

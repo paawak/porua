@@ -32,38 +32,9 @@ import org.junit.Test;
 public class BanglaWordFinderTest {
 
     @Test
-    public void testBanglaWordPattern_1() {
+    public void testBanglaWordPattern() {
         // given
-        String input = "rabindra,rabindranath,gitanjali,rabindra sangeet,রবীন্দ্র,রচনাবলী,রবীন্দ্র-রচনাবলী,অবতরণিকা,উপন্যাস,গল্প,নাটক,গান,কবিতা,প্রবন্ধ,অচলিত সংগ্রহ,দুই বোন,বউ-ঠাকুরানীর হাট,চোখের বালি ঘরে বাইরে,প্রজাপতির নির্বন্ধ,চতুরঙ্গ চার অধ্যায়,যোগাযোগ,মালঞ্চ রাজর্ষি,গোরা,শেষের কবিতা,নৌকাডুবি,রবীন্দ্রনাথ ,রবিরচনা, Braille, Bangla Braille, Bengali Braille, Indian Language Braille, Bharati Braille, Braille Transliteration, Technology for Blinds, Technology for Cerebral Palsy and Speech Impaired, Sanyog, Aakash Bani, Sparsha, Speech Enabled Baishakhi Keyboard, Web Browser for Blinds, Sweepsticks, Assistive Technology";
-
-        List<String> expected = Arrays.asList("রবীন্দ্র", "রচনাবলী", "রবীন্দ্র",
-                "রচনাবলী", "অবতরণিকা", "উপন্যাস", "গল্প", "নাটক", "গান",
-                "কবিতা", "প্রবন্ধ", "অচলিত", "সংগ্রহ", "দুই", "বোন", "বউ",
-                "ঠাকুরানীর", "হাট", "চোখের", "বালি", "ঘরে", "বাইরে",
-                "প্রজাপতির", "নির্বন্ধ", "চতুরঙ্গ", "চার", "অধ্যায়", "যোগাযোগ",
-                "মালঞ্চ", "রাজর্ষি", "গোরা", "শেষের", "কবিতা", "নৌকাডুবি",
-                "রবীন্দ্রনাথ", "রবিরচনা");
-
-        BanglaWordFinder testClass = new BanglaWordFinder(null, null);
-        Pattern testPattern = testClass.getRegex();
-
-        // when
-        Matcher matcher = testPattern.matcher(input);
-
-        // then
-        List<String> result = new ArrayList<>();
-        while (matcher.find()) {
-            String word = matcher.group();
-            result.add(word);
-        }
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    public void testBanglaWordPattern_2() {
-        // given
-        String input = "rabindra,rabindranath ০১২৩,gitanjali,rabindra sangeet,রবীন্দ্র,রচনাবলী,রবীন্দ্র-রচনাবলী,অবতরণিকা,উপন্যাস,গল্প,নাটক,গান,কবিতা,প্রবন্ধ,অচলিত সংগ্রহ,দুই বোন,বউ-ঠাকুরানীর হাট,চোখের বালি ঘরে বাইরে,প্রজাপতির নির্বন্ধ,চতুরঙ্গ চার অধ্যায়,৭৮৯,যোগাযোগ,মালঞ্চ রাজর্ষি,গোরা,শেষের কবিতা,নৌকাডুবি,রবীন্দ্রনাথ ,রবিরচনা, Braille, Bangla Braille, Bengali Braille, Indian Language Braille, Bharati Braille, Braille Transliteration, Technology for Blinds, Technology for Cerebral Palsy and Speech Impaired, Sanyog, Aakash Bani, Sparsha, Speech Enabled Baishakhi Keyboard, Web Browser for Blinds, Sweepsticks, Assistive Technology";
+        String input = "rabindra, র rabindranath ও ০১২৩,gitanjali,rabindra sangeet,রবীন্দ্র,রচনাবলী,রবীন্দ্র-রচনাবলী,অবতরণিকা,উপন্যাস,গল্প,নাটক,গান,কবিতা,প্রবন্ধ,অচলিত সংগ্রহ,দুই বোন,বউ-ঠাকুরানীর হাট,চোখের বালি ঘরে বাইরে,প্রজাপতির নির্বন্ধ,চতুরঙ্গ চার অধ্যায়,৭৮৯,যোগাযোগ,মালঞ্চ রাজর্ষি,গোরা,শেষের কবিতা,নৌকাডুবি,রবীন্দ্রনাথ ,রবিরচনা, Braille, Bangla Braille, Bengali Braille, Indian Language Braille, Bharati Braille, Braille Transliteration, Technology for Blinds, Technology for Cerebral Palsy and Speech Impaired, Sanyog, Aakash Bani, Sparsha, Speech Enabled Baishakhi Keyboard, Web Browser for Blinds, Sweepsticks, Assistive Technology";
 
         List<String> expected = Arrays.asList("রবীন্দ্র", "রচনাবলী", "রবীন্দ্র",
                 "রচনাবলী", "অবতরণিকা", "উপন্যাস", "গল্প", "নাটক", "গান",
