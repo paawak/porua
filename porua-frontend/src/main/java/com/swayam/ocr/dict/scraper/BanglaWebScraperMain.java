@@ -31,13 +31,18 @@ import com.swayam.ocr.dict.scraper.impl.WebScraperImpl;
  * 
  * @author paawak
  */
-public class BanglaWebScraperMain {
+public class BanglaWebScraperMain implements TokenHandler {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(BanglaWebScraperMain.class);
 
     public static void main(String[] args) {
+        new BanglaWebScraperMain()
+                .handleToken("http://www.rabindra-rachanabali.nltr.org/node/1");
+    }
 
+    @Override
+    public void handleToken(String url) {
         Executor executor = Executors.newCachedThreadPool();
 
         WebScraper webScraper = new WebScraperImpl(executor);
@@ -46,12 +51,10 @@ public class BanglaWebScraperMain {
             LOGGER.debug(token);
         };
 
-        webScraper.addTextHandler(new HrefFinder(executor, tokenHandler));
+        webScraper.addTextHandler(new HrefFinder(executor, this));
         webScraper.addTextHandler(new BanglaWordFinder(executor, tokenHandler));
 
-        webScraper.startScraping(
-                "http://www.rabindra-rachanabali.nltr.org/node/1");
-
+        webScraper.startScraping(url);
     }
 
 }
