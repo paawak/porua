@@ -17,7 +17,6 @@ package com.swayam.ocr.dict.scraper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -52,8 +51,6 @@ public class BanglaWebScraperMain {
 
         ExecutorService executor = Executors.newCachedThreadPool();
 
-        CountDownLatch countDownLatch = new CountDownLatch(1);
-
         WebScraper webScraper = new WebScraperImpl(executor);
 
         TokenHandler banglaTokenHandler = (String token) -> {
@@ -86,14 +83,8 @@ public class BanglaWebScraperMain {
 
             });
 
-            countDownLatch.countDown();
         });
 
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            LOGGER.error("error waiting", e);
-        }
     }
 
 }
