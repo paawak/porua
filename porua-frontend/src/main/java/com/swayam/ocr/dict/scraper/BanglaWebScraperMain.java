@@ -77,11 +77,18 @@ public class BanglaWebScraperMain {
                 new BanglaWordFinder(executor, banglaTokenHandler));
 
         webScraper.startScraping(url, () -> {
-            // executor.shutdown();
-            countDownLatch.countDown();
+
+            LOGGER.debug("scraping completed for {}", url);
+
             hrefLinks.forEach((String href) -> {
-                new BanglaWebScraperMain().startScraping(href);
+
+                executor.execute(() -> {
+                    new BanglaWebScraperMain().startScraping(href);
+                });
+
             });
+
+            countDownLatch.countDown();
         });
 
         try {

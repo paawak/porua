@@ -21,13 +21,16 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.slf4j.Logger;
@@ -66,72 +69,65 @@ public class WebScraperImpl implements WebScraper {
         HttpGet request = new HttpGet(url);
 
         // Execute request
-        httpclient.execute(request, new FutureCallback<HttpResponse>() {
+        Future<HttpResponse> futureResponse = httpclient.execute(request, null);
 
-            @Override
-            public void completed(HttpResponse response) {
-                LOGGER.info("request completed");
-                int statusCode = response.getStatusLine().getStatusCode();
-                Header contentTypeHeader = response
-                        .getFirstHeader("content-type");
+        try {
+            HttpResponse response = futureResponse.get(3, TimeUnit.SECONDS);
+            LOGGER.info("request completed");
+            int statusCode = response.getStatusLine().getStatusCode();
+            Header contentTypeHeader = response.getFirstHeader("content-type");
 
-                LOGGER.info("status-code: {}, content-type: {}", statusCode,
-                        contentTypeHeader.getValue());
+            LOGGER.info("status-code: {}, content-type: {}", statusCode,
+                    contentTypeHeader.getValue());
 
-                if ((statusCode != 200)
-                        || (!contentTypeHeader.getValue().contains("text"))) {
+            if ((statusCode != 200)
+                    || (!contentTypeHeader.getValue().contains("text"))) {
 
-                    LOGGER.info("aborting request...");
-                    request.abort();
+                LOGGER.info("aborting request...");
+                request.abort();
 
-                } else {
+            } else {
 
-                    HttpEntity entity = response.getEntity();
-                    if (entity != null) {
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
 
-                        String rawText = null;
+                    String rawText = null;
 
-                        try (InputStream instream = entity.getContent();) {
+                    try (InputStream instream = entity.getContent();) {
 
-                            rawText = read(instream);
+                        rawText = read(instream);
 
-                        } catch (UnsupportedOperationException
-                                | IOException e) {
-                            LOGGER.error("error reading content", e);
-                        }
-
-                        if (rawText != null) {
-                            dispatchRawText(url, rawText);
-                        }
-
+                    } catch (UnsupportedOperationException | IOException e) {
+                        LOGGER.error("error reading content", e);
                     }
+
+                    if (rawText != null) {
+                        dispatchRawText(url, rawText);
+                    }
+
                 }
+            }
+        } catch (InterruptedException | ExecutionException
+                | TimeoutException e) {
+            LOGGER.error("request timed out", e);
 
-                close();
+        } finally {
+            try {
+                httpclient.close();
+                request.completed();
+            } catch (IOException e) {
+                LOGGER.error("error closing http-client", e);
             }
 
-            @Override
-            public void cancelled() {
-                LOGGER.info("request cancelled");
-                close();
+            // FIXME: ideally should not be there
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                LOGGER.error("error waiting", e);
             }
 
-            @Override
-            public void failed(Exception e) {
-                LOGGER.error("request failed", e);
-                close();
-            }
-
-            private void close() {
-                try {
-                    httpclient.close();
-                    request.completed();
-                } catch (IOException e) {
-                    LOGGER.error("error closing http-client", e);
-                }
-                taskCompletionNotifier.taskCompleted();
-            }
-        });
+            taskCompletionNotifier.taskCompleted();
+        }
 
     }
 
