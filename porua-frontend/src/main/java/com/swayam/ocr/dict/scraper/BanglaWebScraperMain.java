@@ -82,9 +82,7 @@ public class BanglaWebScraperMain {
 
             hrefLinks.forEach((String href) -> {
 
-                executor.execute(() -> {
-                    new BanglaWebScraperMain().startScraping(href);
-                });
+                new BanglaWebScraperMain().startScraping(href);
 
             });
 
