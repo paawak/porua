@@ -39,13 +39,18 @@ public class BanglaWebScraperMain {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(BanglaWebScraperMain.class);
 
+    private static final List<String> LINKS_ALREADY_VISITED = new ArrayList<>();
+
     public static void main(String[] args) {
         new BanglaWebScraperMain().startScraping(
-                Executors.newCachedThreadPool(),
                 "http://www.rabindra-rachanabali.nltr.org/node/1");
     }
 
-    private void startScraping(ExecutorService executor, String url) {
+    private void startScraping(String url) {
+
+        LOGGER.info("started scraping {} ...", url);
+
+        ExecutorService executor = Executors.newCachedThreadPool();
 
         CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -58,7 +63,13 @@ public class BanglaWebScraperMain {
         List<String> hrefLinks = new ArrayList<>();
 
         TokenHandler linkTokenHandler = (String href) -> {
-            hrefLinks.add(href);
+            LOGGER.debug("href, {}", href);
+
+            if (!LINKS_ALREADY_VISITED.contains(href)) {
+                hrefLinks.add(href);
+                LINKS_ALREADY_VISITED.add(href);
+            }
+
         };
 
         webScraper.addTextHandler(new HrefFinder(executor, linkTokenHandler));
@@ -66,11 +77,10 @@ public class BanglaWebScraperMain {
                 new BanglaWordFinder(executor, banglaTokenHandler));
 
         webScraper.startScraping(url, () -> {
-            executor.shutdown();
+            // executor.shutdown();
             countDownLatch.countDown();
             hrefLinks.forEach((String href) -> {
-                new BanglaWebScraperMain()
-                        .startScraping(Executors.newCachedThreadPool(), href);
+                new BanglaWebScraperMain().startScraping(href);
             });
         });
 
