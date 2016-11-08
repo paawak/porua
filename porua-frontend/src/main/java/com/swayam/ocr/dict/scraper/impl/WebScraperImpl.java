@@ -73,12 +73,12 @@ public class WebScraperImpl implements WebScraper {
 
         try {
             HttpResponse response = futureResponse.get(3, TimeUnit.SECONDS);
-            LOGGER.info("request completed");
             int statusCode = response.getStatusLine().getStatusCode();
             Header contentTypeHeader = response.getFirstHeader("content-type");
 
-            LOGGER.info("status-code: {}, content-type: {}", statusCode,
-                    contentTypeHeader.getValue());
+            LOGGER.info(
+                    "request completed: status-code: {}, content-type: {}, url: {}",
+                    statusCode, contentTypeHeader.getValue(), url);
 
             if ((statusCode != 200)
                     || (!contentTypeHeader.getValue().contains("text"))) {
@@ -121,7 +121,7 @@ public class WebScraperImpl implements WebScraper {
 
             // FIXME: ideally should not be there
             try {
-                Thread.sleep(100);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 LOGGER.error("error waiting", e);
             }

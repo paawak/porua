@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,7 +54,10 @@ public class BanglaWebScraperMain {
 
         WebScraper webScraper = new WebScraperImpl(executor);
 
+        AtomicBoolean banglaWordFound = new AtomicBoolean(false);
+
         TokenHandler banglaTokenHandler = (String token) -> {
+            banglaWordFound.compareAndSet(false, true);
             LOGGER.debug(token);
         };
 
@@ -75,13 +79,18 @@ public class BanglaWebScraperMain {
 
         webScraper.startScraping(url, () -> {
 
-            LOGGER.debug("scraping completed for {}", url);
+            LOGGER.info("scraping completed for {}", url);
 
-            hrefLinks.forEach((String href) -> {
+            if (banglaWordFound.get()) {
+                hrefLinks.forEach((String href) -> {
 
-                new BanglaWebScraperMain().startScraping(href);
+                    new BanglaWebScraperMain().startScraping(href);
 
-            });
+                });
+            } else {
+                LOGGER.info("ignoring all hrefs for {} as no Bangla word found",
+                        url);
+            }
 
         });
 
