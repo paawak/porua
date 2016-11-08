@@ -15,7 +15,10 @@
 
 package com.swayam.ocr.dict.scraper;
 
-import java.util.concurrent.Executor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
@@ -31,30 +34,51 @@ import com.swayam.ocr.dict.scraper.impl.WebScraperImpl;
  * 
  * @author paawak
  */
-public class BanglaWebScraperMain implements TokenHandler {
+public class BanglaWebScraperMain {
 
     private static final Logger LOGGER = LoggerFactory
             .getLogger(BanglaWebScraperMain.class);
 
     public static void main(String[] args) {
-        new BanglaWebScraperMain()
-                .handleToken("http://www.rabindra-rachanabali.nltr.org/node/1");
+        new BanglaWebScraperMain().startScraping(
+                Executors.newCachedThreadPool(),
+                "http://www.rabindra-rachanabali.nltr.org/node/1");
     }
 
-    @Override
-    public void handleToken(String url) {
-        Executor executor = Executors.newCachedThreadPool();
+    private void startScraping(ExecutorService executor, String url) {
+
+        CountDownLatch countDownLatch = new CountDownLatch(1);
 
         WebScraper webScraper = new WebScraperImpl(executor);
 
-        TokenHandler tokenHandler = (String token) -> {
+        TokenHandler banglaTokenHandler = (String token) -> {
             LOGGER.debug(token);
         };
 
-        webScraper.addTextHandler(new HrefFinder(executor, this));
-        webScraper.addTextHandler(new BanglaWordFinder(executor, tokenHandler));
+        List<String> hrefLinks = new ArrayList<>();
 
-        webScraper.startScraping(url);
+        TokenHandler linkTokenHandler = (String href) -> {
+            hrefLinks.add(href);
+        };
+
+        webScraper.addTextHandler(new HrefFinder(executor, linkTokenHandler));
+        webScraper.addTextHandler(
+                new BanglaWordFinder(executor, banglaTokenHandler));
+
+        webScraper.startScraping(url, () -> {
+            executor.shutdown();
+            countDownLatch.countDown();
+            hrefLinks.forEach((String href) -> {
+                new BanglaWebScraperMain()
+                        .startScraping(Executors.newCachedThreadPool(), href);
+            });
+        });
+
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            LOGGER.error("error waiting", e);
+        }
     }
 
 }

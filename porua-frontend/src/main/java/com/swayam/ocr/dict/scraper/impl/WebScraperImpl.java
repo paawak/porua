@@ -21,7 +21,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executor;
 
 import org.apache.http.Header;
@@ -35,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.dict.scraper.api.RawTextHandler;
+import com.swayam.ocr.dict.scraper.api.TaskCompletionNotifier;
 import com.swayam.ocr.dict.scraper.api.WebScraper;
 
 /**
@@ -56,8 +56,8 @@ public class WebScraperImpl implements WebScraper {
     }
 
     @Override
-    public void startScraping(String url) {
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+    public void startScraping(String url,
+            TaskCompletionNotifier taskCompletionNotifier) {
 
         CloseableHttpAsyncClient httpclient = HttpAsyncClients.createDefault();
         // Start the client
@@ -129,15 +129,10 @@ public class WebScraperImpl implements WebScraper {
                 } catch (IOException e) {
                     LOGGER.error("error closing http-client", e);
                 }
-                countDownLatch.countDown();
+                taskCompletionNotifier.taskCompleted();
             }
         });
 
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            LOGGER.error("error", e);
-        }
     }
 
     @Override

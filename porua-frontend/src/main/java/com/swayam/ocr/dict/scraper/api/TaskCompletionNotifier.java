@@ -1,7 +1,7 @@
 /*
- * BanglaWebScraper.java
+ * TaskCompletionNotifier.java
  *
- * Created on 06-Nov-2016 5:41:14 PM
+ * Created on 08-Nov-2016 10:46:56 PM
  *
  * Copyright (c) 2002 - 2008 : Swayam Inc.
  *
@@ -19,11 +19,7 @@ package com.swayam.ocr.dict.scraper.api;
  * 
  * @author paawak
  */
-public interface WebScraper {
+public interface TaskCompletionNotifier {
 
-    void startScraping(String url,
-            TaskCompletionNotifier taskCompletionNotifier);
-
-    void addTextHandler(RawTextHandler textHandler);
-
+    void taskCompleted();
 }
