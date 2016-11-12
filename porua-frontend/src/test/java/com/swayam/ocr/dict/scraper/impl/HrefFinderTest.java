@@ -68,7 +68,7 @@ public class HrefFinderTest {
     @Test
     public void testLinkPattern_1() {
         // given
-        HrefFinder testClass = new HrefFinder(null, null);
+        HrefFinder testClass = new HrefFinder();
         Pattern linkPattern = testClass.getRegex();
 
         // when
@@ -84,7 +84,7 @@ public class HrefFinderTest {
     @Test
     public void testLinkPattern_2() {
         // given
-        HrefFinder testClass = new HrefFinder(null, null);
+        HrefFinder testClass = new HrefFinder();
         Pattern linkPattern = testClass.getRegex();
 
         // when
@@ -119,7 +119,7 @@ public class HrefFinderTest {
 
         List<String> result = new ArrayList<>();
 
-        HrefFinder testClass = new HrefFinder(null, null);
+        HrefFinder testClass = new HrefFinder();
         Pattern linkPattern = testClass.getRegex();
 
         // when
@@ -137,7 +137,7 @@ public class HrefFinderTest {
     @Test
     public void testProcessRawToken_1() {
         // given
-        HrefFinder testClass = new HrefFinder(null, null);
+        HrefFinder testClass = new HrefFinder();
 
         // when
         String result = testClass.processRawToken(null,
@@ -153,7 +153,7 @@ public class HrefFinderTest {
     @Test
     public void testProcessRawToken_2() {
         // given
-        HrefFinder testClass = new HrefFinder(null, null);
+        HrefFinder testClass = new HrefFinder();
 
         // when
         String result = testClass.processRawToken(null,
@@ -167,7 +167,7 @@ public class HrefFinderTest {
     @Test
     public void testProcessRawToken_3() {
         // given
-        HrefFinder testClass = new HrefFinder(null, null);
+        HrefFinder testClass = new HrefFinder();
 
         // when
         String result = testClass.processRawToken("http://hayyan.com.jo",

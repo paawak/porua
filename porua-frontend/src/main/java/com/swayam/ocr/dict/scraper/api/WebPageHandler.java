@@ -1,7 +1,7 @@
 /*
- * Action.java
+ * TextHandler.java
  *
- * Created on 07-Nov-2016 10:51:46 PM
+ * Created on 06-Nov-2016 5:44:01 PM
  *
  * Copyright (c) 2002 - 2008 : Swayam Inc.
  *
@@ -19,8 +19,8 @@ package com.swayam.ocr.dict.scraper.api;
  * 
  * @author paawak
  */
-public interface TokenHandler {
+public interface WebPageHandler {
 
-    void handleToken(String url, String token);
+    void handleRawText(String baseUrl, String text);
 
 }

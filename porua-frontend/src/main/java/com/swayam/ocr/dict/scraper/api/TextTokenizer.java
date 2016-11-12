@@ -1,7 +1,7 @@
 /*
- * Action.java
+ * TextTokenizer.java
  *
- * Created on 07-Nov-2016 10:51:46 PM
+ * Created on 12-Nov-2016 6:23:54 PM
  *
  * Copyright (c) 2002 - 2008 : Swayam Inc.
  *
@@ -15,12 +15,14 @@
 
 package com.swayam.ocr.dict.scraper.api;
 
+import java.util.List;
+
 /**
  * 
  * @author paawak
  */
-public interface TokenHandler {
+public interface TextTokenizer {
 
-    void handleToken(String url, String token);
+    List<String> tokenize(String baseUrl, String text);
 
 }

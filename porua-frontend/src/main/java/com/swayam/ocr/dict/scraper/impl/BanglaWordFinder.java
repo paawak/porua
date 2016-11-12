@@ -15,24 +15,19 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
-import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
 
-import com.swayam.ocr.dict.scraper.api.TokenHandler;
+import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author paawak
  */
-public class BanglaWordFinder extends AbstractTokenHandler {
+@Component
+public class BanglaWordFinder extends AbstractTextTokenizer {
 
     // exclude numbers
-    private final Pattern banglaWordPattern = Pattern
-            .compile("[\u0980-\u09e5\u09f0-\u09ff]{2,}");
-
-    public BanglaWordFinder(Executor executor, TokenHandler tokenHandler) {
-        super(executor, tokenHandler);
-    }
+    private final Pattern banglaWordPattern = Pattern.compile("[\u0980-\u09e5\u09f0-\u09ff]{2,}");
 
     @Override
     public Pattern getRegex() {

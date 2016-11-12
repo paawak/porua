@@ -15,25 +15,21 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
-import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
 
-import com.swayam.ocr.dict.scraper.api.TokenHandler;
+import org.springframework.stereotype.Component;
 
 /**
  * 
  * @author paawak
  */
-public class HrefFinder extends AbstractTokenHandler {
+@Component
+public class HrefFinder extends AbstractTextTokenizer {
 
     // <a href="http://hayyan.com.jo/images/index.php">
     private static final String HREF_FRAGMENT = "[\\s\\w=\"]*";
     private final Pattern linkPattern = Pattern.compile("<a" + HREF_FRAGMENT
             + "href=\"[\\w\\:\\/\\.\\-]*\"" + HREF_FRAGMENT + ">");
-
-    public HrefFinder(Executor executor, TokenHandler tokenHandler) {
-        super(executor, tokenHandler);
-    }
 
     @Override
     public Pattern getRegex() {

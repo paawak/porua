@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -35,8 +33,10 @@ import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import com.swayam.ocr.dict.scraper.api.RawTextHandler;
+import com.swayam.ocr.dict.scraper.api.WebPageHandler;
 import com.swayam.ocr.dict.scraper.api.TaskCompletionNotifier;
 import com.swayam.ocr.dict.scraper.api.WebScraper;
 
@@ -44,23 +44,25 @@ import com.swayam.ocr.dict.scraper.api.WebScraper;
  * 
  * @author paawak
  */
+@Component
 public class WebScraperImpl implements WebScraper {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(WebScraperImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(WebScraperImpl.class);
 
-    private final List<RawTextHandler> textHandlers;
+    private static final int REQUEST_TIMEOUT_SECONDS = 4;
+
+    private final WebPageHandler textHandler;
 
     private final Executor executor;
 
-    public WebScraperImpl(Executor executor) {
+    @Autowired
+    public WebScraperImpl(Executor executor, WebPageHandler textHandler) {
         this.executor = executor;
-        textHandlers = new ArrayList<>();
+        this.textHandler = textHandler;
     }
 
     @Override
-    public void startScraping(String url,
-            TaskCompletionNotifier taskCompletionNotifier) {
+    public void startScraping(String url, TaskCompletionNotifier taskCompletionNotifier) {
 
         CloseableHttpAsyncClient httpclient = HttpAsyncClients.createDefault();
         // Start the client
@@ -72,7 +74,8 @@ public class WebScraperImpl implements WebScraper {
         Future<HttpResponse> futureResponse = httpclient.execute(request, null);
 
         try {
-            HttpResponse response = futureResponse.get(3, TimeUnit.SECONDS);
+            HttpResponse response = futureResponse.get(REQUEST_TIMEOUT_SECONDS,
+                    TimeUnit.SECONDS);
             int statusCode = response.getStatusLine().getStatusCode();
             Header contentTypeHeader = response.getFirstHeader("content-type");
 
@@ -131,16 +134,9 @@ public class WebScraperImpl implements WebScraper {
 
     }
 
-    @Override
-    public void addTextHandler(RawTextHandler textHandler) {
-        textHandlers.add(textHandler);
-    }
-
     private void dispatchRawText(String baseUrl, String rawText) {
-        textHandlers.forEach((RawTextHandler textHandler) -> {
-            executor.execute(() -> {
-                textHandler.handleRawText(baseUrl, rawText);
-            });
+        executor.execute(() -> {
+            textHandler.handleRawText(baseUrl, rawText);
         });
     }
 

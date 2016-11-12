@@ -15,20 +15,13 @@
 
 package com.swayam.ocr.dict.scraper;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import com.swayam.ocr.dict.scraper.api.TokenHandler;
+import com.swayam.ocr.config.SpringConfig;
 import com.swayam.ocr.dict.scraper.api.WebScraper;
-import com.swayam.ocr.dict.scraper.impl.BanglaWordFinder;
-import com.swayam.ocr.dict.scraper.impl.HrefFinder;
-import com.swayam.ocr.dict.scraper.impl.WebScraperImpl;
 
 /**
  * 
@@ -39,8 +32,6 @@ public class BanglaWebScraperMain {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(BanglaWebScraperMain.class);
 
-    private static final List<String> LINKS_ALREADY_VISITED = new ArrayList<>();
-
     public static void main(String[] args) {
         new BanglaWebScraperMain().startScraping(
                 "http://www.rabindra-rachanabali.nltr.org/node/1");
@@ -50,47 +41,13 @@ public class BanglaWebScraperMain {
 
         LOGGER.info("started scraping {} ...", url);
 
-        ExecutorService executor = Executors.newCachedThreadPool();
+        ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
 
-        WebScraper webScraper = new WebScraperImpl(executor);
-
-        AtomicBoolean banglaWordFound = new AtomicBoolean(false);
-
-        TokenHandler banglaTokenHandler = (String token) -> {
-            banglaWordFound.compareAndSet(false, true);
-            LOGGER.debug(token);
-        };
-
-        List<String> hrefLinks = new ArrayList<>();
-
-        TokenHandler linkTokenHandler = (String href) -> {
-            LOGGER.debug("href, {}", href);
-
-            if (!LINKS_ALREADY_VISITED.contains(href)) {
-                hrefLinks.add(href);
-                LINKS_ALREADY_VISITED.add(href);
-            }
-
-        };
-
-        webScraper.addTextHandler(new HrefFinder(executor, linkTokenHandler));
-        webScraper.addTextHandler(
-                new BanglaWordFinder(executor, banglaTokenHandler));
+        WebScraper webScraper = ctx.getBean(WebScraper.class);
 
         webScraper.startScraping(url, () -> {
 
             LOGGER.info("scraping completed for {}", url);
-
-            if (banglaWordFound.get()) {
-                hrefLinks.forEach((String href) -> {
-
-                    new BanglaWebScraperMain().startScraping(href);
-
-                });
-            } else {
-                LOGGER.info("ignoring all hrefs for {} as no Bangla word found",
-                        url);
-            }
 
         });
 

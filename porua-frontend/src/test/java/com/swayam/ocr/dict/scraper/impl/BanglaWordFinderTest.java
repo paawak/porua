@@ -44,7 +44,7 @@ public class BanglaWordFinderTest {
                 "মালঞ্চ", "রাজর্ষি", "গোরা", "শেষের", "কবিতা", "নৌকাডুবি",
                 "রবীন্দ্রনাথ", "রবিরচনা");
 
-        BanglaWordFinder testClass = new BanglaWordFinder(null, null);
+        BanglaWordFinder testClass = new BanglaWordFinder();
         Pattern testPattern = testClass.getRegex();
 
         // when

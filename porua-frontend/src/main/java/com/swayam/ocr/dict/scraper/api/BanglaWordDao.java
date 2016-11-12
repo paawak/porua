@@ -1,7 +1,7 @@
 /*
- * TextHandler.java
+ * BanglaWordDao.java
  *
- * Created on 06-Nov-2016 5:44:01 PM
+ * Created on 12-Nov-2016 11:20:59 PM
  *
  * Copyright (c) 2002 - 2008 : Swayam Inc.
  *
@@ -19,8 +19,10 @@ package com.swayam.ocr.dict.scraper.api;
  * 
  * @author paawak
  */
-public interface RawTextHandler {
+public interface BanglaWordDao {
 
-    void handleRawText(String baseUrl, String text);
+    int saveUrl(String url);
+
+    void insertBanglaWord(int urlId, String token);
 
 }

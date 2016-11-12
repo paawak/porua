@@ -24,6 +24,4 @@ public interface WebScraper {
     void startScraping(String url,
             TaskCompletionNotifier taskCompletionNotifier);
 
-    void addTextHandler(RawTextHandler textHandler);
-
 }

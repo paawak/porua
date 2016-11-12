@@ -15,55 +15,45 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
-import java.util.concurrent.Executor;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.dict.scraper.api.RawTextHandler;
-import com.swayam.ocr.dict.scraper.api.TokenHandler;
+import com.swayam.ocr.dict.scraper.api.TextTokenizer;
 
 /**
  * 
  * @author paawak
  */
-public abstract class AbstractTokenHandler implements RawTextHandler {
+public abstract class AbstractTextTokenizer implements TextTokenizer {
 
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(AbstractTokenHandler.class);
-
-    private final Executor executor;
-    private final TokenHandler tokenHandler;
-
-    public AbstractTokenHandler(Executor executor, TokenHandler tokenHandler) {
-        this.executor = executor;
-        this.tokenHandler = tokenHandler;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTextTokenizer.class);
 
     @Override
-    public void handleRawText(String baseUrl, String text) {
-        LOGGER.trace("{}", text);
+    public List<String> tokenize(String baseUrl, String text) {
+        LOGGER.trace("text: {}", text);
+
+        List<String> tokens = new ArrayList<>();
 
         Matcher matcher = getRegex().matcher(text);
 
         while (matcher.find()) {
             String rawToken = matcher.group();
             String token = processRawToken(baseUrl, rawToken);
-            notifyTokenFound(token);
+            LOGGER.debug("token: {}", token);
+            tokens.add(token);
         }
+
+        return tokens;
 
     }
 
     protected abstract Pattern getRegex();
 
     protected abstract String processRawToken(String baseUrl, String rawToken);
-
-    private void notifyTokenFound(String token) {
-        executor.execute(() -> {
-            tokenHandler.handleToken(token);
-        });
-    }
 
 }
