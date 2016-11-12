@@ -36,8 +36,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.swayam.ocr.dict.scraper.api.WebPageHandler;
 import com.swayam.ocr.dict.scraper.api.TaskCompletionNotifier;
+import com.swayam.ocr.dict.scraper.api.WebPageHandler;
 import com.swayam.ocr.dict.scraper.api.WebScraper;
 
 /**
@@ -87,6 +87,7 @@ public class WebScraperImpl implements WebScraper {
                     || (!contentTypeHeader.getValue().contains("text"))) {
 
                 LOGGER.info("aborting request...");
+                taskCompletionNotifier.errorInRequest();
                 request.abort();
 
             } else {
@@ -105,7 +106,7 @@ public class WebScraperImpl implements WebScraper {
                     }
 
                     if (rawText != null) {
-                        dispatchRawText(url, rawText);
+                        dispatchRawText(url, rawText, taskCompletionNotifier);
                     }
 
                 }
@@ -113,6 +114,7 @@ public class WebScraperImpl implements WebScraper {
         } catch (InterruptedException | ExecutionException
                 | TimeoutException e) {
             LOGGER.error("request timed out", e);
+            taskCompletionNotifier.errorInRequest();
 
         } finally {
             try {
@@ -134,9 +136,9 @@ public class WebScraperImpl implements WebScraper {
 
     }
 
-    private void dispatchRawText(String baseUrl, String rawText) {
+    private void dispatchRawText(String baseUrl, String rawText, TaskCompletionNotifier taskCompletionNotifier) {
         executor.execute(() -> {
-            textHandler.handleRawText(baseUrl, rawText);
+            textHandler.handleRawText(baseUrl, rawText, taskCompletionNotifier);
         });
     }
 

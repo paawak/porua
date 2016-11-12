@@ -15,12 +15,16 @@
 
 package com.swayam.ocr.dict.scraper;
 
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import com.swayam.ocr.config.SpringConfig;
+import com.swayam.ocr.dict.scraper.api.TaskCompletionNotifier;
 import com.swayam.ocr.dict.scraper.api.WebScraper;
 
 /**
@@ -33,22 +37,50 @@ public class BanglaWebScraperMain {
             .getLogger(BanglaWebScraperMain.class);
 
     public static void main(String[] args) {
-        new BanglaWebScraperMain().startScraping(
-                "http://www.rabindra-rachanabali.nltr.org/node/1");
-    }
-
-    private void startScraping(String url) {
-
-        LOGGER.info("started scraping {} ...", url);
-
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
 
         WebScraper webScraper = ctx.getBean(WebScraper.class);
+        new BanglaWebScraperMain().startScraping(webScraper,
+                "http://www.rabindra-rachanabali.nltr.org/node/1");
+    }
 
-        webScraper.startScraping(url, () -> {
+    private void startScraping(WebScraper webScraper, String url) {
 
-            LOGGER.info("scraping completed for {}", url);
+        LOGGER.info("started scraping {} ...", url);
 
+        webScraper.startScraping(url, new TaskCompletionNotifier() {
+
+            private final CountDownLatch countDownLatch = new CountDownLatch(1);
+
+            private boolean errorInRequest = false;
+
+            private List<String> banglaLinks;
+
+            @Override
+            public void taskCompleted() {
+                if (errorInRequest) {
+                    return;
+                }
+                try {
+                    countDownLatch.await();
+                } catch (InterruptedException e) {
+                    LOGGER.error("", e);
+                }
+                banglaLinks.forEach((String link) -> {
+                    startScraping(webScraper, link);
+                });
+            }
+
+            @Override
+            public void setBanglaLinks(List<String> banglaLinks) {
+                this.banglaLinks = banglaLinks;
+                countDownLatch.countDown();
+            }
+
+            @Override
+            public void errorInRequest() {
+                errorInRequest = true;
+            }
         });
 
     }

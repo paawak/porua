@@ -15,7 +15,9 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.swayam.ocr.dict.scraper.api.BanglaWordDao;
+import com.swayam.ocr.dict.scraper.api.TaskCompletionNotifier;
 import com.swayam.ocr.dict.scraper.api.WebPageHandler;
 
 /**
@@ -46,7 +49,7 @@ public class BanglaWebPageHandler implements WebPageHandler {
     }
 
     @Override
-    public void handleRawText(String baseUrl, String text) {
+    public void handleRawText(String baseUrl, String text, TaskCompletionNotifier taskCompletionNotifier) {
 
         int baseUrlId = banglaWordDao.saveUrl(baseUrl);
 
@@ -62,6 +65,13 @@ public class BanglaWebPageHandler implements WebPageHandler {
 
         if (!banglaWords.isEmpty()) {
             List<String> banglaLinks = hrefFinder.tokenize(baseUrl, text);
+            List<String> uniqueBanglaLinks = banglaLinks.stream().filter((String link) -> {
+                return !banglaWordDao.doesUrlExist(link);
+            }).collect(Collectors.toList());
+
+            taskCompletionNotifier.setBanglaLinks(uniqueBanglaLinks);
+        } else {
+            taskCompletionNotifier.setBanglaLinks(Collections.emptyList());
         }
 
     }
