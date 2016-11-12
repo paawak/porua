@@ -15,8 +15,8 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,10 +34,10 @@ public abstract class AbstractTextTokenizer implements TextTokenizer {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractTextTokenizer.class);
 
     @Override
-    public List<String> tokenize(String baseUrl, String text) {
+    public Set<String> tokenize(String baseUrl, String text) {
         LOGGER.trace("text: {}", text);
 
-        List<String> tokens = new ArrayList<>();
+        Set<String> tokens = new HashSet<>();
 
         Matcher matcher = getRegex().matcher(text);
 

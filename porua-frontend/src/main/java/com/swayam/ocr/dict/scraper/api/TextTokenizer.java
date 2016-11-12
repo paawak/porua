@@ -15,7 +15,7 @@
 
 package com.swayam.ocr.dict.scraper.api;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -23,6 +23,6 @@ import java.util.List;
  */
 public interface TextTokenizer {
 
-    List<String> tokenize(String baseUrl, String text);
+    Set<String> tokenize(String baseUrl, String text);
 
 }

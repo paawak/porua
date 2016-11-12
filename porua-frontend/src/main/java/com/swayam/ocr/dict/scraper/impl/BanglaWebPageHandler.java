@@ -16,7 +16,7 @@
 package com.swayam.ocr.dict.scraper.impl;
 
 import java.util.Collections;
-import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public class BanglaWebPageHandler implements WebPageHandler {
             baseUrlId = banglaWordDao.saveUrl(baseUrl);
         }
 
-        List<String> banglaWords = banglaWordFinder.tokenize(baseUrl, text);
+        Set<String> banglaWords = banglaWordFinder.tokenize(baseUrl, text);
 
         banglaWords.forEach((String banglaWord) -> {
             try {
@@ -69,14 +69,14 @@ public class BanglaWebPageHandler implements WebPageHandler {
         });
 
         if (!banglaWords.isEmpty()) {
-            List<String> banglaLinks = hrefFinder.tokenize(baseUrl, text);
-            List<String> uniqueBanglaLinks = banglaLinks.stream().filter((String link) -> {
+            Set<String> banglaLinks = hrefFinder.tokenize(baseUrl, text);
+            Set<String> uniqueBanglaLinks = banglaLinks.stream().filter((String link) -> {
                 return !banglaWordDao.doesUrlExist(link);
-            }).collect(Collectors.toList());
+            }).collect(Collectors.toSet());
 
             taskCompletionNotifier.setBanglaLinks(uniqueBanglaLinks);
         } else {
-            taskCompletionNotifier.setBanglaLinks(Collections.emptyList());
+            taskCompletionNotifier.setBanglaLinks(Collections.emptySet());
         }
 
     }

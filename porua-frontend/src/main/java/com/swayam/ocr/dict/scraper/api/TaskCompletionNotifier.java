@@ -15,7 +15,7 @@
 
 package com.swayam.ocr.dict.scraper.api;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * 
@@ -25,7 +25,7 @@ public interface TaskCompletionNotifier {
 
     void taskCompleted();
 
-    void setBanglaLinks(List<String> banglaLinks);
+    void setBanglaLinks(Set<String> banglaLinks);
 
     void errorInRequest();
 }

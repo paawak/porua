@@ -15,7 +15,7 @@
 
 package com.swayam.ocr.dict.scraper;
 
-import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
@@ -54,7 +54,7 @@ public class BanglaWebScraperMain {
 
             private boolean errorInRequest = false;
 
-            private List<String> banglaLinks;
+            private Set<String> banglaLinks;
 
             @Override
             public void taskCompleted() {
@@ -72,7 +72,7 @@ public class BanglaWebScraperMain {
             }
 
             @Override
-            public void setBanglaLinks(List<String> banglaLinks) {
+            public void setBanglaLinks(Set<String> banglaLinks) {
                 this.banglaLinks = banglaLinks;
                 countDownLatch.countDown();
             }
