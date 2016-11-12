@@ -71,4 +71,10 @@ public class BanglaWordDaoImpl implements BanglaWordDao {
         return jdbcOperations.queryForObject(sql, Integer.class, url) == 1;
     }
 
+    @Override
+    public int getUrlId(String url) {
+        String sql = "select id from audit_web_site where site_name = ?";
+        return jdbcOperations.queryForObject(sql, Integer.class, url);
+    }
+
 }

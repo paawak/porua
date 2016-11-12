@@ -51,7 +51,12 @@ public class BanglaWebPageHandler implements WebPageHandler {
     @Override
     public void handleRawText(String baseUrl, String text, TaskCompletionNotifier taskCompletionNotifier) {
 
-        int baseUrlId = banglaWordDao.saveUrl(baseUrl);
+        int baseUrlId;
+        if (banglaWordDao.doesUrlExist(baseUrl)) {
+            baseUrlId = banglaWordDao.getUrlId(baseUrl);
+        } else {
+            baseUrlId = banglaWordDao.saveUrl(baseUrl);
+        }
 
         List<String> banglaWords = banglaWordFinder.tokenize(baseUrl, text);
 

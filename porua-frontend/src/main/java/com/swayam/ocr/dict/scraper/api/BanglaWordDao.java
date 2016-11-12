@@ -25,6 +25,8 @@ public interface BanglaWordDao {
 
     void insertBanglaWord(int urlId, String token);
 
+    int getUrlId(String url);
+
     boolean doesUrlExist(String url);
 
 }

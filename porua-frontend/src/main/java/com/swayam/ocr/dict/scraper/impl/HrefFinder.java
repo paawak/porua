@@ -41,7 +41,7 @@ public class HrefFinder extends AbstractTextTokenizer {
         String hrefWithClosingQuotes = rawToken.split("href=\"")[1];
         String href = hrefWithClosingQuotes.split("\"")[0];
 
-        if (href.startsWith("http://")) {
+        if (href.startsWith("http")) {
             return href;
         }
 
