@@ -9,7 +9,6 @@ CREATE TABLE audit_web_site (
 
 CREATE TABLE bangla_word (
 	id BIGINT(20) NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
-	--audit_web_site_id INTEGER(6) REFERENCES audit_web_site(id),
 	word VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci UNIQUE NOT NULL
 );
 
