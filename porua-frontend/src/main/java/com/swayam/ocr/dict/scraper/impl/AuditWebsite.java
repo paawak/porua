@@ -15,6 +15,7 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -29,12 +30,16 @@ public class AuditWebsite {
 
     private final String name;
 
+    private final LocalDateTime scrapingStarted;
+
     private final boolean scrapingCompleted;
 
-    public AuditWebsite(int id, Optional<Integer> parentId, String name, boolean scrapingCompleted) {
+    public AuditWebsite(int id, Optional<Integer> parentId, String name, LocalDateTime scrapingStarted,
+            boolean scrapingCompleted) {
         this.id = id;
         this.parentId = parentId;
         this.name = name;
+        this.scrapingStarted = scrapingStarted;
         this.scrapingCompleted = scrapingCompleted;
     }
 
@@ -50,14 +55,18 @@ public class AuditWebsite {
         return name;
     }
 
+    public LocalDateTime getScrapingStarted() {
+        return scrapingStarted;
+    }
+
     public boolean isScrapingCompleted() {
         return scrapingCompleted;
     }
 
     @Override
     public String toString() {
-        return "AuditWebsite [id=" + id + ", parentId=" + parentId + ", name=" + name + ", scrapingCompleted="
-                + scrapingCompleted + "]";
+        return "AuditWebsite [id=" + id + ", parentId=" + parentId + ", name=" + name + ", scrapingStarted="
+                + scrapingStarted + ", scrapingCompleted=" + scrapingCompleted + "]";
     }
 
 }

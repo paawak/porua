@@ -49,6 +49,11 @@ public class HrefFinder extends AbstractTextTokenizer {
             return href;
         }
 
+        if (baseUrl.endsWith("/") && href.startsWith("/")) {
+            return baseUrl + href.substring(1);
+
+        }
+
         return baseUrl + href;
 
     }

@@ -15,6 +15,8 @@
 
 package com.swayam.ocr.dict.scraper.impl;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
@@ -37,6 +39,8 @@ import com.swayam.ocr.dict.scraper.api.WebPageHandler;
 public class BanglaWebPageHandler implements WebPageHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BanglaWebPageHandler.class);
+
+    private static final int MIN_DAYS_BEFORE_RE_SCRAPING = 10;
 
     private final BanglaWordDao banglaWordDao;
     private final BanglaWordFinder banglaWordFinder;
@@ -65,7 +69,8 @@ public class BanglaWebPageHandler implements WebPageHandler {
 
         if (banglaWordDao.doesUrlExist(baseUrl)) {
             AuditWebsite auditWebsite = banglaWordDao.getAuditWebsite(baseUrl);
-            if (auditWebsite.isScrapingCompleted()) {
+            Period period = Period.between(LocalDate.now(), auditWebsite.getScrapingStarted().toLocalDate());
+            if (auditWebsite.isScrapingCompleted() && period.getDays() < MIN_DAYS_BEFORE_RE_SCRAPING) {
                 taskCompletionNotifier.setBanglaLinks(Collections.emptySet());
                 return;
             } else {

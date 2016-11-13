@@ -86,6 +86,7 @@ public class BanglaWordDaoImpl implements BanglaWordDao {
                 optionalParentId = Optional.of(parentId);
             }
             return new AuditWebsite(rs.getInt("id"), optionalParentId, rs.getString("site_name"),
+                    rs.getTimestamp("scraping_started").toLocalDateTime(),
                     rs.getBoolean("scraping_completed"));
         }).get(0);
     }
