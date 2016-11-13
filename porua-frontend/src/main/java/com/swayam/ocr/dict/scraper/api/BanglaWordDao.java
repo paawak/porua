@@ -15,18 +15,22 @@
 
 package com.swayam.ocr.dict.scraper.api;
 
+import com.swayam.ocr.dict.scraper.impl.AuditWebsite;
+
 /**
  * 
  * @author paawak
  */
 public interface BanglaWordDao {
 
-    int saveUrl(String url);
+    int saveUrl(int parentId, String url);
 
-    void insertBanglaWord(int urlId, String token);
+    void insertBanglaWord(String token);
 
-    int getUrlId(String url);
+    AuditWebsite getAuditWebsite(String url);
 
     boolean doesUrlExist(String url);
+
+    void markScrapingCompleted(int baseUrlId);
 
 }

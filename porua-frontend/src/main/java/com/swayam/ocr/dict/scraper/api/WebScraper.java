@@ -15,13 +15,15 @@
 
 package com.swayam.ocr.dict.scraper.api;
 
+import java.util.Optional;
+
 /**
  * 
  * @author paawak
  */
 public interface WebScraper {
 
-    void startScraping(String url,
+    void startScraping(Optional<String> parentUrl, String url,
             TaskCompletionNotifier taskCompletionNotifier);
 
 }

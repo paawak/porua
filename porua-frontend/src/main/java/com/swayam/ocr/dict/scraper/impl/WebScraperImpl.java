@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
@@ -62,7 +63,7 @@ public class WebScraperImpl implements WebScraper {
     }
 
     @Override
-    public void startScraping(String url, TaskCompletionNotifier taskCompletionNotifier) {
+    public void startScraping(Optional<String> parentUrl, String url, TaskCompletionNotifier taskCompletionNotifier) {
 
         CloseableHttpAsyncClient httpclient = HttpAsyncClients.createDefault();
         // Start the client
@@ -106,7 +107,7 @@ public class WebScraperImpl implements WebScraper {
                     }
 
                     if (rawText != null) {
-                        dispatchRawText(url, rawText, taskCompletionNotifier);
+                        dispatchRawText(parentUrl, url, rawText, taskCompletionNotifier);
                     }
 
                 }
@@ -136,9 +137,10 @@ public class WebScraperImpl implements WebScraper {
 
     }
 
-    private void dispatchRawText(String baseUrl, String rawText, TaskCompletionNotifier taskCompletionNotifier) {
+    private void dispatchRawText(Optional<String> parentUrl, String baseUrl, String rawText,
+            TaskCompletionNotifier taskCompletionNotifier) {
         executor.execute(() -> {
-            textHandler.handleRawText(baseUrl, rawText, taskCompletionNotifier);
+            textHandler.handleRawText(parentUrl, baseUrl, rawText, taskCompletionNotifier);
         });
     }
 

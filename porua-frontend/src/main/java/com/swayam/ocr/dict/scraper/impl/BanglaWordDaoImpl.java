@@ -17,8 +17,10 @@ package com.swayam.ocr.dict.scraper.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -44,15 +46,16 @@ public class BanglaWordDaoImpl implements BanglaWordDao {
     }
 
     @Override
-    public int saveUrl(String url) {
-        String sql = "insert into audit_web_site (site_name) values (?)";
+    public int saveUrl(int parentId, String url) {
+        String sql = "insert into audit_web_site (parent_id, site_name) values (?, ?)";
         KeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
         jdbcOperations.update(new PreparedStatementCreator() {
             @Override
             public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
                 PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-                ps.setString(1, url);
+                ps.setInt(1, parentId);
+                ps.setString(2, url);
                 return ps;
             }
         }, generatedKeyHolder);
@@ -60,9 +63,9 @@ public class BanglaWordDaoImpl implements BanglaWordDao {
     }
 
     @Override
-    public void insertBanglaWord(int urlId, String token) {
-        String sql = "insert into bangla_word (audit_web_site_id, word) values (?, ?)";
-        jdbcOperations.update(sql, urlId, token);
+    public void insertBanglaWord(String token) {
+        String sql = "insert into bangla_word ( word) values ( ?)";
+        jdbcOperations.update(sql, token);
     }
 
     @Override
@@ -72,9 +75,25 @@ public class BanglaWordDaoImpl implements BanglaWordDao {
     }
 
     @Override
-    public int getUrlId(String url) {
-        String sql = "select id from audit_web_site where site_name = ?";
-        return jdbcOperations.queryForObject(sql, Integer.class, url);
+    public AuditWebsite getAuditWebsite(String url) {
+        String sql = "select * from audit_web_site where site_name = ?";
+        return jdbcOperations.query(sql, new Object[] { url }, (ResultSet rs, int row) -> {
+            int parentId = rs.getInt("parent_id");
+            Optional<Integer> optionalParentId;
+            if (parentId == -1) {
+                optionalParentId = Optional.empty();
+            } else {
+                optionalParentId = Optional.of(parentId);
+            }
+            return new AuditWebsite(rs.getInt("id"), optionalParentId, rs.getString("site_name"),
+                    rs.getBoolean("scraping_completed"));
+        }).get(0);
+    }
+
+    @Override
+    public void markScrapingCompleted(int baseUrlId) {
+        String sql = "update audit_web_site set scraping_completed = TRUE where id = ?";
+        jdbcOperations.update(sql, baseUrlId);
     }
 
 }

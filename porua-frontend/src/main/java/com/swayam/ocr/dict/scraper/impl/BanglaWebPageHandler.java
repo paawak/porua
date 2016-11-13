@@ -16,6 +16,7 @@
 package com.swayam.ocr.dict.scraper.impl;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,20 +50,36 @@ public class BanglaWebPageHandler implements WebPageHandler {
     }
 
     @Override
-    public void handleRawText(String baseUrl, String text, TaskCompletionNotifier taskCompletionNotifier) {
+    public void handleRawText(Optional<String> parentUrl, String baseUrl, String text,
+            TaskCompletionNotifier taskCompletionNotifier) {
+
+        int parentUrlId;
+
+        if (parentUrl.isPresent()) {
+            parentUrlId = banglaWordDao.getAuditWebsite(parentUrl.get()).getId();
+        } else {
+            parentUrlId = -1;
+        }
 
         int baseUrlId;
+
         if (banglaWordDao.doesUrlExist(baseUrl)) {
-            baseUrlId = banglaWordDao.getUrlId(baseUrl);
+            AuditWebsite auditWebsite = banglaWordDao.getAuditWebsite(baseUrl);
+            if (auditWebsite.isScrapingCompleted()) {
+                taskCompletionNotifier.setBanglaLinks(Collections.emptySet());
+                return;
+            } else {
+                baseUrlId = auditWebsite.getId();
+            }
         } else {
-            baseUrlId = banglaWordDao.saveUrl(baseUrl);
+            baseUrlId = banglaWordDao.saveUrl(parentUrlId, baseUrl);
         }
 
         Set<String> banglaWords = banglaWordFinder.tokenize(baseUrl, text);
 
         banglaWords.forEach((String banglaWord) -> {
             try {
-                banglaWordDao.insertBanglaWord(baseUrlId, banglaWord);
+                banglaWordDao.insertBanglaWord(banglaWord);
             } catch (Exception e) {
                 LOGGER.warn("could not insert bangla word", e.getMessage());
             }
@@ -78,6 +95,8 @@ public class BanglaWebPageHandler implements WebPageHandler {
         } else {
             taskCompletionNotifier.setBanglaLinks(Collections.emptySet());
         }
+
+        banglaWordDao.markScrapingCompleted(baseUrlId);
 
     }
 

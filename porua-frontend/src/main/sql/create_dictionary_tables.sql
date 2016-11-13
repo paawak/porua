@@ -1,12 +1,14 @@
 CREATE TABLE audit_web_site (
 	id INTEGER(6) NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
-	site_name VARCHAR(200) UNIQUE NOT NULL
+	parent_id INTEGER(6) NOT NULL,
+	site_name MEDIUMTEXT NOT NULL,
+	scraping_completed BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 
 CREATE TABLE bangla_word (
 	id BIGINT(20) NOT NULL UNIQUE PRIMARY KEY AUTO_INCREMENT,
-	audit_web_site_id INTEGER(6) REFERENCES audit_web_site(id),
+	--audit_web_site_id INTEGER(6) REFERENCES audit_web_site(id),
 	word VARCHAR(200) CHARACTER SET utf8 COLLATE utf8_general_ci UNIQUE NOT NULL
 );
 

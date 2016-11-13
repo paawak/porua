@@ -15,6 +15,7 @@
 
 package com.swayam.ocr.dict.scraper;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 
@@ -40,15 +41,15 @@ public class BanglaWebScraperMain {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
 
         WebScraper webScraper = ctx.getBean(WebScraper.class);
-        new BanglaWebScraperMain().startScraping(webScraper,
+        new BanglaWebScraperMain().startScraping(webScraper, Optional.<String> empty(),
                 "http://www.rabindra-rachanabali.nltr.org/node/1");
     }
 
-    private void startScraping(WebScraper webScraper, String url) {
+    private void startScraping(WebScraper webScraper, Optional<String> parentUrl, String url) {
 
         LOGGER.info("started scraping {} ...", url);
 
-        webScraper.startScraping(url, new TaskCompletionNotifier() {
+        webScraper.startScraping(parentUrl, url, new TaskCompletionNotifier() {
 
             private final CountDownLatch countDownLatch = new CountDownLatch(1);
 
@@ -67,7 +68,7 @@ public class BanglaWebScraperMain {
                     LOGGER.error("", e);
                 }
                 banglaLinks.forEach((String link) -> {
-                    startScraping(webScraper, link);
+                    startScraping(webScraper, Optional.of(url), link);
                 });
             }
 

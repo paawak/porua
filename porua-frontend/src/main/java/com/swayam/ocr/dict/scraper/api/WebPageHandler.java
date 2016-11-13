@@ -15,12 +15,15 @@
 
 package com.swayam.ocr.dict.scraper.api;
 
+import java.util.Optional;
+
 /**
  * 
  * @author paawak
  */
 public interface WebPageHandler {
 
-    void handleRawText(String baseUrl, String text, TaskCompletionNotifier taskCompletionNotifier);
+    void handleRawText(Optional<String> parentUrl, String baseUrl, String text,
+            TaskCompletionNotifier taskCompletionNotifier);
 
 }
