@@ -52,13 +52,6 @@ public class BanglaWebScraperMain {
 
         LOGGER.info("started scraping {} ...", url);
 
-        try {
-            Thread.sleep(4_000);
-        } catch (InterruptedException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-
         webScraper.startScraping(parentUrl, url, new TaskCompletionNotifier() {
 
             private final CountDownLatch countDownLatch = new CountDownLatch(1);
