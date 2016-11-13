@@ -15,6 +15,8 @@
 
 package com.swayam.ocr.dict.scraper.api;
 
+import java.util.Optional;
+
 import com.swayam.ocr.dict.scraper.impl.AuditWebsite;
 
 /**
@@ -32,5 +34,9 @@ public interface BanglaWordDao {
     boolean doesUrlExist(String url);
 
     void markScrapingCompleted(int baseUrlId);
+
+    Optional<String> getNextUrlForScrapping();
+
+    void markErrorInScrapping(String url);
 
 }

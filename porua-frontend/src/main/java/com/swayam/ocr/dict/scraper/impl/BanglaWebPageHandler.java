@@ -17,10 +17,8 @@ package com.swayam.ocr.dict.scraper.impl;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,7 +69,7 @@ public class BanglaWebPageHandler implements WebPageHandler {
             AuditWebsite auditWebsite = banglaWordDao.getAuditWebsite(baseUrl);
             Period period = Period.between(LocalDate.now(), auditWebsite.getScrapingStarted().toLocalDate());
             if (auditWebsite.isScrapingCompleted() && period.getDays() < MIN_DAYS_BEFORE_RE_SCRAPING) {
-                taskCompletionNotifier.setBanglaLinks(Collections.emptySet());
+                taskCompletionNotifier.linksInsertedIntoDataStore();
                 return;
             } else {
                 baseUrlId = auditWebsite.getId();
@@ -92,16 +90,17 @@ public class BanglaWebPageHandler implements WebPageHandler {
 
         if (!banglaWords.isEmpty()) {
             Set<String> banglaLinks = hrefFinder.tokenize(baseUrl, text);
-            Set<String> uniqueBanglaLinks = banglaLinks.stream().filter((String link) -> {
+            banglaLinks.stream().filter((String link) -> {
                 return !banglaWordDao.doesUrlExist(link);
-            }).collect(Collectors.toSet());
+            }).forEach((String banglaLink) -> {
+                banglaWordDao.saveUrl(baseUrlId, banglaLink);
+            });
 
-            taskCompletionNotifier.setBanglaLinks(uniqueBanglaLinks);
-        } else {
-            taskCompletionNotifier.setBanglaLinks(Collections.emptySet());
         }
 
         banglaWordDao.markScrapingCompleted(baseUrlId);
+
+        taskCompletionNotifier.linksInsertedIntoDataStore();
 
     }
 

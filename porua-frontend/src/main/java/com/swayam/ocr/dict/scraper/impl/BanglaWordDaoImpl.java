@@ -20,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,6 +96,27 @@ public class BanglaWordDaoImpl implements BanglaWordDao {
     public void markScrapingCompleted(int baseUrlId) {
         String sql = "update audit_web_site set scraping_completed = TRUE where id = ?";
         jdbcOperations.update(sql, baseUrlId);
+    }
+
+    @Override
+    public Optional<String> getNextUrlForScrapping() {
+        String sql = "select site_name from audit_web_site where scraping_completed = FALSE and error_scraping = FALSE order by id";
+        List<String> urls = jdbcOperations.query(sql, (ResultSet rs, int row) -> {
+            return rs.getString("site_name");
+        });
+
+        if (urls.isEmpty()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(urls.get(0));
+
+    }
+
+    @Override
+    public void markErrorInScrapping(String url) {
+        String sql = "update audit_web_site set error_scraping = TRUE where site_name = ?";
+        jdbcOperations.update(sql, url);
     }
 
 }

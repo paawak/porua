@@ -3,6 +3,7 @@ CREATE TABLE audit_web_site (
 	parent_id INTEGER(6) NOT NULL,
 	site_name MEDIUMTEXT NOT NULL,
 	scraping_started DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	error_scraping BOOLEAN NOT NULL DEFAULT FALSE,
 	scraping_completed BOOLEAN NOT NULL DEFAULT FALSE
 );
 

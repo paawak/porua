@@ -88,7 +88,7 @@ public class WebScraperImpl implements WebScraper {
                     || (!contentTypeHeader.getValue().contains("text"))) {
 
                 LOGGER.info("aborting request...");
-                taskCompletionNotifier.errorInRequest();
+                taskCompletionNotifier.errorInRequest(url);
                 request.abort();
 
             } else {
@@ -115,7 +115,7 @@ public class WebScraperImpl implements WebScraper {
         } catch (InterruptedException | ExecutionException
                 | TimeoutException e) {
             LOGGER.error("request timed out", e);
-            taskCompletionNotifier.errorInRequest();
+            taskCompletionNotifier.errorInRequest(url);
 
         } finally {
             try {
