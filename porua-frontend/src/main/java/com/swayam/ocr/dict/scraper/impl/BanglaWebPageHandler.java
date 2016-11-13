@@ -86,7 +86,7 @@ public class BanglaWebPageHandler implements WebPageHandler {
             try {
                 banglaWordDao.insertBanglaWord(banglaWord);
             } catch (Exception e) {
-                LOGGER.warn("could not insert bangla word", e.getMessage());
+                LOGGER.warn("could not insert {}: {}", banglaWord, e.getMessage());
             }
         });
 
