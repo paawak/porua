@@ -17,6 +17,7 @@ package com.swayam.ocr.dict.scraper;
 
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,13 +42,16 @@ public class BanglaWebScraperMain {
 
         WebScraper webScraper = ctx.getBean(WebScraper.class);
 
+        Executor executor = ctx.getBean(Executor.class);
+
         BanglaWordDao banglaWordDao = ctx.getBean(BanglaWordDao.class);
 
-        new BanglaWebScraperMain().startScraping(banglaWordDao, webScraper, Optional.<String> empty(),
+        new BanglaWebScraperMain().startScraping(executor, banglaWordDao, webScraper, Optional.<String> empty(),
                 "http://www.rabindra-rachanabali.nltr.org/node/1");
     }
 
-    private void startScraping(BanglaWordDao banglaWordDao, WebScraper webScraper, Optional<String> parentUrl,
+    private void startScraping(Executor executor, BanglaWordDao banglaWordDao, WebScraper webScraper,
+            Optional<String> parentUrl,
             String url) {
 
         LOGGER.info("started scraping {} ...", url);
@@ -65,13 +69,15 @@ public class BanglaWebScraperMain {
                     LOGGER.error("", e);
                 }
 
-                LOGGER.info("getting the next url for scrapping");
+                executor.execute(() -> {
+                    LOGGER.info("getting the next url for scrapping");
 
-                Optional<String> nextUrl = banglaWordDao.getNextUrlForScrapping();
+                    Optional<String> nextUrl = banglaWordDao.getNextUrlForScrapping();
 
-                if (nextUrl.isPresent()) {
-                    startScraping(banglaWordDao, webScraper, Optional.of(url), nextUrl.get());
-                }
+                    if (nextUrl.isPresent()) {
+                        startScraping(executor, banglaWordDao, webScraper, Optional.of(url), nextUrl.get());
+                    }
+                });
 
             }
 
