@@ -37,6 +37,10 @@ public class BanglaWebScraperMain {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BanglaWebScraperMain.class);
 
+    // private static final String INITIAL_SITE =
+    // "http://www.rabindra-rachanabali.nltr.org/node/1";
+    private static final String INITIAL_SITE = "http://www.anandabazar.com/";
+
     public static void main(String[] args) {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
 
@@ -47,7 +51,7 @@ public class BanglaWebScraperMain {
         BanglaWordDao banglaWordDao = ctx.getBean(BanglaWordDao.class);
 
         new BanglaWebScraperMain().startScraping(executor, banglaWordDao, webScraper, Optional.<String> empty(),
-                "http://www.rabindra-rachanabali.nltr.org/node/1");
+                INITIAL_SITE);
     }
 
     private void startScraping(Executor executor, BanglaWordDao banglaWordDao, WebScraper webScraper,
