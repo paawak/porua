@@ -39,7 +39,8 @@ public class BanglaWebScraperMain {
 
     // private static final String INITIAL_SITE =
     // "http://www.rabindra-rachanabali.nltr.org/node/1";
-    private static final String INITIAL_SITE = "http://www.anandabazar.com/";
+    // private static final String INITIAL_SITE = "http://www.anandabazar.com/";
+    private static final String INITIAL_SITE = "http://bartamanpatrika.com/";
 
     public static void main(String[] args) {
         ApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
