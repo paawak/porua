@@ -1,4 +1,4 @@
-FROM alpine:3.7
+FROM alpine:3.7 as builder
 MAINTAINER Palash Ray <paawak@gmail.com>
 
 
@@ -60,7 +60,24 @@ RUN cd ${tess_dir}/src/ &&  \
     make &&  \
     make install 
 
-RUN export TESSDATA_PREFIX=${tess_dir}/tessdata/
+
+FROM alpine:3.7
+MAINTAINER Palash Ray <paawak@gmail.com>
+
+ENV tess_dir /tesseract-3.05.02 
+
+RUN mkdir -p ${tess_dir}/src  \
+    ${tess_dir}/install  \
+    ${tess_dir}/tessdata  \
+    /input-output   
+
+COPY --from=builder ${tess_dir}/tessdata ${tess_dir}/tessdata
+
+COPY --from=builder ${tess_dir}/install ${tess_dir}/install
+
+COPY --from=builder /usr /usr
+
+
 CMD ${tess_dir}/install/bin/tesseract -l $LANG $IMAGE $OUTFILE
 
 
