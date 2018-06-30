@@ -1,0 +1,36 @@
+*Installing Tesseract 3.x from source*
+
+https://github.com/tesseract-ocr/tesseract/wiki/Compiling#linux
+
+Dependencies:
+1. G++
+2. Leptonica
+3. libpng
+4. libjpeg
+5. libtiff
+
+The below are the commands:
+./autogen.sh 
+./configure --prefix=/kaaj/source/porua/tesseract-ocr-docker/tesseract-3.05.02-bin
+make
+make install
+
+*Running tesseract*
+
+Copy the tessdata directory to an appropriate folder
+
+export TESSDATA_PREFIX=/kaaj/source/porua/tesseract-ocr-docker/tessdata/
+bin/tesseract -l ben ../images/Bangla-mahabharat-1-page_2.jpg outputbase
+
+
+*Building the docker image*
+
+docker build -t paawak/tesseract-ocr-3.05.02:0.1 .
+
+
+
+*Running docker image*
+
+docker run -it -v images:/input-output -e LANG=ben -e IMAGE=/input-output/Bangla-mahabharat-1-page_2.jpg -e OUTFILE=/input-output/output paawak/tesseract-ocr-3.05.02:0.1
+
+
