@@ -3,15 +3,9 @@ MAINTAINER Palash Ray <paawak@gmail.com>
 
 
 RUN apk add --no-cache g++  \
-    autoconf automake libtool   \
-    #autoconf-archive    \
-    #pkg-config  \
-    libpng  \
-    libjpeg    \
-    make
-    #libtiff    \
-    #zlib1g  \
-    #leptonica
+    autoconf automake libtool   \   
+    make    
+
 
 ENV tess_dir /tesseract-3.05.02 
 
@@ -19,14 +13,26 @@ RUN mkdir -p ${tess_dir}/src  \
     ${tess_dir}/install  \
     ${tess_dir}/tessdata  \
     /input-output   \
-    /leptonica-1.76.0-src
+    /leptonica-1.76.0-src   \
+    /libpng-1.6.34-src  \
+    /zlib-1.2.11-src
 
 
 ADD ${tess_dir} ${tess_dir}/src/
 ADD tessdata ${tess_dir}/tessdata/
 ADD leptonica-1.76.0    /leptonica-1.76.0-src/
+ADD libpng-1.6.34   /libpng-1.6.34-src/
+ADD zlib-1.2.11 /zlib-1.2.11-src/
 
-#ADD images //
+RUN cd /zlib-1.2.11-src/   &&  \
+    ./configure &&  \
+    make &&  \
+    make install 
+
+RUN cd /libpng-1.6.34-src/   &&  \
+    ./configure &&  \
+    make &&  \
+    make install 
 
 RUN cd /leptonica-1.76.0-src/   &&  \
     ./configure &&  \

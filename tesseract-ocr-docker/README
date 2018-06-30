@@ -31,6 +31,6 @@ docker build -t paawak/tesseract-ocr-3.05.02:0.1 .
 
 *Running docker image*
 
-docker run -it -v images:/input-output -e LANG=ben -e IMAGE=/input-output/Bangla-mahabharat-1-page_2.jpg -e OUTFILE=/input-output/output paawak/tesseract-ocr-3.05.02:0.1
+docker run -it -v images:/input-output -e LANG=ben -e IMAGE=/input-output/Bangla-mahabharat-1-page_2.jpg -e OUTFILE=/input-output/output -e TESSDATA_PREFIX=/tesseract-3.05.02/tessdata/ paawak/tesseract-ocr-3.05.02:0.1
 
 
