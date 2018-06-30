@@ -11,8 +11,6 @@ ENV tess_dir /tesseract-3.05.02
 
 RUN mkdir -p ${tess_dir}/src  \
     ${tess_dir}/install  \
-    ${tess_dir}/tessdata  \
-    /input-output   \
     /leptonica-1.76.0-src   \
     /libpng-1.6.34-src  \
     /zlib-1.2.11-src    \
@@ -22,7 +20,6 @@ RUN mkdir -p ${tess_dir}/src  \
 
 
 ADD ${tess_dir} ${tess_dir}/src/
-ADD tessdata ${tess_dir}/tessdata/
 ADD leptonica-1.76.0    /leptonica-1.76.0-src/
 ADD libpng-1.6.34   /libpng-1.6.34-src/
 ADD zlib-1.2.11 /zlib-1.2.11-src/
@@ -71,7 +68,7 @@ RUN mkdir -p ${tess_dir}/src  \
     ${tess_dir}/tessdata  \
     /input-output   
 
-COPY --from=builder ${tess_dir}/tessdata ${tess_dir}/tessdata
+ADD tessdata ${tess_dir}/tessdata/
 
 COPY --from=builder ${tess_dir}/install ${tess_dir}/install
 
