@@ -72,17 +72,16 @@ RUN cd ${sources}/  && \
 FROM alpine:3.7
 MAINTAINER Palash Ray <paawak@gmail.com>
 
-ENV tess_dir /tesseract-3.05.02 
+ENV tess_dir tesseract-3.05.02 
 
-RUN mkdir -p ${tess_dir}/src  \
-    ${tess_dir}/install  \
-    ${tess_dir}/tessdata  \
+RUN mkdir -p /${tess_dir}/install  \
+    /${tess_dir}/tessdata  \
     /input-output   
 
 
 COPY --from=builder /lib-sources/tessdata /${tess_dir}/tessdata
 
-COPY --from=builder ${tess_dir}/install ${tess_dir}/install
+COPY --from=builder /${tess_dir}/install /${tess_dir}/install
 
 COPY --from=builder /usr /usr
 
