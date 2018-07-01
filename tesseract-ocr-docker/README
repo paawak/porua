@@ -36,5 +36,11 @@ docker run -it -v /kaaj/source/porua/tesseract-ocr-docker/images:/input-output -
 
 docker run -it -v /kaaj/source/porua/tesseract-ocr-docker/images:/input-output -e LANG=ben -e IMAGE=/input-output/bangla.tif -e OUTFILE=/input-output/output -e TESSDATA_PREFIX=/tesseract-3.05.02/tessdata/ paawak/tesseract-ocr-3.05.02:0.2
 
+*To gte into a docker image*
+
+docker run -it 1e66e2d38256 sh
+
+
+
 
 

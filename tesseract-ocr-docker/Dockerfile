@@ -7,55 +7,66 @@ RUN apk add --no-cache g++  \
     make    
 
 
-ENV tess_dir /tesseract-3.05.02 
+ENV tess_dir tesseract-3.05.02 
+ENV sources /lib-sources 
 
-RUN mkdir -p ${tess_dir}/src  \
-    ${tess_dir}/install  \
-    /leptonica-1.76.0-src   \
-    /libpng-1.6.34-src  \
-    /zlib-1.2.11-src    \
-    /jpeg-6b-src    \
-    /usr/local/man/man1/cjpeg.1 \
-    /tiff-4.0.9-src
+ADD ${sources} ${sources}/
+
+RUN mkdir -p /${tess_dir}/install  \    
+    /usr/local/man/man1/cjpeg.1 
 
 
-ADD ${tess_dir} ${tess_dir}/src/
-ADD leptonica-1.76.0    /leptonica-1.76.0-src/
-ADD libpng-1.6.34   /libpng-1.6.34-src/
-ADD zlib-1.2.11 /zlib-1.2.11-src/
-ADD jpeg-6b /jpeg-6b-src/
-ADD tiff-4.0.9 /tiff-4.0.9-src/
+RUN cd ${sources}/  && \
+    tar -xvf zlib-1.2.11.tar.gz
 
-RUN cd /zlib-1.2.11-src/   &&  \
+RUN cd ${sources}/zlib-1.2.11/   &&  \
     ./configure &&  \
     make &&  \
     make install 
 
-RUN cd /jpeg-6b-src/   &&  \
+RUN cd ${sources}/  && \
+    tar -xvf jpegsrc.v6b.tar.gz
+
+RUN cd ${sources}/jpeg-6b/   &&  \
     ./configure &&  \
     make &&  \
     make install 
 
-RUN cd /tiff-4.0.9-src/   &&  \
+RUN cd ${sources}/  && \
+    tar -xvf tiff-4.0.9.tar.gz
+
+RUN cd ${sources}/tiff-4.0.9/   &&  \
     ./configure &&  \
     make &&  \
     make install 
 
-RUN cd /libpng-1.6.34-src/   &&  \
+RUN cd ${sources}/  && \
+    tar -xvf libpng-1.6.34.tar.xz
+
+RUN cd ${sources}/libpng-1.6.34/   &&  \
     ./configure &&  \
     make &&  \
     make install 
 
-RUN cd /leptonica-1.76.0-src/   &&  \
+RUN cd ${sources}/  && \
+    tar -xvf leptonica-1.76.0.tar.gz
+
+RUN cd ${sources}/leptonica-1.76.0/   &&  \
     ./configure &&  \
     make &&  \
     make install 
 
-RUN cd ${tess_dir}/src/ &&  \
+RUN cd ${sources}/  && \
+    tar -xvf ${tess_dir}.tar.gz
+
+RUN cd ${sources}/${tess_dir}/ &&  \
     ./autogen.sh &&  \
-    ./configure --prefix=${tess_dir}/install &&  \
+    ./configure --prefix=/${tess_dir}/install &&  \
     make &&  \
     make install 
+
+RUN cd ${sources}/  && \
+    tar -xvf tessdata.tar.gz
 
 
 FROM alpine:3.7
@@ -68,13 +79,14 @@ RUN mkdir -p ${tess_dir}/src  \
     ${tess_dir}/tessdata  \
     /input-output   
 
-ADD tessdata ${tess_dir}/tessdata/
+
+COPY --from=builder /lib-sources/tessdata /${tess_dir}/tessdata
 
 COPY --from=builder ${tess_dir}/install ${tess_dir}/install
 
 COPY --from=builder /usr /usr
 
 
-CMD ${tess_dir}/install/bin/tesseract -l $LANG $IMAGE $OUTFILE
+CMD /${tess_dir}/install/bin/tesseract -l $LANG $IMAGE $OUTFILE
 
 
