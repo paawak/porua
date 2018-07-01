@@ -26,14 +26,15 @@ import org.junit.Test;
 
 public class BasicTesseractExampleTest {
 
-	private static final String TESSDATA = "/kaaj/BanglaOCR/tesseract/tessdata";
-	private static final String BANGLA_IMAGE_FILE =  "/kaaj/github/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
+	private static final String TESSDATA = "/kaaj/source/porua/tesseract-configs/tessdata";
+	private static final String BANGLA_IMAGE_FILE = "/kaaj/source/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_1/Bangla-mahabharat-1-page_1.png";
 
 	@Test
 	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_eng() throws Exception {
 
 		// Open input image with leptonica library
-		String imageFile = BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/test-english.png").getPath();
+		String imageFile = BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/test-english.png")
+				.getPath();
 		PIX image = pixRead(imageFile);
 		BytePointer outText = null;
 
@@ -56,7 +57,8 @@ public class BasicTesseractExampleTest {
 		System.out.printf("OCR output:%s\n", ocrText);
 		assertTrue(!ocrText.isEmpty());
 
-		String expected = readFile(BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/test-english.txt").getPath());
+		String expected = readFile(
+				BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/test-english.txt").getPath());
 
 		assertEquals(expected, ocrText);
 
@@ -65,7 +67,8 @@ public class BasicTesseractExampleTest {
 	@Test
 	public void givenTessBaseApi_whenImageOcrd_thenTextDisplayed_ben() throws Exception {
 		// Open input image with leptonica library
-		String imageFile = BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/Bangla-300-short.png").getPath();
+		String imageFile = BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/Bangla-300-short.png")
+				.getPath();
 		PIX image = pixRead(imageFile);
 		BytePointer outText = null;
 
@@ -88,7 +91,8 @@ public class BasicTesseractExampleTest {
 		System.out.printf("OCR output:%s\n", ocrText);
 		assertTrue(!ocrText.isEmpty());
 
-		String expected = readFile(BasicTesseractExampleTest.class.getResource("/com/swayam/ocr/porua/res/Bangla-300-short.txt").getPath());
+		String expected = readFile(BasicTesseractExampleTest.class
+				.getResource("/com/swayam/ocr/porua/res/Bangla-300-short.txt").getPath());
 
 		assertEquals(expected, ocrText);
 	}
@@ -115,7 +119,8 @@ public class BasicTesseractExampleTest {
 			String ocrText = ocrResult.getString().trim();
 			ocrResult.deallocate();
 			int conf = api.MeanTextConf();
-			System.out.printf("Box[%d]: x=%d, y=%d, w=%d, h=%d, confidence: %d, text: %s%n", i, box.x(), box.y(), box.w(), box.h(), conf, ocrText);
+			System.out.printf("Box[%d]: x=%d, y=%d, w=%d, h=%d, confidence: %d, text: %s%n", i, box.x(), box.y(),
+					box.w(), box.h(), conf, ocrText);
 		}
 
 		// Destroy used object and release memory
@@ -150,7 +155,8 @@ public class BasicTesseractExampleTest {
 			IntBuffer y2 = IntBuffer.allocate(50);
 
 			ri.BoundingBox(level, x1, y1, x2, y2);
-			System.out.printf("word: '%s';  \tconf: %.2f; BoundingBox: %d,%d,%d,%d;%n", ocrText, conf, x1.get(), y1.get(), x2.get(), y2.get());
+			System.out.printf("word: '%s';  \tconf: %.2f; BoundingBox: %d,%d,%d,%d;%n", ocrText, conf, x1.get(),
+					y1.get(), x2.get(), y2.get());
 		}
 
 		// Destroy used object and release memory
