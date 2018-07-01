@@ -69,7 +69,7 @@ RUN cd ${sources}/  && \
     tar -xvf tessdata.tar.gz
 
 
-FROM alpine:3.7
+FROM openjdk:8u171-jre-alpine3.7
 MAINTAINER Palash Ray <paawak@gmail.com>
 
 ENV tess_dir tesseract-3.05.02 
