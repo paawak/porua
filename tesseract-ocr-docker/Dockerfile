@@ -25,9 +25,9 @@ RUN cd ${sources}/zlib-1.2.11/   &&  \
     make install 
 
 RUN cd ${sources}/  && \
-    tar -xvf jpegsrc.v6b.tar.gz
+    tar -xvf jpegsrc.v9c.tar.gz
 
-RUN cd ${sources}/jpeg-6b/   &&  \
+RUN cd ${sources}/jpeg-9c/   &&  \
     ./configure &&  \
     make &&  \
     make install 
