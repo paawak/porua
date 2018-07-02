@@ -2,19 +2,19 @@
 <div>
 	<h2>Tesseract OCR Frontend</h2>
 	<div>
-		<form enctype="multipart/form-data" action="rest/ocr" method="post">
+		<form enctype="multipart/form-data" action="rest/ocr" method="POST" >
 			<div>
 				<div>Language:</div>
 				<div>
-					<input type="radio" name="language" value="ben" checked> Bangla<br> 
-					<input type="radio" name="language" value="eng"> English<br>
+					<input type="radio" name="language" id="language" value="ben" checked="checked"> Bangla<br>   
+					<input type="radio" name="language" id="language" value="eng"> English<br>
 				</div>
 			</div>
 			<div>
 				Image: <input type="file" name="images" multiple="multiple"/>
 			</div>
 			<div>
-				<input type="submit" value="Submit to OCR"/>
+				<input type="submit"/>
 			</div>
 		</form>
 	</div>

@@ -10,3 +10,8 @@ logging:
     org.springframework.web: INFO
     org.hibernate: INFO
 
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
