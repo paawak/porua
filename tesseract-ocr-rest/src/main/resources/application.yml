@@ -1,0 +1,12 @@
+server:
+  port: 8080
+  servlet:
+    contextPath: /
+  
+logging:
+  level:
+    root: INFO
+    com.swayam.ocr.porua: DEBUG
+    org.springframework.web: INFO
+    org.hibernate: INFO
+
