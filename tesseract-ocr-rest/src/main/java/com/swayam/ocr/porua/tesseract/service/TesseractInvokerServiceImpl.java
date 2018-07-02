@@ -57,7 +57,6 @@ public class TesseractInvokerServiceImpl implements TesseractInvokerService {
 
 			api.End();
 			outText.close();
-			outText.deallocate();
 			pixDestroy(image);
 
 			return ocrText;
