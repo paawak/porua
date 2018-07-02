@@ -8,7 +8,6 @@ logging:
     root: INFO
     com.swayam.ocr.porua: DEBUG
     org.springframework.web: INFO
-    org.hibernate: INFO
 
 spring:
   servlet:

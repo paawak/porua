@@ -1,0 +1,7 @@
+app:
+  config:
+    server:
+      image-write-directory: /kaaj/source/porua/tesseract-ocr-rest/target/temp-images
+    ocr:
+      tesseract:
+        tessdata-location: /kaaj/source/porua/tesseract-configs/tessdata

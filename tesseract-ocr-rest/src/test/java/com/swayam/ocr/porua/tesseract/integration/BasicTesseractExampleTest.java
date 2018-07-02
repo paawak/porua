@@ -1,4 +1,4 @@
-package com.swayam.ocr.porua;
+package com.swayam.ocr.porua.tesseract.integration;
 
 import static org.bytedeco.javacpp.lept.L_CLONE;
 import static org.bytedeco.javacpp.lept.boxaGetBox;
