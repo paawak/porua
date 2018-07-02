@@ -24,6 +24,7 @@ import org.bytedeco.javacpp.tesseract.TessBaseAPI;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class BasicTesseractExampleTest {
 
 	private static final String TESSDATA = "/kaaj/source/porua/tesseract-configs/tessdata";
@@ -97,7 +98,6 @@ public class BasicTesseractExampleTest {
 		assertEquals(expected, ocrText);
 	}
 
-	@Ignore
 	@Test
 	public void givenTessBaseApi_GetComponentImages() throws Exception {
 		PIX image = pixRead(BANGLA_IMAGE_FILE);
@@ -166,7 +166,6 @@ public class BasicTesseractExampleTest {
 
 	}
 
-	@Ignore
 	@Test
 	public void givenTessBaseApi_rajshekhar_basu_mahabharat() throws Exception {
 
