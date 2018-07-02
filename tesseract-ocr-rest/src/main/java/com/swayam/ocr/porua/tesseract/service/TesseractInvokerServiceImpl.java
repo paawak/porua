@@ -19,8 +19,6 @@ import org.springframework.stereotype.Service;
 import com.swayam.ocr.porua.tesseract.model.ImageData;
 import com.swayam.ocr.porua.tesseract.model.Language;
 
-import reactor.core.publisher.Flux;
-
 @Service
 public class TesseractInvokerServiceImpl implements TesseractInvokerService {
 
@@ -36,7 +34,7 @@ public class TesseractInvokerServiceImpl implements TesseractInvokerService {
 	}
 
 	@Override
-	public Flux<String> submitToOCR(Language language, ImageData imageData) throws IOException {
+	public String submitToOCR(Language language, ImageData imageData) throws IOException {
 
 		Path imagePath = saveFile(imageData);
 
@@ -45,7 +43,7 @@ public class TesseractInvokerServiceImpl implements TesseractInvokerService {
 		try (TessBaseAPI api = new TessBaseAPI();) {
 			int returnCode = api.Init(tessdataDirectory, language.name());
 			if (returnCode != 0) {
-				return Flux.error(new RuntimeException("could not initialize tesseract, error code: " + returnCode));
+				throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 			}
 
 			PIX image = pixRead(imagePath.toFile().getAbsolutePath());
@@ -62,7 +60,7 @@ public class TesseractInvokerServiceImpl implements TesseractInvokerService {
 			outText.deallocate();
 			pixDestroy(image);
 
-			return Flux.just(ocrText);
+			return ocrText;
 
 		} finally {
 			Files.delete(imagePath);
