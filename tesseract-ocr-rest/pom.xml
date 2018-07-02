@@ -92,13 +92,13 @@
 									<goal>build</goal>
 								</goals>
 							</execution>
-							<!-- <execution>
+							<execution>
 								<id>push-docker-image</id>
 								<phase>install</phase>
 								<goals>
 									<goal>push</goal>
 								</goals>
-							</execution> -->
+							</execution>
 						</executions>
 					</plugin>
 				</plugins>
