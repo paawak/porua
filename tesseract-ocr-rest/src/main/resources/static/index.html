@@ -2,7 +2,7 @@
 <div>
 	<h2>Tesseract OCR Frontend</h2>
 	<div>
-		<form enctype="multipart/form-data" action="" method="post">
+		<form enctype="multipart/form-data" action="rest/ocr" method="post">
 			<div>
 				<div>Language:</div>
 				<div>
@@ -11,7 +11,7 @@
 				</div>
 			</div>
 			<div>
-				Image: <input type="file" name="image" />
+				Image: <input type="file" name="images" multiple="multiple"/>
 			</div>
 			<div>
 				<input type="submit" value="Submit to OCR"/>
