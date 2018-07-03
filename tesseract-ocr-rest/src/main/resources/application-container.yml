@@ -4,4 +4,4 @@ app:
       image-write-directory: /tesseract-temp-images  
     ocr:
       tesseract:
-        tessdata-location: /tesseract-3.05.02/tessdata/
+        tessdata-location: /tesseract/tessdata/
