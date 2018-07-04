@@ -5,8 +5,8 @@ RUN apk add --no-cache g++  \
     make    
 
 RUN mkdir -p /libs/tar-ball  \    
-    /libs/src  \
-    /usr/local/man/man1/cjpeg.1 
+    /libs/src  
+    #/usr/local/man/man1/cjpeg.1 
 
 ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
@@ -24,7 +24,8 @@ RUN mkdir /input-output
 
 COPY --from=builder /tesseract/tessdata /tesseract/tessdata
 
-COPY --from=builder /usr /usr
+COPY --from=builder /usr/local/lib /usr/local/lib
+COPY --from=builder /usr/local/bin /usr/local/bin
 
 
 CMD tesseract -l $LANG $IMAGE $OUTFILE
