@@ -25,7 +25,7 @@ public class OCRFrontController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(OCRFrontController.class);
 
 	private static final List<String> SUPPORTED_CONTENT_TYPES = Arrays.asList(MediaType.IMAGE_JPEG_VALUE,
-			MediaType.IMAGE_PNG_VALUE, "image/tiff");
+			MediaType.IMAGE_PNG_VALUE, "image/tiff", MediaType.APPLICATION_OCTET_STREAM_VALUE);
 
 	private final TesseractInvokerService tesseractInvokerService;
 
