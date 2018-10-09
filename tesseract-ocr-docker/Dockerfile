@@ -6,7 +6,7 @@ ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
 
 RUN apk add --no-cache g++  \
-    autoconf automake libtool libgomp  \   
+    autoconf automake libtool \   
     make    &&  \
     chmod u+rx /scripts/install-libs.sh &&  \
     /scripts/install-libs.sh 
@@ -20,6 +20,7 @@ RUN mkdir /input-output
 
 ADD tessdata.tar.gz /tesseract/
 
+COPY --from=tess_installer /usr/lib/libgomp.so* /usr/lib/
 COPY --from=tess_installer /usr/local/lib /usr/local/lib
 COPY --from=tess_installer /usr/local/bin /usr/local/bin
 
