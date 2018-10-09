@@ -1,19 +1,19 @@
 ###################         START BUILDER         ###################
 
-FROM alpine:3.7 as tess_installer      
+FROM alpine:3.8 as tess_installer      
 
 ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
 
 RUN apk add --no-cache g++  \
-    autoconf automake libtool   \   
+    autoconf automake libtool libgomp  \   
     make    &&  \
     chmod u+rx /scripts/install-libs.sh &&  \
     /scripts/install-libs.sh 
 
 ###################         END BUILDER         ###################
 
-FROM openjdk:8u171-jre-alpine3.7
+FROM openjdk:8u171-jre-alpine3.8
 MAINTAINER Palash Ray <paawak@gmail.com>
 
 RUN mkdir /input-output   
