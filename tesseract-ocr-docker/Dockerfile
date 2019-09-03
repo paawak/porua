@@ -1,6 +1,6 @@
 ###################         START BUILDER         ###################
 
-FROM alpine:3.8 as tess_installer      
+FROM alpine:3.10.2 as tess_installer      
 
 ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
