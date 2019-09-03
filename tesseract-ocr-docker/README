@@ -9,6 +9,10 @@ Dependencies:
 4. libjpeg
 5. libtiff
 
+For available packages in Alpine Linux:
+1. http://dl-cdn.alpinelinux.org/alpine/v3.10/main/x86_64/
+2. http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/
+
 The below are the commands:
 ./autogen.sh 
 ./configure --prefix=/kaaj/source/porua/tesseract-ocr-docker/tesseract-4.1.0-bin

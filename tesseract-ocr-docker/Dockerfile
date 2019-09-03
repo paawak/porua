@@ -7,6 +7,7 @@ ADD install-libs.sh /scripts/
 
 RUN apk add --no-cache g++  \
     autoconf automake libtool \   
+    leptonica-dev icu-dev pango-dev cairo-dev \
     make    &&  \
     chmod u+rx /scripts/install-libs.sh &&  \
     /scripts/install-libs.sh 
