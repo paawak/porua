@@ -6,7 +6,7 @@ ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
 
 RUN apt-get update  &&  \
-    apt-get install -y apt-utils g++  \
+    apt-get install -y g++  \
     pkg-config autoconf automake libtool \   
     make    &&  \
     chmod u+rx /scripts/install-libs.sh &&  \
@@ -21,11 +21,11 @@ RUN mkdir /input-output
 
 ADD tessdata.tar.gz /tesseract/
 
-COPY --from=tess_installer /usr/lib/libgomp.so* /usr/lib/
 COPY --from=tess_installer /usr/local/lib /usr/local/lib
 COPY --from=tess_installer /usr/local/bin /usr/local/bin
 
 
-CMD tesseract -l $LANG $IMAGE $OUTFILE
+
+CMD /usr/local/bin/tesseract -l $LANG $IMAGE $OUTFILE
 
 
