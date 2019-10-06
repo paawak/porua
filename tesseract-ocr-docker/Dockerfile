@@ -1,11 +1,12 @@
 ###################         START BUILDER         ###################
 
-FROM alpine:3.8 as tess_installer      
+FROM debian:bullseye-20190910-slim as tess_installer      
 
 ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
 
-RUN apk add --no-cache g++  \
+RUN apt-get update  &&  \
+    apt-get install g++  \
     autoconf automake libtool \   
     make    &&  \
     chmod u+rx /scripts/install-libs.sh &&  \
