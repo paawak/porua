@@ -10,22 +10,18 @@ RUN apt-get update  &&  \
     pkg-config autoconf automake libtool \   
     make    &&  \
     chmod u+rx /scripts/install-libs.sh &&  \
-    /scripts/install-libs.sh 
+    /scripts/install-libs.sh  && \
+    ldconfig
 
-###################         END BUILDER         ###################
-
-FROM openjdk:8u171-jre-alpine3.8
-MAINTAINER Palash Ray <paawak@gmail.com>
 
 RUN mkdir /input-output   
 
 ADD tessdata.tar.gz /tesseract/
 
-COPY --from=tess_installer /usr/local/lib /usr/local/lib
-COPY --from=tess_installer /usr/local/bin /usr/local/bin
 
 
 
-CMD /usr/local/bin/tesseract -l $LANG $IMAGE $OUTFILE
+
+CMD tesseract -l $LANG $IMAGE $OUTFILE
 
 
