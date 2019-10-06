@@ -6,6 +6,14 @@ This image is built on top of Alpine 3.7 and has the *paawak/tesseract-ocr-bareb
 
 This application is written in Java/Spring Boot. JavaCPP-Presets(https://github.com/bytedeco/javacpp-presets) is used to talk to the C++ API of Tesseract from Java. Then, Spring Boot uses REST semantices to further expose these calls over HTTP. 
 
+# How build docker image
+
+mvn clean package
+
+# How upload docker image to docker hub
+
+mvn clean install
+
 # How to run
 
 docker run -it -p 8080:8080 -e spring.profiles.active=default,container paawak/tesseract-ocr-rest:latest
