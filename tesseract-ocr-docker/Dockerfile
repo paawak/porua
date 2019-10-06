@@ -6,8 +6,8 @@ ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
 
 RUN apt-get update  &&  \
-    apt-get install g++  \
-    autoconf automake libtool \   
+    apt-get install -y apt-utils g++  \
+    pkg-config autoconf automake libtool \   
     make    &&  \
     chmod u+rx /scripts/install-libs.sh &&  \
     /scripts/install-libs.sh 
