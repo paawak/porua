@@ -36,7 +36,7 @@ docker build -t paawak/tesseract-ocr-4.1.0:0.1 .
 *Running docker image*
 
 
-docker run -it -v /kaaj/source/porua/tesseract-ocr-docker/sample-images:/input-output -e LANG=ben -e IMAGE=/input-output/bangla.tif -e OUTFILE=/input-output/output -e TESSDATA_PREFIX=/tesseract/tessdata/  paawak/tesseract-ocr-barebones:alpine_jre-8_tess-4.1.0_v0.1
+docker run -it -v /kaaj/source/porua/tesseract-ocr-docker/sample-images:/input-output -e LANG=ben -e IMAGE=/input-output/bangla.tif -e OUTFILE=/input-output/output -e TESSDATA_PREFIX=/tesseract/tessdata/  paawak/tesseract-ocr-barebones:alpine_jre-8_tess-4.0.0_v0.1
 
 *To get into a docker image*
 
@@ -47,7 +47,7 @@ docker run -it 1e66e2d38256 sh
 
 docker ps --filter status=dead --filter status=exited -aq | xargs -r docker rm -v
 
-docker images --no-trunc | grep '<none>' | awk '{ print $3 }' | xargs -r docker rmi
+docker images --no-trunc | grep '<none>' | awk '{ print $3 }' | xargs -r docker rmi -f
 
 
 *Running Tesseract REST Docker*
@@ -56,9 +56,9 @@ docker run -it -p 8080:8080 -e spring.profiles.active=default,container paawak/t
 
 *Refactored*
 
-docker build -t paawak/tesseract-ocr-barebones:alpine_jre-8_tess-4.1.0_v0.1 .
+docker build -t paawak/tesseract-ocr-barebones:alpine_jre-8_tess-4.0.0_v0.1 .
 
-docker run -it -v /kaaj/source/porua/tesseract-ocr-docker/sample-images:/input-output -e LANG=ben -e IMAGE=/input-output/bangla.tif -e OUTFILE=/input-output/output -e TESSDATA_PREFIX=/tesseract/tessdata/ paawak/tesseract-ocr-barebones:alpine_jre-8_tess-4.1.0_v0.1
+docker run -it -v /kaaj/source/porua/tesseract-ocr-docker/sample-images:/input-output -e LANG=ben -e IMAGE=/input-output/bangla.tif -e OUTFILE=/input-output/output -e TESSDATA_PREFIX=/tesseract/tessdata/ paawak/tesseract-ocr-barebones:alpine_jre-8_tess-4.0.0_v0.1
 
 
 
