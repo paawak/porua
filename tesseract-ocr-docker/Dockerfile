@@ -21,7 +21,14 @@ RUN mkdir /input-output
 
 ADD tessdata.tar.gz /tesseract/
 
+COPY --from=tess_installer /usr/lib/libwebp.so* /usr/lib/
+COPY --from=tess_installer /usr/lib/libgif.so* /usr/lib/
+COPY --from=tess_installer /usr/lib/libpng.so* /usr/lib/
+COPY --from=tess_installer /usr/lib/libjpeg.so* /usr/lib/
+COPY --from=tess_installer /usr/lib/libtiff.so* /usr/lib/
+COPY --from=tess_installer /usr/lib/libcairo.so* /usr/lib/
 COPY --from=tess_installer /usr/lib/libgomp.so* /usr/lib/
+COPY --from=tess_installer /usr/lib/liblept.so* /usr/lib/
 COPY --from=tess_installer /usr/local/lib /usr/local/lib
 COPY --from=tess_installer /usr/local/bin /usr/local/bin
 
