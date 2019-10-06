@@ -1,6 +1,4 @@
-###################         START BUILDER         ###################
-
-FROM debian:bullseye-20190910-slim as tess_installer      
+FROM debian:bullseye-20190910-slim    
 
 ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
@@ -13,14 +11,9 @@ RUN apt-get update  &&  \
     /scripts/install-libs.sh  && \
     ldconfig
 
-
 RUN mkdir /input-output   
 
 ADD tessdata.tar.gz /tesseract/
-
-
-
-
 
 CMD tesseract -l $LANG $IMAGE $OUTFILE
 
