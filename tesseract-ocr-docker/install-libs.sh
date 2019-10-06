@@ -17,3 +17,6 @@ do
     make install
 done
 
+rm -rfv $libSrc
+rm -rfv $libDest
+
