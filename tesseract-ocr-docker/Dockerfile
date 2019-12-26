@@ -1,6 +1,6 @@
 ###################         START BUILDER         ###################
 
-FROM alpine:3.10.2 as tess_installer      
+FROM alpine:3.11.2 as tess_installer      
 
 ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
@@ -14,7 +14,7 @@ RUN apk add --no-cache g++  \
 
 ###################         END BUILDER         ###################
 
-FROM openjdk:8u171-jre-alpine3.8
+FROM alpine:3.11.2
 MAINTAINER Palash Ray <paawak@gmail.com>
 
 RUN mkdir /input-output   
