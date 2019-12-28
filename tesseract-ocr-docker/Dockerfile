@@ -1,4 +1,4 @@
-FROM debian:bullseye-20190910-slim    
+FROM debian:bullseye-20191224-slim    
 
 ADD lib-sources /libs/tar-ball/
 ADD install-libs.sh /scripts/
