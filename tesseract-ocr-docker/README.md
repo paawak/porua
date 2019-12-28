@@ -4,11 +4,11 @@
 
 # Running docker image
     
-docker run -it -v /kaaj/source/porua/tesseract-ocr-docker/sample-images:/input-output -e LANG=ben -e IMAGE=/input-output/bangla.tif -e OUTFILE=/input-output/output -e TESSDATA_PREFIX=/tesseract/tessdata/ paawak/tesseract-ocr-barebones:debian_slim_tess-4.1.1_v0.1
+    docker run -it -v /kaaj/source/porua/tesseract-ocr-docker/sample-images:/input-output -e LANG=ben -e IMAGE=/input-output/bangla.tif -e OUTFILE=/input-output/output -e TESSDATA_PREFIX=/tesseract/tessdata/ paawak/tesseract-ocr-barebones:debian_slim_tess-4.1.1_v0.1
 
 # To get into a docker image
 
-    docker run -it 1e66e2d38256 sh
+    docker run -it paawak/tesseract-ocr-barebones:debian_slim_tess-4.1.1_v0.1 sh
 
 
 # Cleanup Docker images
