@@ -2,15 +2,19 @@
 
 FROM alpine:3.11.2 as tess_installer      
 
-ADD lib-sources /libs/tar-ball/
-ADD install-libs.sh /scripts/
+ENV TESS_SRC_ZIP tesseract-4.1.1.tar.gz
+
+ADD $TESS_SRC_ZIP .
 
 RUN apk add --no-cache g++  \
     autoconf automake libtool \   
     leptonica-dev icu-dev pango-dev cairo-dev \
     make    &&  \
-    chmod u+rx /scripts/install-libs.sh &&  \
-    /scripts/install-libs.sh 
+    cd $(echo $TESS_SRC_ZIP | sed -e 's,.tar.gz$,,g;s,.tar.xz$,,g') && \
+    ./autogen.sh && \
+    ./configure && \
+    make && \
+    make install
 
 ###################         END BUILDER         ###################
 
