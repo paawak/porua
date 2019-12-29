@@ -22,10 +22,14 @@ RUN apt-get update  &&  \
 
 ###################         END BUILDER         ###################
 
-FROM openjdk:11.0.5-jre-slim-buster
+FROM debian:buster-20191224-slim
 MAINTAINER Palash Ray <paawak@gmail.com>
 
-RUN mkdir /input-output   
+RUN mkdir /input-output   && \
+    mkdir -p /usr/share/man/man1
+
+RUN apt-get update  &&  \
+    apt-get install -y ca-certificates-java openjdk-11-jre-headless
 
 ADD tessdata.tar.gz /tesseract/
 
