@@ -1,6 +1,6 @@
 ###################         START BUILDER         ###################
 
-FROM debian:bullseye-20191224-slim as tess_installer          
+FROM debian:buster-20191224-slim as tess_installer          
 
 ENV TESS_SRC_ZIP tesseract-4.1.1.tar.gz
 
@@ -22,17 +22,12 @@ RUN apt-get update  &&  \
 
 ###################         END BUILDER         ###################
 
-FROM debian:bullseye-20191224-slim
+FROM openjdk:11.0.5-jre-slim-buster
 MAINTAINER Palash Ray <paawak@gmail.com>
-
-ENV JAVA_HOME jdk-11
-ENV PATH $JAVA_HOME/bin:$PATH
 
 RUN mkdir /input-output   
 
 ADD tessdata.tar.gz /tesseract/
-
-ADD openjdk-11_28_linux-x64_bin.tar.gz .
 
 COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libwebp* /usr/lib/x86_64-linux-gnu/
 COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libopenjp2* /usr/lib/x86_64-linux-gnu/
@@ -50,6 +45,4 @@ COPY --from=tess_installer /usr/local/bin /usr/local/bin
 RUN ldconfig
 
 CMD tesseract -l $LANG $IMAGE $OUTFILE
-
-
 
