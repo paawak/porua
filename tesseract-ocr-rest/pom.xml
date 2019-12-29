@@ -78,9 +78,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.bytedeco.javacpp-presets</groupId>
-			<artifactId>tesseract-platform</artifactId>
-			<version>4.0.0-1.4.4</version>
+			<groupId>org.bytedeco</groupId>
+            <artifactId>tesseract-platform</artifactId>
+            <version>4.1.0-1.5.2</version>
 		</dependency>
 
 		<dependency>
