@@ -1,38 +1,62 @@
 ###################         START BUILDER         ###################
 
-FROM alpine:3.10.2 as tess_installer      
+FROM debian:buster-20191224-slim as tess_installer          
 
-ADD lib-sources /libs/tar-ball/
-ADD install-libs.sh /scripts/
+ENV TESS_SRC_ZIP tesseract-4.1.1.tar.gz
 
-RUN apk add --no-cache g++  \
-    autoconf automake libtool \   
-    leptonica-dev icu-dev pango-dev cairo-dev \
+ADD $TESS_SRC_ZIP .
+
+# Needed for installing jre
+RUN mkdir -p /usr/share/man/man1
+
+RUN apt-get update  &&  \
+    apt-get install -y \
+    openjdk-11-jre-headless \
+    g++  \
+    pkg-config autoconf automake libtool \   
+    libpng-dev libjpeg62-turbo-dev libtiff5-dev zlib1g-dev \
+    libicu-dev libpango1.0-dev libcairo2-dev libleptonica-dev \
     make    &&  \
-    chmod u+rx /scripts/install-libs.sh &&  \
-    /scripts/install-libs.sh 
+    cd $(echo $TESS_SRC_ZIP | sed -e 's,.tar.gz$,,g;s,.tar.xz$,,g') && \
+    ./autogen.sh && \
+    ./configure && \
+    make && \
+    make install && \
+    make training && \
+    make training-install
 
 ###################         END BUILDER         ###################
 
-FROM openjdk:8u171-jre-alpine3.8
+FROM debian:buster-20191224-slim
 MAINTAINER Palash Ray <paawak@gmail.com>
-
-RUN mkdir /input-output   
 
 ADD tessdata.tar.gz /tesseract/
 
-COPY --from=tess_installer /usr/lib/libwebp.so* /usr/lib/
-COPY --from=tess_installer /usr/lib/libgif.so* /usr/lib/
-COPY --from=tess_installer /usr/lib/libpng.so* /usr/lib/
-COPY --from=tess_installer /usr/lib/libjpeg.so* /usr/lib/
-COPY --from=tess_installer /usr/lib/libtiff.so* /usr/lib/
-COPY --from=tess_installer /usr/lib/libcairo.so* /usr/lib/
-COPY --from=tess_installer /usr/lib/libgomp.so* /usr/lib/
-COPY --from=tess_installer /usr/lib/liblept.so* /usr/lib/
+# Copy tesseract and its dependencies
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libwebp* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libopenjp2* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libgif* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libpng* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libjpeg* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libtiff* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libcairo* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libgomp* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/liblept* /usr/lib/x86_64-linux-gnu/
+COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libjbig* /usr/lib/x86_64-linux-gnu/
 COPY --from=tess_installer /usr/local/lib /usr/local/lib
 COPY --from=tess_installer /usr/local/bin /usr/local/bin
 
+# Copy jre and certs
+COPY --from=tess_installer /etc/ssl/certs/java/ /etc/ssl/certs/java/
+COPY --from=tess_installer /etc/java-11-openjdk /etc/java-11-openjdk/
+COPY --from=tess_installer /usr/lib/jvm/java-11-openjdk-amd64 /usr/lib/jvm/java-11-openjdk-amd64/
+
+RUN ldconfig && \
+    rm -rfv /usr/lib/jvm/java-11-openjdk-amd64/man && \
+    rm -rfv /usr/lib/jvm/java-11-openjdk-amd64/docs
+
+ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH $JAVA_HOME/bin:$PATH
 
 CMD tesseract -l $LANG $IMAGE $OUTFILE
-
 
