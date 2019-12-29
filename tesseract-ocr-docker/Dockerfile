@@ -33,7 +33,6 @@ MAINTAINER Palash Ray <paawak@gmail.com>
 ADD tessdata.tar.gz /tesseract/
 
 # Copy tesseract and its dependencies
-
 COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libwebp* /usr/lib/x86_64-linux-gnu/
 COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libopenjp2* /usr/lib/x86_64-linux-gnu/
 COPY --from=tess_installer /usr/lib/x86_64-linux-gnu/libgif* /usr/lib/x86_64-linux-gnu/
@@ -48,10 +47,6 @@ COPY --from=tess_installer /usr/local/lib /usr/local/lib
 COPY --from=tess_installer /usr/local/bin /usr/local/bin
 
 # Copy jre and certs
-RUN mkdir -p /etc/ssl/certs/java && \
-    mkdir -p /etc/java-11-openjdk && \
-    mkdir -p /usr/lib/jvm/java-11-openjdk-amd64
-
 COPY --from=tess_installer /etc/ssl/certs/java/ /etc/ssl/certs/java/
 COPY --from=tess_installer /etc/java-11-openjdk /etc/java-11-openjdk/
 COPY --from=tess_installer /usr/lib/jvm/java-11-openjdk-amd64 /usr/lib/jvm/java-11-openjdk-amd64/
