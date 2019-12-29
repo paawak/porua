@@ -18,6 +18,9 @@
     docker ps --filter status=dead --filter status=exited -aq | xargs -r docker rm -v
     docker images --no-trunc | grep '<none>' | awk '{ print $3 }' | xargs -r docker rmi
 
+# Getting latest Tessdata    
+
+The latest Tessdata has been got from <https://github.com/tesseract-ocr/tessdata/releases>. Took the latest 4.x and removed all languages except Bengali and Hindi.
 
 # Running Tesseract REST Docker
 
