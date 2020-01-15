@@ -67,6 +67,7 @@ For available packages in Alpine Linux:
 2. http://dl-cdn.alpinelinux.org/alpine/v3.10/community/x86_64/
 
 The below are the commands:
+
     ./autogen.sh
     ./configure --prefix=/kaaj/installs/tesseract/4.1.1
     make
