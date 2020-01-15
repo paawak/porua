@@ -3,7 +3,7 @@
 
     docker build -t paawak/tesseract-ocr-jdk-11:debian_slim_tess-4.1.1_v1.0 -t paawak/tesseract-ocr-jdk-11:latest .
 
-    ## Using Buildah
+## Using Buildah
 
         buildah bud -t paawak/tesseract-ocr-jdk-11:debian_slim_tess-4.1.1_v1.0 -t paawak/tesseract-ocr-jdk-11:latest .
 
