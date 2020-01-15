@@ -79,5 +79,6 @@ The below are the commands:
 
 Copy the tessdata directory to an appropriate folder
 
-export TESSDATA_PREFIX=/kaaj/installs/tesseract/tessdata-4.0.0
-bin/tesseract -l ben ../images/Bangla-mahabharat-1-page_2.jpg outputbase
+    cd /kaaj/installs/tesseract/4.1.1
+    export TESSDATA_PREFIX=/kaaj/installs/tesseract/tessdata-4.0.0
+    bin/tesseract -l ben /kaaj/source/porua/porua-frontend/image-store/training/bangla/rajshekhar-basu-mahabharat/Bangla-mahabharat-1-page_2.jpg outputbase
