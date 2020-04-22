@@ -75,9 +75,15 @@ The below are the commands:
     make training
     make training-install
 
+    make ScrollView.jar
+
+Manually copy the java folder to TESSERACT_HOME. Then define the below variable:
+    export SCROLLVIEW_PATH=$TESSERACT_HOME/java    
+
 # Running tesseract
 
-Copy the tessdata directory to an appropriate folder
+Copy the tessdata directory to an appropriate folder. For training, make sure that you copy the below folder under $TESSDATA_PREFIX
+    https://github.com/tesseract-ocr/tessconfigs/tree/master/configs
 
     cd /kaaj/installs/tesseract/4.1.1
     export TESSDATA_PREFIX=/kaaj/installs/tesseract/tessdata-4.0.0
