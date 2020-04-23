@@ -367,7 +367,11 @@ public class OcrWorkBench extends JFrame {
 
 	case DETECT_WORDS_NAIVE:
 
-	    filteredImage = detectWordsNaive();
+	    if (true) {
+		filteredImage = detectWordsWithTesseract();
+	    } else {
+		filteredImage = detectWordsNaive();
+	    }
 
 	    break;
 
@@ -380,8 +384,6 @@ public class OcrWorkBench extends JFrame {
     private BufferedImage detectWordsNaive() {
 	BufferedImage filteredImage;
 	binaryImage = new BinaryImage(currentImage, BinaryImage.DEFAULT_COLOR_THRESHOLD, true);
-
-	new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), binaryImage).getWordBoundaries();
 
 	WordAnalyser wordAnalyser = new LeftToRightWordAnalyser(binaryImage);
 	filteredImage = binaryImage.getImage();
@@ -429,6 +431,29 @@ public class OcrWorkBench extends JFrame {
 		}
 
 	    }
+	}
+	return filteredImage;
+    }
+
+    private BufferedImage detectWordsWithTesseract() {
+	BufferedImage filteredImage;
+	binaryImage = new BinaryImage(currentImage, BinaryImage.DEFAULT_COLOR_THRESHOLD, true);
+
+	filteredImage = binaryImage.getImage();
+
+	WordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), binaryImage);
+
+	List<Rectangle> wordAreas = wordAnalyser.getWordBoundaries();
+
+	Graphics g = filteredImage.getGraphics();
+
+	for (Rectangle wordArea : wordAreas) {
+
+	    if (MARK_WORD_BOUNDS) {
+		g.setColor(Color.GREEN);
+		g.drawRect(wordArea.getX(), wordArea.getY(), wordArea.getWidth(), wordArea.getHeight());
+	    }
+
 	}
 	return filteredImage;
     }

@@ -4,6 +4,7 @@ import static org.bytedeco.leptonica.global.lept.pixDestroy;
 import static org.bytedeco.leptonica.global.lept.pixRead;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bytedeco.javacpp.BytePointer;
@@ -38,19 +39,9 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
 
     @Override
     public List<Rectangle> getWordBoundaries() {
-	submitToOCR();
-	return null;
-    }
-
-    @Override
-    public BinaryImage getWordMatrix(Rectangle wordBoundary) {
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    private void submitToOCR() {
-
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
+
+	List<Rectangle> rects = new ArrayList<>();
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
 	    int returnCode = api.Init(TESSDATA_DIRECTORY, LANGUAGE_CODE);
@@ -88,6 +79,8 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
 		TextBox textBox = new TextBox(x1.get(), y1.get(), x2.get(), y2.get(), conf, ocrText);
 		LOGGER.info("{}", textBox);
 
+		rects.add(new Rectangle(textBox.x1, textBox.y1, textBox.x2 - textBox.x1, textBox.y2 - textBox.y1));
+
 		x1.deallocate();
 		y1.deallocate();
 		x2.deallocate();
@@ -100,6 +93,12 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
 	    pixDestroy(image);
 	}
 
+	return rects;
+    }
+
+    @Override
+    public BinaryImage getWordMatrix(Rectangle wordBoundary) {
+	throw new UnsupportedOperationException();
     }
 
 }
