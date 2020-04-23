@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.WordAnalyser;
+import com.swayam.ocr.core.model.TextBox;
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.Rectangle;
 
@@ -75,7 +76,8 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
 		String ocrText = ocrResult.getString().trim();
 		ocrResult.deallocate();
 		int conf = api.MeanTextConf();
-		LOGGER.info("Box[{}]: x={}, y={}, w={}, h={}, confidence: {}, text: {}", i, box.x(), box.y(), box.w(), box.h(), conf, ocrText);
+		TextBox textBox = new TextBox(box.x(), box.y(), box.w(), box.h(), conf, ocrText);
+		LOGGER.info("TextBox[{}]: {}", i, textBox);
 	    }
 
 	    api.End();
