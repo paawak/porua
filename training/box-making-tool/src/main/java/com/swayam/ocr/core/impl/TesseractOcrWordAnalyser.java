@@ -30,11 +30,9 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
     private static final String LANGUAGE_CODE = "ben";
 
     private final Path imagePath;
-    private final BinaryImage binaryImage;
 
-    public TesseractOcrWordAnalyser(Path imagePath, BinaryImage binaryImage) {
+    public TesseractOcrWordAnalyser(Path imagePath) {
 	this.imagePath = imagePath;
-	this.binaryImage = binaryImage;
     }
 
     @Override

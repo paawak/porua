@@ -441,7 +441,7 @@ public class OcrWorkBench extends JFrame {
 
 	filteredImage = binaryImage.getImage();
 
-	WordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), binaryImage);
+	WordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
 
 	List<Rectangle> wordAreas = wordAnalyser.getWordBoundaries();
 
