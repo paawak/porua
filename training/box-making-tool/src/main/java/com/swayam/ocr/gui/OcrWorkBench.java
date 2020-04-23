@@ -30,6 +30,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
@@ -67,6 +68,8 @@ public class OcrWorkBench extends JFrame {
     private static final boolean MARK_WORD_BOUNDS = true;
 
     private static final boolean MARK_MATRAS = true;
+
+    private static final String LAST_USED_IMAGE_DIRECTORY = "LAST_USED_IMAGE_DIRECTORY";
 
     private GlassPanedImagePanel imagePanel;
 
@@ -126,7 +129,14 @@ public class OcrWorkBench extends JFrame {
 	    @Override
 	    public void actionPerformed(ActionEvent evt) {
 
+		Preferences imageDirectoryPrefs = Preferences.userNodeForPackage(OcrWorkBench.class);
+
+		String initialDirectory = imageDirectoryPrefs.get(LAST_USED_IMAGE_DIRECTORY, System.getProperty("user.home"));
+
+		LOG.info("initialDirectory: {}", initialDirectory);
+
 		JFileChooser fileChooser = new JFileChooser();
+		fileChooser.setCurrentDirectory(new File(initialDirectory));
 
 		int option = fileChooser.showOpenDialog(OcrWorkBench.this);
 
@@ -138,7 +148,11 @@ public class OcrWorkBench extends JFrame {
 
 			getGlassPane().setVisible(false);
 
-			currentImage = ImageIO.read(fileChooser.getSelectedFile());
+			File selectedImage = fileChooser.getSelectedFile();
+
+			imageDirectoryPrefs.put(LAST_USED_IMAGE_DIRECTORY, selectedImage.getParentFile().getAbsolutePath());
+
+			currentImage = ImageIO.read(selectedImage);
 			setImageInFrame(currentImage);
 
 			binaryImage = null;
