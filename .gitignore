@@ -7,3 +7,6 @@
 **bin
 **.settings
 output.txt
+/bangla-ocr/nbproject/private/
+/bangla-ocr/build/
+/bangla-ocr/dist/
