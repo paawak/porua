@@ -20,7 +20,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.WordAnalyser;
 import com.swayam.ocr.core.util.BinaryImage;
@@ -34,298 +35,286 @@ import com.swayam.ocr.core.util.Rectangle;
  */
 public class BanglaGlyphAnalyser {
 
-	private static final Logger LOG = Logger
-			.getLogger(BanglaGlyphAnalyser.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BanglaGlyphAnalyser.class);
 
-	private static final int MIN_WORD_SIZE = 5;
+    private static final int MIN_WORD_SIZE = 5;
 
-	private static final int MIN_MATRA_WIDTH = 11;
-	private static final int MIN_MATRA_HEIGHT = 3;
+    private static final int MIN_MATRA_WIDTH = 11;
+    private static final int MIN_MATRA_HEIGHT = 3;
 
-	/**
-	 * The max allowed height deviation from the widest matra
-	 */
-	private static final int MAX_ALLOWED_MATRA_HEIGHT_DEVIATION = 0;
+    /**
+     * The max allowed height deviation from the widest matra
+     */
+    private static final int MAX_ALLOWED_MATRA_HEIGHT_DEVIATION = 0;
 
-	private final BinaryImage word;
-	private final List<Rectangle> matras;
+    private final BinaryImage word;
+    private final List<Rectangle> matras;
 
-	public BanglaGlyphAnalyser(BinaryImage word) {
+    public BanglaGlyphAnalyser(BinaryImage word) {
 
-		this.word = word;
+	this.word = word;
 
-		LOG.info("wordWidth=" + word.getWidth() + ", wordHeight="
-				+ word.getHeight());
+	LOG.info("wordWidth=" + word.getWidth() + ", wordHeight=" + word.getHeight());
 
-		matras = Collections.unmodifiableList(findMatras());
+	matras = Collections.unmodifiableList(findMatras());
 
+    }
+
+    public List<Rectangle> getGlyphBoundaries() {
+	BinaryImage wordWithoutMatras = getWordWithoutMatras();
+	WordAnalyser wordAnalyser = new LeftToRightWordAnalyser(wordWithoutMatras);
+	return wordAnalyser.getWordBoundaries();
+    }
+
+    public List<Rectangle> getMatras() {
+	return matras;
+    }
+
+    private BinaryImage getWordWithoutMatras() {
+
+	// clone word data
+	int width = word.getWidth();
+	int height = word.getHeight();
+
+	boolean[][] data = new boolean[width][height];
+
+	for (int x = 0; x < width; x++) {
+	    for (int y = 0; y < height; y++) {
+		data[x][y] = word.getValueAt(x, y);
+	    }
 	}
 
-	public List<Rectangle> getGlyphBoundaries() {
-		BinaryImage wordWithoutMatras = getWordWithoutMatras();
-		WordAnalyser wordAnalyser = new LeftToRightWordAnalyser(
-				wordWithoutMatras);
-		return wordAnalyser.getWordBoundaries();
-	}
-
-	public List<Rectangle> getMatras() {
-		return matras;
-	}
-
-	private BinaryImage getWordWithoutMatras() {
-
-		// clone word data
-		int width = word.getWidth();
-		int height = word.getHeight();
-
-		boolean[][] data = new boolean[width][height];
-
-		for (int x = 0; x < width; x++) {
-			for (int y = 0; y < height; y++) {
-				data[x][y] = word.getValueAt(x, y);
-			}
+	// get rid of the matras
+	for (Rectangle matra : matras) {
+	    for (int x = matra.x; x < matra.width; x++) {
+		for (int y = matra.y; y < matra.height; y++) {
+		    data[x][y] = false;
 		}
-
-		// get rid of the matras
-		for (Rectangle matra : matras) {
-			for (int x = matra.x; x < matra.width; x++) {
-				for (int y = matra.y; y < matra.height; y++) {
-					data[x][y] = false;
-				}
-			}
-		}
-
-		return new BinaryImage(data, width, height);
-
+	    }
 	}
 
-	private List<Rectangle> findMatras() {
+	return new BinaryImage(data, width, height);
 
-		int wordWidth = word.getWidth();
-		int wordHeight = word.getHeight();
+    }
 
-		List<Rectangle> _matras = new ArrayList<Rectangle>();
+    private List<Rectangle> findMatras() {
 
-		if (wordWidth > MIN_WORD_SIZE && wordHeight > MIN_WORD_SIZE) {
+	int wordWidth = word.getWidth();
+	int wordHeight = word.getHeight();
 
-			for (int y = 1; y < wordHeight / 2; y++) {
+	List<Rectangle> _matras = new ArrayList<Rectangle>();
 
-				for (int x = 1; x < wordWidth - MIN_MATRA_WIDTH; x++) {
+	if (wordWidth > MIN_WORD_SIZE && wordHeight > MIN_WORD_SIZE) {
 
-					if (!word.getValueAt(x, y)
-							|| GeometryUtils.isPointInside(_matras, x, y)) {
-						continue;
-					}
+	    for (int y = 1; y < wordHeight / 2; y++) {
 
-					int steps = MIN_MATRA_WIDTH / 3;
-					int residue = MIN_MATRA_WIDTH % 3;
+		for (int x = 1; x < wordWidth - MIN_MATRA_WIDTH; x++) {
 
-					boolean isMatra = false;
+		    if (!word.getValueAt(x, y) || GeometryUtils.isPointInside(_matras, x, y)) {
+			continue;
+		    }
 
-					for (int count = 0; count < steps; count++) {
+		    int steps = MIN_MATRA_WIDTH / 3;
+		    int residue = MIN_MATRA_WIDTH % 3;
 
-						PixelNeighbours neighbour = new PixelNeighbours(x + 3
-								* count, y, word);
+		    boolean isMatra = false;
 
-						int[] pixelsTrue;
+		    for (int count = 0; count < steps; count++) {
 
-						switch (MIN_MATRA_HEIGHT) {
-						case 2:
-							pixelsTrue = new int[] { 1, 2, 3, 4, 8 };
-							break;
-						case 3:
-						default:
-							pixelsTrue = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
-							break;
-						}
+			PixelNeighbours neighbour = new PixelNeighbours(x + 3 * count, y, word);
 
-						isMatra = neighbour.checkAllTrue(pixelsTrue);
+			int[] pixelsTrue;
 
-					}
-
-					if (isMatra && (residue > 0)) {
-
-						int neighbourX = x + 3 * steps - 1;
-
-						PixelNeighbours neighbour = new PixelNeighbours(
-								neighbourX, y, word);
-
-						if (word.getValueAt(neighbourX, y)) {
-
-							int[] pixelsTrue;
-
-							switch (residue) {
-							case 1:
-								switch (MIN_MATRA_HEIGHT) {
-								case 2:
-									pixelsTrue = new int[] { 1, 2, 8 };
-									break;
-								case 3:
-								default:
-									pixelsTrue = new int[] { 1, 2, 6, 7, 8 };
-									break;
-								}
-								break;
-							case 2:
-							default:
-								switch (MIN_MATRA_HEIGHT) {
-								case 2:
-									pixelsTrue = new int[] { 1, 2, 3, 8 };
-									break;
-								case 3:
-								default:
-									pixelsTrue = new int[] { 1, 2, 3, 4, 5, 6,
-											7, 8 };
-									break;
-								}
-								break;
-							}
-
-							isMatra = neighbour.checkAllTrue(pixelsTrue);
-
-						} else {
-
-							isMatra = false;
-
-						}
-
-					}
-
-					if (isMatra) {
-
-						Rectangle matra = new Rectangle(x, y, MIN_MATRA_WIDTH,
-								MIN_MATRA_HEIGHT);
-
-						int actualMatraWidth = findActualMatraWidth(matra);
-
-						matra = new Rectangle(matra.x, matra.y,
-								actualMatraWidth, MIN_MATRA_HEIGHT);
-
-						_matras.add(matra);
-
-						x += actualMatraWidth;
-
-					}
-
-				}
-
+			switch (MIN_MATRA_HEIGHT) {
+			case 2:
+			    pixelsTrue = new int[] { 1, 2, 3, 4, 8 };
+			    break;
+			case 3:
+			default:
+			    pixelsTrue = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+			    break;
 			}
 
-			if (_matras.size() > 1) {
-				purgeFalseMatras(_matras);
-			}
+			isMatra = neighbour.checkAllTrue(pixelsTrue);
 
-			// reduce all y-s by 1px
-			// TODO: should be a smarter way to do this
-			if (_matras.size() > 0) {
+		    }
 
-				for (int i = 0; i < _matras.size(); i++) {
+		    if (isMatra && (residue > 0)) {
 
-					Rectangle matra = _matras.get(i);
+			int neighbourX = x + 3 * steps - 1;
 
-					Rectangle newMatra = new Rectangle(matra.x, matra.y - 1,
-							matra.width, matra.height);
+			PixelNeighbours neighbour = new PixelNeighbours(neighbourX, y, word);
 
-					_matras.set(i, newMatra);
+			if (word.getValueAt(neighbourX, y)) {
 
-				}
+			    int[] pixelsTrue;
 
-			}
-
-		} else {
-
-			LOG.warn("The word is lesser than " + MIN_WORD_SIZE + " px");
-
-		}
-
-		return _matras;
-
-	}
-
-	/**
-	 * Finds the actual width of where the matra ends
-	 * 
-	 * @param matraDimension
-	 * @return
-	 */
-	private int findActualMatraWidth(Rectangle matraDimension) {
-
-		int endX = matraDimension.x + matraDimension.width;
-
-		int wordWidth = word.getWidth();
-		// boolean[][] wordMatrix = binaryImage.getData();
-
-		for (int x = endX + 1; x < wordWidth - 1; x++) {
-
-			if (word.getValueAt(x, matraDimension.y)) {
-
-				PixelNeighbours neighbour = new PixelNeighbours(x,
-						matraDimension.y, word);
-
-				int[] pixelsTrue;
-
+			    switch (residue) {
+			    case 1:
 				switch (MIN_MATRA_HEIGHT) {
 				case 2:
-					pixelsTrue = new int[] { 1, 2, 8 };
-					break;
+				    pixelsTrue = new int[] { 1, 2, 8 };
+				    break;
 				case 3:
 				default:
-					pixelsTrue = new int[] { 1, 2, 6, 7, 8 };
-					break;
+				    pixelsTrue = new int[] { 1, 2, 6, 7, 8 };
+				    break;
 				}
-
-				if (neighbour.checkAllTrue(pixelsTrue)) {
-					endX = x;
-				} else {
-					break;
+				break;
+			    case 2:
+			    default:
+				switch (MIN_MATRA_HEIGHT) {
+				case 2:
+				    pixelsTrue = new int[] { 1, 2, 3, 8 };
+				    break;
+				case 3:
+				default:
+				    pixelsTrue = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+				    break;
 				}
+				break;
+			    }
+
+			    isMatra = neighbour.checkAllTrue(pixelsTrue);
+
+			} else {
+
+			    isMatra = false;
 
 			}
 
-		}
+		    }
 
-		return endX - matraDimension.x;
+		    if (isMatra) {
 
-	}
+			Rectangle matra = new Rectangle(x, y, MIN_MATRA_WIDTH, MIN_MATRA_HEIGHT);
 
-	private void purgeFalseMatras(List<Rectangle> _matras) {
+			int actualMatraWidth = findActualMatraWidth(matra);
 
-		Rectangle widestMatra = findWidestMatra(_matras);
+			matra = new Rectangle(matra.x, matra.y, actualMatraWidth, MIN_MATRA_HEIGHT);
 
-		int minY = widestMatra.y - MAX_ALLOWED_MATRA_HEIGHT_DEVIATION;
-		int maxY = widestMatra.y + widestMatra.height
-				+ MAX_ALLOWED_MATRA_HEIGHT_DEVIATION;
+			_matras.add(matra);
 
-		Iterator<Rectangle> _matrasItr = _matras.iterator();
+			x += actualMatraWidth;
 
-		while (_matrasItr.hasNext()) {
-
-			Rectangle matra = _matrasItr.next();
-
-			if (matra.y < minY || matra.y > maxY) {
-				_matrasItr.remove();
-			}
+		    }
 
 		}
 
-	}
+	    }
 
-	private Rectangle findWidestMatra(List<Rectangle> _matras) {
+	    if (_matras.size() > 1) {
+		purgeFalseMatras(_matras);
+	    }
 
-		Rectangle widestMatra = _matras.get(0);
+	    // reduce all y-s by 1px
+	    // TODO: should be a smarter way to do this
+	    if (_matras.size() > 0) {
 
-		for (int i = 1; i < _matras.size(); i++) {
+		for (int i = 0; i < _matras.size(); i++) {
 
-			Rectangle matra = _matras.get(i);
+		    Rectangle matra = _matras.get(i);
 
-			if (widestMatra.width < matra.width) {
-				widestMatra = matra;
-			}
+		    Rectangle newMatra = new Rectangle(matra.x, matra.y - 1, matra.width, matra.height);
+
+		    _matras.set(i, newMatra);
 
 		}
 
-		return widestMatra;
+	    }
+
+	} else {
+
+	    LOG.warn("The word is lesser than " + MIN_WORD_SIZE + " px");
 
 	}
+
+	return _matras;
+
+    }
+
+    /**
+     * Finds the actual width of where the matra ends
+     * 
+     * @param matraDimension
+     * @return
+     */
+    private int findActualMatraWidth(Rectangle matraDimension) {
+
+	int endX = matraDimension.x + matraDimension.width;
+
+	int wordWidth = word.getWidth();
+	// boolean[][] wordMatrix = binaryImage.getData();
+
+	for (int x = endX + 1; x < wordWidth - 1; x++) {
+
+	    if (word.getValueAt(x, matraDimension.y)) {
+
+		PixelNeighbours neighbour = new PixelNeighbours(x, matraDimension.y, word);
+
+		int[] pixelsTrue;
+
+		switch (MIN_MATRA_HEIGHT) {
+		case 2:
+		    pixelsTrue = new int[] { 1, 2, 8 };
+		    break;
+		case 3:
+		default:
+		    pixelsTrue = new int[] { 1, 2, 6, 7, 8 };
+		    break;
+		}
+
+		if (neighbour.checkAllTrue(pixelsTrue)) {
+		    endX = x;
+		} else {
+		    break;
+		}
+
+	    }
+
+	}
+
+	return endX - matraDimension.x;
+
+    }
+
+    private void purgeFalseMatras(List<Rectangle> _matras) {
+
+	Rectangle widestMatra = findWidestMatra(_matras);
+
+	int minY = widestMatra.y - MAX_ALLOWED_MATRA_HEIGHT_DEVIATION;
+	int maxY = widestMatra.y + widestMatra.height + MAX_ALLOWED_MATRA_HEIGHT_DEVIATION;
+
+	Iterator<Rectangle> _matrasItr = _matras.iterator();
+
+	while (_matrasItr.hasNext()) {
+
+	    Rectangle matra = _matrasItr.next();
+
+	    if (matra.y < minY || matra.y > maxY) {
+		_matrasItr.remove();
+	    }
+
+	}
+
+    }
+
+    private Rectangle findWidestMatra(List<Rectangle> _matras) {
+
+	Rectangle widestMatra = _matras.get(0);
+
+	for (int i = 1; i < _matras.size(); i++) {
+
+	    Rectangle matra = _matras.get(i);
+
+	    if (widestMatra.width < matra.width) {
+		widestMatra = matra;
+	    }
+
+	}
+
+	return widestMatra;
+
+    }
 
 }

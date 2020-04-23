@@ -15,7 +15,8 @@
 
 package com.swayam.ocr.core.impl;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.Rectangle;
@@ -26,7 +27,7 @@ import com.swayam.ocr.core.util.Rectangle;
  */
 public class ImageSearcher {
 
-    private static final Logger LOG = Logger.getLogger(ImageSearcher.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ImageSearcher.class);
 
     private static final int DEVIATION_TOLERANCE_PERCENT = 10;
 
@@ -40,94 +41,85 @@ public class ImageSearcher {
      */
     public void search(BinaryImage needle, BinaryImage haystack) {
 
-        if (needle.getWidth() < haystack.getWidth()
-                && needle.getHeight() < haystack.getHeight()) {
+	if (needle.getWidth() < haystack.getWidth() && needle.getHeight() < haystack.getHeight()) {
 
-            // move horizontally
-            for (int x = 0; (x < haystack.getWidth() && (x + needle.getWidth() < haystack
-                    .getWidth())); x++) {
+	    // move horizontally
+	    for (int x = 0; (x < haystack.getWidth() && (x + needle.getWidth() < haystack.getWidth())); x++) {
 
-                for (int y = 0; (y < haystack.getHeight() && (y
-                        + needle.getHeight() < haystack.getHeight())); y++) {
+		for (int y = 0; (y < haystack.getHeight() && (y + needle.getHeight() < haystack.getHeight())); y++) {
 
-                    BinaryImage haystackSnapShot = haystack
-                            .getSubImage(new Rectangle(x, y, needle.getWidth(),
-                                    needle.getHeight()));
+		    BinaryImage haystackSnapShot = haystack.getSubImage(new Rectangle(x, y, needle.getWidth(), needle.getHeight()));
 
-                    if (compareSameSizeImages(needle, haystackSnapShot)) {
-                        System.err.println("Match found at: " + x + ", " + y);
-                        x += needle.getWidth();
-                        y += needle.getHeight();
-                    }
+		    if (compareSameSizeImages(needle, haystackSnapShot)) {
+			System.err.println("Match found at: " + x + ", " + y);
+			x += needle.getWidth();
+			y += needle.getHeight();
+		    }
 
-                }
+		}
 
-            }
-        } else {
+	    }
+	} else {
 
-            LOG.warn("The dimensions of the `needle` image should be lesser than the `haystack`");
+	    LOG.warn("The dimensions of the `needle` image should be lesser than the `haystack`");
 
-        }
+	}
 
     }
 
-    private boolean compareSameSizeImages(BinaryImage needle,
-            BinaryImage haystackSnapShot) {
+    private boolean compareSameSizeImages(BinaryImage needle, BinaryImage haystackSnapShot) {
 
-        if (needle.getWidth() != haystackSnapShot.getWidth()
-                || needle.getHeight() != haystackSnapShot.getHeight()) {
-            throw new IllegalArgumentException(
-                    "The two images should have the same dimensions");
-        }
+	if (needle.getWidth() != haystackSnapShot.getWidth() || needle.getHeight() != haystackSnapShot.getHeight()) {
+	    throw new IllegalArgumentException("The two images should have the same dimensions");
+	}
 
-        int deviationCount = 0;
+	int deviationCount = 0;
 
-        for (int x = 0; x < needle.getWidth(); x++) {
-            for (int y = 0; y < needle.getHeight(); y++) {
+	for (int x = 0; x < needle.getWidth(); x++) {
+	    for (int y = 0; y < needle.getHeight(); y++) {
 
-                if (needle.getValueAt(x, y)
-                        && (needle.getValueAt(x, y) ^ haystackSnapShot
-                                .getValueAt(x, y))) {
-                    deviationCount++;
-                }
+		if (needle.getValueAt(x, y) && (needle.getValueAt(x, y) ^ haystackSnapShot.getValueAt(x, y))) {
+		    deviationCount++;
+		}
 
-            }
-        }
+	    }
+	}
 
-        int deviationPercent = getDeviationPercent(needle, deviationCount);
+	int deviationPercent = getDeviationPercent(needle, deviationCount);
 
-        // System.err.println("deviationPercent = " + deviationPercent);
+	// System.err.println("deviationPercent = " + deviationPercent);
 
-        return deviationPercent <= DEVIATION_TOLERANCE_PERCENT;
+	return deviationPercent <= DEVIATION_TOLERANCE_PERCENT;
 
     }
 
     private int getDeviationPercent(BinaryImage image, int deviationCount) {
 
-        int totalInterestPoints = 0;
+	int totalInterestPoints = 0;
 
-        for (int x = 0; x < image.getWidth(); x++) {
-            for (int y = 0; y < image.getHeight(); y++) {
+	for (int x = 0; x < image.getWidth(); x++) {
+	    for (int y = 0; y < image.getHeight(); y++) {
 
-                if (image.getValueAt(x, y)) {
-                    totalInterestPoints++;
-                }
+		if (image.getValueAt(x, y)) {
+		    totalInterestPoints++;
+		}
 
-            }
-        }
+	    }
+	}
 
-        int deviationPercent = 0;
+	int deviationPercent = 0;
 
-        if (totalInterestPoints != 0) {
+	if (totalInterestPoints != 0) {
 
-            deviationPercent = (deviationCount * 100) / totalInterestPoints;
-        }
+	    deviationPercent = (deviationCount * 100) / totalInterestPoints;
+	}
 
-        return deviationPercent;
+	return deviationPercent;
 
     }
 
-    // private boolean matchByJOpenSurf(BinaryImage image1, BinaryImage image2) {
+    // private boolean matchByJOpenSurf(BinaryImage image1, BinaryImage image2)
+    // {
     //
     // return new Surf(image1.getImage()).isEquivalentTo(new Surf(image2
     // .getImage()));
