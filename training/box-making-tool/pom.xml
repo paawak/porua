@@ -66,11 +66,6 @@
           <version>2.4</version>
         </dependency>
         <dependency>
-          <groupId>org.apache.sanselan</groupId>
-          <artifactId>sanselan</artifactId>
-          <version>0.97-incubator</version>
-        </dependency>
-        <dependency>
           <groupId>org.hsqldb</groupId>
           <artifactId>hsqldb</artifactId>
           <version>2.5.0</version>
