@@ -1,19 +1,16 @@
 package com.swayam.ocr.core.impl;
 
-import static org.bytedeco.leptonica.global.lept.L_CLONE;
-import static org.bytedeco.leptonica.global.lept.boxaGetBox;
 import static org.bytedeco.leptonica.global.lept.pixDestroy;
 import static org.bytedeco.leptonica.global.lept.pixRead;
 
-import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.util.List;
 
 import org.bytedeco.javacpp.BytePointer;
-import org.bytedeco.leptonica.BOX;
-import org.bytedeco.leptonica.BOXA;
+import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.leptonica.PIX;
-import org.bytedeco.leptonica.PIXA;
+import org.bytedeco.tesseract.ETEXT_DESC;
+import org.bytedeco.tesseract.ResultIterator;
 import org.bytedeco.tesseract.TessBaseAPI;
 import org.bytedeco.tesseract.global.tesseract;
 import org.slf4j.Logger;
@@ -64,21 +61,39 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
 	    PIX image = pixRead(imagePath.toFile().getAbsolutePath());
 
 	    api.SetImage(image);
+	    int code = api.Recognize(new ETEXT_DESC());
 
-	    BOXA boxes = api.GetComponentImages(tesseract.RIL_TEXTLINE, true, (PIXA) null, (IntBuffer) null);
-
-	    LOGGER.info("Found {} textline image components.", boxes.n());
-
-	    for (int i = 0; i < boxes.n(); i++) {
-		BOX box = boxaGetBox(boxes, i, L_CLONE);
-		api.SetRectangle(box.x(), box.y(), box.w(), box.h());
-		BytePointer ocrResult = api.GetUTF8Text();
-		String ocrText = ocrResult.getString().trim();
-		ocrResult.deallocate();
-		int conf = api.MeanTextConf();
-		TextBox textBox = new TextBox(box.x(), box.y(), box.w(), box.h(), conf, ocrText);
-		LOGGER.info("TextBox[{}]: {}", i, textBox);
+	    if (code != 0) {
+		throw new IllegalArgumentException("could not recognize text");
 	    }
+
+	    ResultIterator ri = api.GetIterator();
+	    int level = tesseract.RIL_WORD;
+
+	    do {
+		BytePointer ocrResult = ri.GetUTF8Text(level);
+		String ocrText = ocrResult.getString().trim();
+
+		float conf = ri.Confidence(level);
+		IntPointer x1 = new IntPointer(new int[1]);
+		IntPointer y1 = new IntPointer(new int[1]);
+		IntPointer x2 = new IntPointer(new int[1]);
+		IntPointer y2 = new IntPointer(new int[1]);
+		boolean foundRectangle = ri.BoundingBox(level, x1, y1, x2, y2);
+
+		if (!foundRectangle) {
+		    throw new IllegalArgumentException("Could not find any rectangle here");
+		}
+
+		TextBox textBox = new TextBox(x1.get(), y1.get(), x2.get(), y2.get(), conf, ocrText);
+		LOGGER.info("{}", textBox);
+
+		x1.deallocate();
+		y1.deallocate();
+		x2.deallocate();
+		y2.deallocate();
+		ocrResult.deallocate();
+	    } while (ri.Next(level));
 
 	    api.End();
 	    api.close();

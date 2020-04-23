@@ -6,10 +6,10 @@ public class TextBox {
     private final int y;
     private final int width;
     private final int height;
-    private final int confidence;
+    private final float confidence;
     private final String text;
 
-    public TextBox(int x, int y, int width, int height, int confidence, String text) {
+    public TextBox(int x, int y, int width, int height, float confidence, String text) {
 	this.x = x;
 	this.y = y;
 	this.width = width;
@@ -34,7 +34,7 @@ public class TextBox {
 	return height;
     }
 
-    public int getConfidence() {
+    public float getConfidence() {
 	return confidence;
     }
 
