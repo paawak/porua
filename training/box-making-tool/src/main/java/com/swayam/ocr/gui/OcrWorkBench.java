@@ -174,7 +174,7 @@ public class OcrWorkBench extends JFrame {
 	JMenuItem detectIndividualGlyphsMenuItem = new JMenuItem("Detect Individual Gyphs");
 	ocrMenu.add(detectIndividualGlyphsMenuItem);
 
-	detectIndividualGlyphsMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.OCR));
+	detectIndividualGlyphsMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.DETECT_WORDS_NAIVE));
 
 	JMenu trainingMenu = new JMenu("Training");
 	menuBar.add(trainingMenu);
@@ -362,57 +362,9 @@ public class OcrWorkBench extends JFrame {
 
 	    break;
 
-	case OCR:
+	case DETECT_WORDS_NAIVE:
 
-	    binaryImage = new BinaryImage(currentImage, BinaryImage.DEFAULT_COLOR_THRESHOLD, true);
-
-	    WordAnalyser wordAnalyser = new LeftToRightWordAnalyser(binaryImage);
-	    filteredImage = binaryImage.getImage();
-
-	    List<Rectangle> wordAreas = wordAnalyser.getWordBoundaries();
-
-	    Graphics g = filteredImage.getGraphics();
-
-	    for (Rectangle wordArea : wordAreas) {
-
-		if (MARK_WORD_BOUNDS) {
-		    g.setColor(Color.GREEN);
-		    g.drawRect(wordArea.getX(), wordArea.getY(), wordArea.getWidth(), wordArea.getHeight());
-		}
-
-		BinaryImage word = wordAnalyser.getWordMatrix(wordArea);
-
-		if (MARK_MATRAS) {
-
-		    BanglaGlyphAnalyser glyphAnalyser = new BanglaGlyphAnalyser(word);
-
-		    List<Rectangle> matras = glyphAnalyser.getMatras();
-
-		    LOG.debug("matras:" + matras);
-
-		    for (Rectangle rect : matras) {
-
-			int x = wordArea.getX() + rect.x;
-			int y = wordArea.getY() + rect.y;
-
-			g.setColor(Color.YELLOW);
-			g.fillRect(x, y, rect.width, rect.height);
-
-		    }
-
-		    List<Rectangle> glyphBoundaries = glyphAnalyser.getGlyphBoundaries();
-
-		    for (Rectangle glyphBoundary : glyphBoundaries) {
-
-			int x = wordArea.getX() + glyphBoundary.x;
-			int y = wordArea.getY() + glyphBoundary.y;
-
-			g.setColor(Color.RED);
-			g.drawRect(x, y, glyphBoundary.getWidth(), glyphBoundary.getHeight());
-		    }
-
-		}
-	    }
+	    filteredImage = detectWordsNaive();
 
 	    break;
 
@@ -420,6 +372,60 @@ public class OcrWorkBench extends JFrame {
 
 	return filteredImage;
 
+    }
+
+    private BufferedImage detectWordsNaive() {
+	BufferedImage filteredImage;
+	binaryImage = new BinaryImage(currentImage, BinaryImage.DEFAULT_COLOR_THRESHOLD, true);
+
+	WordAnalyser wordAnalyser = new LeftToRightWordAnalyser(binaryImage);
+	filteredImage = binaryImage.getImage();
+
+	List<Rectangle> wordAreas = wordAnalyser.getWordBoundaries();
+
+	Graphics g = filteredImage.getGraphics();
+
+	for (Rectangle wordArea : wordAreas) {
+
+	if (MARK_WORD_BOUNDS) {
+	    g.setColor(Color.GREEN);
+	    g.drawRect(wordArea.getX(), wordArea.getY(), wordArea.getWidth(), wordArea.getHeight());
+	}
+
+	BinaryImage word = wordAnalyser.getWordMatrix(wordArea);
+
+	if (MARK_MATRAS) {
+
+	    BanglaGlyphAnalyser glyphAnalyser = new BanglaGlyphAnalyser(word);
+
+	    List<Rectangle> matras = glyphAnalyser.getMatras();
+
+	    LOG.debug("matras:" + matras);
+
+	    for (Rectangle rect : matras) {
+
+		int x = wordArea.getX() + rect.x;
+		int y = wordArea.getY() + rect.y;
+
+		g.setColor(Color.YELLOW);
+		g.fillRect(x, y, rect.width, rect.height);
+
+	    }
+
+	    List<Rectangle> glyphBoundaries = glyphAnalyser.getGlyphBoundaries();
+
+	    for (Rectangle glyphBoundary : glyphBoundaries) {
+
+		int x = wordArea.getX() + glyphBoundary.x;
+		int y = wordArea.getY() + glyphBoundary.y;
+
+		g.setColor(Color.RED);
+		g.drawRect(x, y, glyphBoundary.getWidth(), glyphBoundary.getHeight());
+	    }
+
+	}
+	}
+	return filteredImage;
     }
 
     private class StoreCharacterActionListener implements ActionListener {
@@ -464,7 +470,7 @@ public class OcrWorkBench extends JFrame {
 
     private enum ProcessImageOption {
 
-	BINARY_IMAGE_ONLY, EDGE_DETECTION, OCR;
+	BINARY_IMAGE_ONLY, EDGE_DETECTION, DETECT_WORDS_NAIVE, DETECT_WORDS_TESSERACT_OCR;
 
     }
 
