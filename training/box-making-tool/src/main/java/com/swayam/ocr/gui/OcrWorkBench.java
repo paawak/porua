@@ -271,10 +271,9 @@ public class OcrWorkBench extends JFrame {
 	    public void mouseReleased(MouseEvent mouseEvent) {
 		EventQueue.invokeLater(() -> {
 
-		    Point p = new Point(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen());
-		    p = SwingUtilities.convertPoint(textCorrectionPopupMenuItem, p, imagePanel);
+		    Point mouseLocation = SwingUtilities.convertPoint(textCorrectionPopupMenuItem, mouseEvent.getLocationOnScreen(), imagePanel);
 
-		    Optional<TextBox> optionalText = getDetectedOcrText(p);
+		    Optional<TextBox> optionalText = getDetectedOcrText(mouseLocation);
 
 		    if (!optionalText.isPresent()) {
 			JOptionPane.showMessageDialog(OcrWorkBench.this, "Select a proper word box", "No word found in this region!", JOptionPane.WARNING_MESSAGE);
