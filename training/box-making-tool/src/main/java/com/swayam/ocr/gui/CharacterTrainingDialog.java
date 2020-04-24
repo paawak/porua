@@ -54,251 +54,239 @@ import com.swayam.ocr.core.util.Typeface;
 public class CharacterTrainingDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
-    
+
     private static final String ERASER_IMG = "/com/swayam/ocr/res/image/eraser.png";
-//    private static final String ERASER_CURSOR = "/com/swayam/ocr/res/image/eraser_cursor.png";
+    // private static final String ERASER_CURSOR =
+    // "/com/swayam/ocr/res/image/eraser_cursor.png";
 
     private static final int DIALOG_WIDTH = 500;
     private static final int DIALOG_HEIGHT = 500;
-    
+
     private static final String CHAR_PATTERN_REGEX = "([\\da-f]{4}\\s?)+";
 
     private static final Pattern CHAR_PATTERN;
 
     static {
 
-        CHAR_PATTERN = Pattern.compile(CHAR_PATTERN_REGEX);
+	CHAR_PATTERN = Pattern.compile(CHAR_PATTERN_REGEX);
 
     }
 
-    private final BinaryImage binaryImage;
-    
+    private final BufferedImage wordImage;
+
     private final Cursor eraserCursor;
-    
+
     private JToggleButton eraserButton;
 
     private JTextField txtCharacters;
 
     private ImagePanel imagePanel;
 
-    public CharacterTrainingDialog(BinaryImage binaryImage) {
-    	
-//    	Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
-//		eraserCursor = defaultToolkit.createCustomCursor(
-//				defaultToolkit.getImage(CharacterTrainingDialog.class.getResource(ERASER_CURSOR)), new Point(5, 5), "EraserCursor"); 
-		
-		eraserCursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
+    public CharacterTrainingDialog(BufferedImage wordImage) {
 
-        setModal(true);
-        setTitle("Store Characters");
+	// Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+	// eraserCursor = defaultToolkit.createCustomCursor(
+	// defaultToolkit.getImage(CharacterTrainingDialog.class.getResource(ERASER_CURSOR)),
+	// new Point(5, 5), "EraserCursor");
 
-        this.binaryImage = binaryImage;
+	eraserCursor = Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR);
 
-        init();
+	setModal(true);
+	setTitle("Store Characters");
+
+	this.wordImage = wordImage;
+
+	init();
 
     }
 
     private void init() {
 
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+	setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
-        // FIXME: make it GridBagLayout
-        getContentPane().setLayout(new BorderLayout());
+	// FIXME: make it GridBagLayout
+	getContentPane().setLayout(new BorderLayout());
 
-        JLabel lbTitle = new JLabel(
-                "<html>Enter the Unicode value of the character in the format xxxx, where 'x' is a digit (0-9). If there are more than one character, each must be separated by a space.</html>");
-        
-        getContentPane().add(lbTitle, BorderLayout.PAGE_START);
-        
-        getContentPane().add(getToolsPanel(), BorderLayout.LINE_START);
+	JLabel lbTitle = new JLabel(
+		"<html>Enter the Unicode value of the character in the format xxxx, where 'x' is a digit (0-9). If there are more than one character, each must be separated by a space.</html>");
 
-        BufferedImage charImage = binaryImage.getImage();
+	getContentPane().add(lbTitle, BorderLayout.PAGE_START);
 
-        imagePanel = new ImagePanel();
-        imagePanel.setImage(charImage);
-        ImageEraserMouseListener imageEraserMouseListener = new ImageEraserMouseListener();
-        imagePanel.addMouseMotionListener(imageEraserMouseListener);
-        imagePanel.addMouseListener(imageEraserMouseListener);
+	getContentPane().add(getToolsPanel(), BorderLayout.LINE_START);
 
-        getContentPane().add(imagePanel, BorderLayout.CENTER);
+	imagePanel = new ImagePanel();
+	imagePanel.setImage(wordImage);
+	ImageEraserMouseListener imageEraserMouseListener = new ImageEraserMouseListener();
+	imagePanel.addMouseMotionListener(imageEraserMouseListener);
+	imagePanel.addMouseListener(imageEraserMouseListener);
 
-        JPanel pnlBottom = new JPanel();
-        pnlBottom.setLayout(new BorderLayout());
-        pnlBottom.setPreferredSize(new Dimension(DIALOG_WIDTH, 40));
-        getContentPane().add(pnlBottom, BorderLayout.SOUTH);
+	getContentPane().add(imagePanel, BorderLayout.CENTER);
 
-        txtCharacters = new JTextField();
-        pnlBottom.add(txtCharacters, BorderLayout.CENTER);
+	JPanel pnlBottom = new JPanel();
+	pnlBottom.setLayout(new BorderLayout());
+	pnlBottom.setPreferredSize(new Dimension(DIALOG_WIDTH, 40));
+	getContentPane().add(pnlBottom, BorderLayout.SOUTH);
 
-        JButton btStoreChar = new JButton("Store Char");
-        pnlBottom.add(btStoreChar, BorderLayout.EAST);
+	txtCharacters = new JTextField();
+	pnlBottom.add(txtCharacters, BorderLayout.CENTER);
 
-        btStoreChar.addActionListener(new ActionListener() {
+	JButton btStoreChar = new JButton("Store Char");
+	pnlBottom.add(btStoreChar, BorderLayout.EAST);
 
-            @Override
-            public void actionPerformed(ActionEvent evt) {
+	btStoreChar.addActionListener(new ActionListener() {
 
-                String chars = txtCharacters.getText().trim();
+	    @Override
+	    public void actionPerformed(ActionEvent evt) {
 
-                if ("".equals(chars)) {
+		String chars = txtCharacters.getText().trim();
 
-                    JOptionPane
-                            .showMessageDialog(CharacterTrainingDialog.this,
-                                    "Please enter some characters",
-                                    "No characters entered!",
-                                    JOptionPane.ERROR_MESSAGE);
+		if ("".equals(chars)) {
 
-                } else {
-                	
-                	Matcher match = CHAR_PATTERN.matcher(chars);
+		    JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Please enter some characters", "No characters entered!", JOptionPane.ERROR_MESSAGE);
 
-                    if (match.matches()) {
-                    	
-                		GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
+		} else {
 
-                        //FIXME: do not hardcode
-                        Typeface typeFace = new Typeface();
-                        typeFace.setName("testing");
-                        typeFace.setScript(Script.BANGLA);
+		    Matcher match = CHAR_PATTERN.matcher(chars);
 
-                        Glyph glyph = new Glyph(-1, typeFace, chars.toUpperCase(),
-                                new BinaryImage(imagePanel.getImage(), BinaryImage.DEFAULT_COLOR_THRESHOLD, false)); 
+		    if (match.matches()) {
 
-                        glyphDB.addGlyph(glyph);
+			GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
 
-                        JOptionPane.showMessageDialog(
-                                CharacterTrainingDialog.this, "Character(s) "
-                                        + chars + " added successfully",
-                                "Success!", JOptionPane.INFORMATION_MESSAGE);
-                        
-                        CharacterTrainingDialog.this.setVisible(false);
-                        CharacterTrainingDialog.this.dispose();
-                    	
-                    } else {
-                    	
-                    	JOptionPane.showMessageDialog(
-                                CharacterTrainingDialog.this,
-                                "Please enter characters in the right format",
-                                "Invalid format!", JOptionPane.ERROR_MESSAGE);
-                    	
-                    }
+			// FIXME: do not hardcode
+			Typeface typeFace = new Typeface();
+			typeFace.setName("testing");
+			typeFace.setScript(Script.BANGLA);
 
-                }
+			Glyph glyph = new Glyph(-1, typeFace, chars.toUpperCase(), new BinaryImage(imagePanel.getImage(), BinaryImage.DEFAULT_COLOR_THRESHOLD, false));
 
-            }
+			glyphDB.addGlyph(glyph);
 
-        });
-        
-        GuiUtils.centerWindow(this, DIALOG_WIDTH, DIALOG_HEIGHT);
+			JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Character(s) " + chars + " added successfully", "Success!", JOptionPane.INFORMATION_MESSAGE);
+
+			CharacterTrainingDialog.this.setVisible(false);
+			CharacterTrainingDialog.this.dispose();
+
+		    } else {
+
+			JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Please enter characters in the right format", "Invalid format!", JOptionPane.ERROR_MESSAGE);
+
+		    }
+
+		}
+
+	    }
+
+	});
+
+	GuiUtils.centerWindow(this, DIALOG_WIDTH, DIALOG_HEIGHT);
 
     }
-    
+
     private JPanel getToolsPanel() {
-    	
-    	JPanel toolsPanel = new JPanel();
-    	toolsPanel.setLayout(new BoxLayout(toolsPanel, BoxLayout.X_AXIS));
-    	eraserButton = new JToggleButton();
-    	toolsPanel.add(eraserButton);
-    	eraserButton.setText("Eraser");
-    	eraserButton.setIcon(new ImageIcon(CharacterTrainingDialog.class.getResource(ERASER_IMG)));
-    	
-    	eraserButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
 
-				boolean state = eraserButton.isSelected();
-				
-				if (state) {
-					setCursor(eraserCursor);
-				} else {
-					setCursor(Cursor.getDefaultCursor());
-				}
-				
-			}
-			
-		});
-    	
-    	return toolsPanel;
-    	
+	JPanel toolsPanel = new JPanel();
+	toolsPanel.setLayout(new BoxLayout(toolsPanel, BoxLayout.X_AXIS));
+	eraserButton = new JToggleButton();
+	toolsPanel.add(eraserButton);
+	eraserButton.setText("Eraser");
+	eraserButton.setIcon(new ImageIcon(CharacterTrainingDialog.class.getResource(ERASER_IMG)));
+
+	eraserButton.addActionListener(new ActionListener() {
+
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+
+		boolean state = eraserButton.isSelected();
+
+		if (state) {
+		    setCursor(eraserCursor);
+		} else {
+		    setCursor(Cursor.getDefaultCursor());
+		}
+
+	    }
+
+	});
+
+	return toolsPanel;
+
     }
-    
+
     private class ImageEraserMouseListener implements MouseListener, MouseMotionListener {
-    	
-    	private BufferedImage tempImage;
 
-		@Override
-		public void mouseDragged(MouseEvent e) {
-			
-			if (!eraserButton.isSelected()) {
-				return;
-			}
-			
-			if (tempImage == null) {
-				tempImage = imagePanel.getImage(); 
-			}
-			
-			Point p = e.getPoint();
-			
-			if ((p.x >= 0 && p.y >= 0) 
-					&& (p.x < tempImage.getWidth() && p.y < tempImage.getHeight())) {
-				tempImage.setRGB(p.x, p.y, Color.BLACK.getRGB());
-			}
-			
-		}
+	private BufferedImage tempImage;
 
-		@Override
-		public void mouseMoved(MouseEvent e) {
-			
-		}
+	@Override
+	public void mouseDragged(MouseEvent e) {
 
-		@Override
-		public void mouseClicked(MouseEvent e) {
-			
-		}
+	    if (!eraserButton.isSelected()) {
+		return;
+	    }
 
-		@Override
-		public void mousePressed(MouseEvent e) {
-			
-		}
+	    if (tempImage == null) {
+		tempImage = imagePanel.getImage();
+	    }
 
-		@Override
-		public void mouseReleased(MouseEvent e) {
-			
-			if (!eraserButton.isSelected()) {
-				return;
-			}
-			
-			if (tempImage != null) {
-				
-				EventQueue.invokeLater(new Runnable() {
-					
-					@Override
-					public void run() {
-						
-						imagePanel.setImage(tempImage);
-						tempImage = null;
-						setCursor(Cursor.getDefaultCursor());
-						eraserButton.setSelected(false);
-						
-					}
-					
-				});
-				
-			}
-			
-		}
+	    Point p = e.getPoint();
 
-		@Override
-		public void mouseEntered(MouseEvent e) {
-			
-		}
+	    if ((p.x >= 0 && p.y >= 0) && (p.x < tempImage.getWidth() && p.y < tempImage.getHeight())) {
+		tempImage.setRGB(p.x, p.y, Color.BLACK.getRGB());
+	    }
 
-		@Override
-		public void mouseExited(MouseEvent e) {
-			
-		}
-    	
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+
+	    if (!eraserButton.isSelected()) {
+		return;
+	    }
+
+	    if (tempImage != null) {
+
+		EventQueue.invokeLater(new Runnable() {
+
+		    @Override
+		    public void run() {
+
+			imagePanel.setImage(tempImage);
+			tempImage = null;
+			setCursor(Cursor.getDefaultCursor());
+			eraserButton.setSelected(false);
+
+		    }
+
+		});
+
+	    }
+
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+
+	}
+
     }
-    
+
 }

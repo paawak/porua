@@ -21,6 +21,7 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -173,12 +174,12 @@ public class OcrWorkBench extends JFrame {
 
 	});
 
-	JMenu ocrMenu = new JMenu("Ocr");
-	menuBar.add(ocrMenu);
-	JMenuItem detectIndividualGlyphsMenuItem = new JMenuItem("Detect Individual Gyphs");
-	ocrMenu.add(detectIndividualGlyphsMenuItem);
+	JMenu tesseractMenu = new JMenu("Tesseract");
+	menuBar.add(tesseractMenu);
+	JMenuItem detectWordsMenuItem = new JMenuItem("Detect Words");
+	tesseractMenu.add(detectWordsMenuItem);
 
-	detectIndividualGlyphsMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.DETECT_WORDS_TESSERACT_OCR));
+	detectWordsMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.DETECT_WORDS_TESSERACT_OCR));
 
 	JMenu trainingMenu = new JMenu("Training");
 	menuBar.add(trainingMenu);
@@ -213,11 +214,6 @@ public class OcrWorkBench extends JFrame {
 	    }
 
 	});
-
-	JMenuItem storeCharacterMenuItem = new JMenuItem("Store Character");
-	trainingMenu.add(storeCharacterMenuItem);
-
-	storeCharacterMenuItem.addActionListener(new StoreCharacterActionListener());
 
 	JMenuItem showGlyphDbMenuItem = new JMenuItem("Show Glyph DB");
 	trainingMenu.add(showGlyphDbMenuItem);
@@ -266,63 +262,37 @@ public class OcrWorkBench extends JFrame {
 
 	statusLabel.setForeground(Color.BLUE);
 
-	final JPopupMenu saveImagePopup = new JPopupMenu();
+	final JPopupMenu ocrCorrectionPopup = new JPopupMenu();
 
-	JMenuItem saveImagePopupMenuItem = new JMenuItem("Save Image To Home Dir");
-	saveImagePopup.add(saveImagePopupMenuItem);
-
-	saveImagePopupMenuItem.addActionListener(new ActionListener() {
-
+	JMenuItem textCorrectionPopupMenuItem = new JMenuItem("Correct OCR Text");
+	ocrCorrectionPopup.add(textCorrectionPopupMenuItem);
+	textCorrectionPopupMenuItem.addMouseListener(new MouseAdapter() {
 	    @Override
-	    public void actionPerformed(ActionEvent e) {
+	    public void mouseReleased(MouseEvent mouseEvent) {
+		EventQueue.invokeLater(() -> {
 
-		EventQueue.invokeLater(new Runnable() {
+		    Optional<TextBox> optionalText = getDetectedOcrText(MouseInfo.getPointerInfo().getLocation());
 
-		    @Override
-		    public void run() {
-
-			BufferedImage morphedImage = imagePanel.getImage();
-
-			if (morphedImage == null) {
-
-			    JOptionPane.showMessageDialog(OcrWorkBench.this, "Please load an image", "No image loaded!", JOptionPane.WARNING_MESSAGE);
-
-			} else {
-
-			    String imagePath = System.getProperty("user.home") + "/Image.png";
-
-			    try {
-				ImageIO.write(morphedImage, "png", new File(imagePath));
-				JOptionPane.showMessageDialog(OcrWorkBench.this, "Image saved successfully to " + imagePath, "Success!", JOptionPane.INFORMATION_MESSAGE);
-			    } catch (IOException e) {
-				JOptionPane.showMessageDialog(OcrWorkBench.this, "Could not save image to " + imagePath, "Error!", JOptionPane.ERROR_MESSAGE);
-				LOG.error("could not save image to: " + imagePath, e);
-			    }
-
-			}
-
+		    if (!optionalText.isPresent()) {
+			JOptionPane.showMessageDialog(OcrWorkBench.this, "Select a proper word box", "No word found in this region!", JOptionPane.WARNING_MESSAGE);
+			return;
 		    }
 
+		    TextBox textBox = optionalText.get();
+		    Rectangle area = textBox.getRectangle();
+		    JDialog dialog = new CharacterTrainingDialog(currentImage.getSubimage(area.x, area.y, area.width, area.height));
+		    dialog.setVisible(true);
 		});
-
 	    }
-
 	});
 
-	JMenuItem storeCharacterPopupMenuItem = new JMenuItem("Store Character");
-	saveImagePopup.add(storeCharacterPopupMenuItem);
-	storeCharacterPopupMenuItem.addActionListener(new StoreCharacterActionListener());
-
 	imagePanel.addMouseListener(new MouseAdapter() {
-
-	    public void mouseReleased(MouseEvent e) {
-
-		if (e.isMetaDown()) {
-		    saveImagePopup.show(e.getComponent(), e.getX(), e.getY());
+	    @Override
+	    public void mouseReleased(MouseEvent mouseEvent) {
+		if (mouseEvent.isMetaDown()) {
+		    ocrCorrectionPopup.show(mouseEvent.getComponent(), mouseEvent.getX(), mouseEvent.getY());
 		}
-
 	    }
-
 	});
 
 	pack();
@@ -398,22 +368,25 @@ public class OcrWorkBench extends JFrame {
     }
 
     private void setDetectedTextInToolTip(Point point) {
-	if (detectedWords == null || detectedWords.isEmpty()) {
+	Optional<TextBox> matchingTextBoxOpt = getDetectedOcrText(point);
+
+	if (!matchingTextBoxOpt.isPresent()) {
 	    return;
 	}
 
-	Optional<TextBox> matchingTextBoxOpt = detectedWords.parallelStream().filter(textBox -> textBox.getRectangle().contains(point)).findFirst();
+	TextBox matchingTextBox = matchingTextBoxOpt.get();
+	imagePanel.setToolTipText(String.format("<html><h1 bgcolor=\"%s\">%s</h1></html>", toHtmlColor(matchingTextBox.getColorCodedConfidence()), matchingTextBox.text));
+    }
 
-	if (matchingTextBoxOpt.isPresent()) {
-	    TextBox matchingTextBox = matchingTextBoxOpt.get();
-	    String toolTipText = "<html><h1 bgcolor=\"%s\">%s</h1></html>";
-	    imagePanel.setToolTipText(String.format(toolTipText, toHtmlColor(matchingTextBox.getColorCodedConfidence()), matchingTextBox.text));
+    private Optional<TextBox> getDetectedOcrText(Point point) {
+	if (detectedWords == null || detectedWords.isEmpty()) {
+	    return Optional.empty();
 	}
 
+	return detectedWords.parallelStream().filter(textBox -> textBox.getRectangle().contains(point)).findFirst();
     }
 
     private String toHtmlColor(Color color) {
-
 	Function<Integer, String> toHex = colorValue -> {
 	    String hex = Integer.toHexString(colorValue);
 	    if (hex.length() == 1) {
@@ -422,52 +395,7 @@ public class OcrWorkBench extends JFrame {
 	    return hex;
 	};
 
-	String red = toHex.apply(color.getRed());
-	String green = toHex.apply(color.getGreen());
-	String blue = toHex.apply(color.getBlue());
-
-	return "#" + red + green + blue;
-
-    }
-
-    private class StoreCharacterActionListener implements ActionListener {
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-
-	    EventQueue.invokeLater(new Runnable() {
-
-		@Override
-		public void run() {
-
-		    com.swayam.ocr.core.util.Rectangle trainingChar = imagePanel.getTrainingCharacter();
-
-		    if (binaryImage == null || trainingChar == null) {
-
-			JOptionPane.showMessageDialog(OcrWorkBench.this, "Please mark a character first", "No character marked!", JOptionPane.WARNING_MESSAGE);
-
-		    } else {
-
-			if (currentImage.getWidth() < trainingChar.width || currentImage.getHeight() < trainingChar.height || currentImage.getWidth() < trainingChar.x
-				|| currentImage.getHeight() < trainingChar.y) {
-
-			    JOptionPane.showMessageDialog(OcrWorkBench.this, "Marked image out of bounds", "Out of bounds!", JOptionPane.ERROR_MESSAGE);
-
-			} else {
-
-			    JDialog dialog = new CharacterTrainingDialog(binaryImage.getSubImage(trainingChar));
-			    dialog.setVisible(true);
-
-			}
-
-		    }
-
-		}
-
-	    });
-
-	}
-
+	return "#" + toHex.apply(color.getRed()) + toHex.apply(color.getGreen()) + toHex.apply(color.getBlue());
     }
 
     private enum ProcessImageOption {
