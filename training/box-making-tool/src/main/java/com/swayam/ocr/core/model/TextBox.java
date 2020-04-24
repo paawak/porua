@@ -1,5 +1,7 @@
 package com.swayam.ocr.core.model;
 
+import java.awt.Rectangle;
+
 public class TextBox {
 
     public final int x1;
@@ -16,6 +18,10 @@ public class TextBox {
 	this.y2 = y2;
 	this.confidence = confidence;
 	this.text = text;
+    }
+
+    public Rectangle getRectangle() {
+	return new Rectangle(x1, y1, x2 - x1, y2 - y1);
     }
 
     @Override

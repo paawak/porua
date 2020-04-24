@@ -22,6 +22,7 @@ import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -31,6 +32,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -53,7 +55,6 @@ import com.swayam.ocr.core.impl.TesseractOcrWordAnalyser;
 import com.swayam.ocr.core.model.TextBox;
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.ImageUtils;
-import com.swayam.ocr.core.util.Rectangle;
 
 /**
  * 
@@ -76,6 +77,8 @@ public class OcrWorkBench extends JFrame {
     private BinaryImage binaryImage;
 
     private File currentSelectedImageFile;
+
+    private Collection<TextBox> detectedWords;
 
     public OcrWorkBench() {
 
@@ -104,6 +107,8 @@ public class OcrWorkBench extends JFrame {
 		Point p = e.getPoint();
 
 		setStatusString(p.x + ", " + p.y);
+
+		setDetectedTextInToolTip(p);
 
 	    }
 
@@ -374,11 +379,11 @@ public class OcrWorkBench extends JFrame {
 
 	TesseractOcrWordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
 
-	Collection<TextBox> words = wordAnalyser.getDetectedWords();
+	detectedWords = wordAnalyser.getDetectedWords();
 
 	Graphics2D g = (Graphics2D) currentImage.getGraphics();
 
-	words.forEach(textBox -> paintWordBoundary(g, textBox));
+	detectedWords.forEach(textBox -> paintWordBoundary(g, textBox));
 
 	return currentImage;
     }
@@ -389,8 +394,21 @@ public class OcrWorkBench extends JFrame {
 	Color confidenceColor = new Color(red, green, 0);
 	g.setColor(confidenceColor);
 	g.setStroke(new BasicStroke(2));
-	Rectangle wordArea = new Rectangle(textBox.x1, textBox.y1, textBox.x2 - textBox.x1, textBox.y2 - textBox.y1);
-	g.drawRect(wordArea.getX(), wordArea.getY(), wordArea.getWidth(), wordArea.getHeight());
+	Rectangle wordArea = textBox.getRectangle();
+	g.drawRect(wordArea.x, wordArea.y, wordArea.width, wordArea.height);
+    }
+
+    private void setDetectedTextInToolTip(Point point) {
+	if (detectedWords == null || detectedWords.isEmpty()) {
+	    return;
+	}
+
+	Optional<TextBox> matchingTextBox = detectedWords.parallelStream().filter(textBox -> textBox.getRectangle().contains(point)).findFirst();
+
+	if (matchingTextBox.isPresent()) {
+	    imagePanel.setToolTipText(matchingTextBox.get().text);
+	}
+
     }
 
     private class StoreCharacterActionListener implements ActionListener {
@@ -403,7 +421,7 @@ public class OcrWorkBench extends JFrame {
 		@Override
 		public void run() {
 
-		    Rectangle trainingChar = imagePanel.getTrainingCharacter();
+		    com.swayam.ocr.core.util.Rectangle trainingChar = imagePanel.getTrainingCharacter();
 
 		    if (binaryImage == null || trainingChar == null) {
 
