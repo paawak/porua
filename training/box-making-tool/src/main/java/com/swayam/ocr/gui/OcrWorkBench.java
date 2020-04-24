@@ -20,7 +20,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -32,7 +31,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -51,9 +49,6 @@ import javax.swing.JScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.WordAnalyser;
-import com.swayam.ocr.core.impl.BanglaGlyphAnalyser;
-import com.swayam.ocr.core.impl.LeftToRightWordAnalyser;
 import com.swayam.ocr.core.impl.TesseractOcrWordAnalyser;
 import com.swayam.ocr.core.model.TextBox;
 import com.swayam.ocr.core.util.BinaryImage;
@@ -69,10 +64,6 @@ public class OcrWorkBench extends JFrame {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOG = LoggerFactory.getLogger(OcrWorkBench.class);
-
-    private static final boolean MARK_WORD_BOUNDS = true;
-
-    private static final boolean MARK_MATRAS = true;
 
     private static final String LAST_USED_IMAGE_DIRECTORY = "LAST_USED_IMAGE_DIRECTORY";
 
@@ -370,73 +361,13 @@ public class OcrWorkBench extends JFrame {
 	    break;
 
 	case DETECT_WORDS_NAIVE:
-
-	    if (true) {
-		filteredImage = detectWordsWithTesseract();
-	    } else {
-		filteredImage = detectWordsNaive();
-	    }
-
+	    filteredImage = detectWordsWithTesseract();
 	    break;
 
 	}
 
 	return filteredImage;
 
-    }
-
-    private BufferedImage detectWordsNaive() {
-	BufferedImage filteredImage;
-	binaryImage = new BinaryImage(currentImage, BinaryImage.DEFAULT_COLOR_THRESHOLD, true);
-
-	WordAnalyser wordAnalyser = new LeftToRightWordAnalyser(binaryImage);
-	filteredImage = binaryImage.getImage();
-
-	List<Rectangle> wordAreas = wordAnalyser.getWordBoundaries();
-
-	Graphics g = filteredImage.getGraphics();
-
-	for (Rectangle wordArea : wordAreas) {
-
-	    if (MARK_WORD_BOUNDS) {
-		g.setColor(Color.GREEN);
-		g.drawRect(wordArea.getX(), wordArea.getY(), wordArea.getWidth(), wordArea.getHeight());
-	    }
-
-	    BinaryImage word = wordAnalyser.getWordMatrix(wordArea);
-
-	    if (MARK_MATRAS) {
-
-		BanglaGlyphAnalyser glyphAnalyser = new BanglaGlyphAnalyser(word);
-
-		List<Rectangle> matras = glyphAnalyser.getMatras();
-
-		LOG.debug("matras:" + matras);
-
-		for (Rectangle rect : matras) {
-
-		    int x = wordArea.getX() + rect.x;
-		    int y = wordArea.getY() + rect.y;
-
-		    g.setColor(Color.YELLOW);
-		    g.fillRect(x, y, rect.width, rect.height);
-
-		}
-
-		List<Rectangle> glyphBoundaries = glyphAnalyser.getGlyphBoundaries();
-
-		for (Rectangle glyphBoundary : glyphBoundaries) {
-
-		    int x = wordArea.getX() + glyphBoundary.x;
-		    int y = wordArea.getY() + glyphBoundary.y;
-
-		    g.setColor(Color.RED);
-		    g.drawRect(x, y, glyphBoundary.getWidth(), glyphBoundary.getHeight());
-		}
-
-	    }
-	}
-	return filteredImage;
     }
 
     private BufferedImage detectWordsWithTesseract() {
