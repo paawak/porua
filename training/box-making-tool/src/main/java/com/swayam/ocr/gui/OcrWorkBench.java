@@ -27,7 +27,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -48,7 +48,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,6 +81,8 @@ public class OcrWorkBench extends JFrame {
 
     private Collection<TextBox> detectedWords;
 
+    private Point currentMousePosition;
+
     public OcrWorkBench() {
 
 	statusLabel = new JLabel();
@@ -101,21 +102,16 @@ public class OcrWorkBench extends JFrame {
 
 	imagePanel = new GlassPanedImagePanel(glassPane);
 
-	imagePanel.addMouseMotionListener(new MouseMotionListener() {
+	imagePanel.addMouseMotionListener(new MouseMotionAdapter() {
 
 	    @Override
 	    public void mouseMoved(MouseEvent e) {
 
-		Point p = e.getPoint();
+		currentMousePosition = e.getPoint();
 
-		setStatusString(p.x + ", " + p.y);
+		setStatusString(currentMousePosition.x + ", " + currentMousePosition.y);
 
-		setDetectedTextInToolTip(p);
-
-	    }
-
-	    @Override
-	    public void mouseDragged(MouseEvent e) {
+		setDetectedTextInToolTip(currentMousePosition);
 
 	    }
 
@@ -129,46 +125,41 @@ public class OcrWorkBench extends JFrame {
 	JMenuItem loadImageMenuItem = new JMenuItem("Load");
 	imageMenu.add(loadImageMenuItem);
 
-	loadImageMenuItem.addActionListener(new ActionListener() {
+	loadImageMenuItem.addActionListener(evt -> {
 
-	    @Override
-	    public void actionPerformed(ActionEvent evt) {
+	    Preferences imageDirectoryPrefs = Preferences.userNodeForPackage(OcrWorkBench.class);
 
-		Preferences imageDirectoryPrefs = Preferences.userNodeForPackage(OcrWorkBench.class);
+	    String initialDirectory = imageDirectoryPrefs.get(LAST_USED_IMAGE_DIRECTORY, System.getProperty("user.home"));
 
-		String initialDirectory = imageDirectoryPrefs.get(LAST_USED_IMAGE_DIRECTORY, System.getProperty("user.home"));
+	    LOG.info("initialDirectory: {}", initialDirectory);
 
-		LOG.info("initialDirectory: {}", initialDirectory);
+	    JFileChooser fileChooser = new JFileChooser();
+	    fileChooser.setCurrentDirectory(new File(initialDirectory));
 
-		JFileChooser fileChooser = new JFileChooser();
-		fileChooser.setCurrentDirectory(new File(initialDirectory));
+	    int option = fileChooser.showOpenDialog(OcrWorkBench.this);
 
-		int option = fileChooser.showOpenDialog(OcrWorkBench.this);
+	    if (option == JFileChooser.APPROVE_OPTION) {
 
-		if (option == JFileChooser.APPROVE_OPTION) {
+		OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-		    OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+		try {
 
-		    try {
+		    getGlassPane().setVisible(false);
 
-			getGlassPane().setVisible(false);
+		    currentSelectedImageFile = fileChooser.getSelectedFile();
 
-			currentSelectedImageFile = fileChooser.getSelectedFile();
+		    imageDirectoryPrefs.put(LAST_USED_IMAGE_DIRECTORY, currentSelectedImageFile.getParentFile().getAbsolutePath());
 
-			imageDirectoryPrefs.put(LAST_USED_IMAGE_DIRECTORY, currentSelectedImageFile.getParentFile().getAbsolutePath());
+		    currentImage = ImageIO.read(currentSelectedImageFile);
+		    setImageInFrame(currentImage);
 
-			currentImage = ImageIO.read(currentSelectedImageFile);
-			setImageInFrame(currentImage);
+		    binaryImage = null;
 
-			binaryImage = null;
-
-		    } catch (IOException e) {
-			LOG.error("could not load image", e);
-		    }
-
-		    OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-
+		} catch (IOException e) {
+		    LOG.error("could not load image", e);
 		}
+
+		OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
 	    }
 
@@ -194,22 +185,17 @@ public class OcrWorkBench extends JFrame {
 
 	JMenuItem markCharacterMenuItem = new JMenuItem("Mark Character");
 	trainingMenu.add(markCharacterMenuItem);
-	markCharacterMenuItem.addActionListener(new ActionListener() {
+	markCharacterMenuItem.addActionListener(e -> {
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
+	    if (currentImage == null || binaryImage == null) {
 
-		if (currentImage == null || binaryImage == null) {
+		getGlassPane().setVisible(false);
 
-		    getGlassPane().setVisible(false);
+		JOptionPane.showMessageDialog(OcrWorkBench.this, "Please load an image and select OCR->Mark Texts from the menu", "Binary image not found!", JOptionPane.WARNING_MESSAGE);
 
-		    JOptionPane.showMessageDialog(OcrWorkBench.this, "Please load an image and select OCR->Mark Texts from the menu", "Binary image not found!", JOptionPane.WARNING_MESSAGE);
+	    } else {
 
-		} else {
-
-		    getGlassPane().setVisible(true);
-
-		}
+		getGlassPane().setVisible(true);
 
 	    }
 
@@ -218,29 +204,13 @@ public class OcrWorkBench extends JFrame {
 	JMenuItem showGlyphDbMenuItem = new JMenuItem("Show Glyph DB");
 	trainingMenu.add(showGlyphDbMenuItem);
 
-	showGlyphDbMenuItem.addActionListener(new ActionListener() {
-
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-
-		EventQueue.invokeLater(new Runnable() {
-
-		    @Override
-		    public void run() {
-
-			// JDialog dialog = new JDialog(OcrWorkBench.this,
-			// true);
-			JFrame frame = new JFrame();
-			GuiUtils.centerWindow(frame, 500, 800);
-			frame.getContentPane().add(new GlyphDatabaseViewer());
-			frame.setVisible(true);
-
-		    }
-
-		});
-
-	    }
-
+	showGlyphDbMenuItem.addActionListener(e -> {
+	    EventQueue.invokeLater(() -> {
+		JFrame frame = new JFrame();
+		GuiUtils.centerWindow(frame, 500, 800);
+		frame.getContentPane().add(new GlyphDatabaseViewer());
+		frame.setVisible(true);
+	    });
 	});
 
 	setJMenuBar(menuBar);
@@ -266,27 +236,21 @@ public class OcrWorkBench extends JFrame {
 
 	JMenuItem textCorrectionPopupMenuItem = new JMenuItem("Correct OCR Text");
 	ocrCorrectionPopup.add(textCorrectionPopupMenuItem);
-	textCorrectionPopupMenuItem.addMouseListener(new MouseAdapter() {
-	    @Override
-	    public void mouseReleased(MouseEvent mouseEvent) {
-		EventQueue.invokeLater(() -> {
+	textCorrectionPopupMenuItem.addActionListener(actionEvent -> {
+	    EventQueue.invokeLater(() -> {
+		Optional<TextBox> optionalText = getDetectedOcrText(currentMousePosition);
 
-		    Point mouseLocation = SwingUtilities.convertPoint(textCorrectionPopupMenuItem, mouseEvent.getLocationOnScreen(), imagePanel);
+		if (!optionalText.isPresent()) {
+		    JOptionPane.showMessageDialog(OcrWorkBench.this, "Select a proper word box", "No word found in this region!", JOptionPane.WARNING_MESSAGE);
+		    return;
+		}
 
-		    Optional<TextBox> optionalText = getDetectedOcrText(mouseLocation);
-
-		    if (!optionalText.isPresent()) {
-			JOptionPane.showMessageDialog(OcrWorkBench.this, "Select a proper word box", "No word found in this region!", JOptionPane.WARNING_MESSAGE);
-			return;
-		    }
-
-		    TextBox textBox = optionalText.get();
-		    LOG.info("Text for correction: {}", textBox.text);
-		    Rectangle area = textBox.getRectangle();
-		    JDialog dialog = new CharacterTrainingDialog(currentImage.getSubimage(area.x, area.y, area.width, area.height));
-		    dialog.setVisible(true);
-		});
-	    }
+		TextBox textBox = optionalText.get();
+		LOG.info("Text for correction: {}", textBox.text);
+		Rectangle area = textBox.getRectangle();
+		JDialog dialog = new CharacterTrainingDialog(currentImage.getSubimage(area.x, area.y, area.width, area.height));
+		dialog.setVisible(true);
+	    });
 	});
 
 	imagePanel.addMouseListener(new MouseAdapter() {
