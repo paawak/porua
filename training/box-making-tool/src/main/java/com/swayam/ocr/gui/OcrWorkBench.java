@@ -21,7 +21,6 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
-import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -49,6 +48,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -271,7 +271,10 @@ public class OcrWorkBench extends JFrame {
 	    public void mouseReleased(MouseEvent mouseEvent) {
 		EventQueue.invokeLater(() -> {
 
-		    Optional<TextBox> optionalText = getDetectedOcrText(MouseInfo.getPointerInfo().getLocation());
+		    Point p = new Point(mouseEvent.getXOnScreen(), mouseEvent.getYOnScreen());
+		    p = SwingUtilities.convertPoint(textCorrectionPopupMenuItem, p, imagePanel);
+
+		    Optional<TextBox> optionalText = getDetectedOcrText(p);
 
 		    if (!optionalText.isPresent()) {
 			JOptionPane.showMessageDialog(OcrWorkBench.this, "Select a proper word box", "No word found in this region!", JOptionPane.WARNING_MESSAGE);
@@ -279,6 +282,7 @@ public class OcrWorkBench extends JFrame {
 		    }
 
 		    TextBox textBox = optionalText.get();
+		    LOG.info("Text for correction: {}", textBox.text);
 		    Rectangle area = textBox.getRectangle();
 		    JDialog dialog = new CharacterTrainingDialog(currentImage.getSubimage(area.x, area.y, area.width, area.height));
 		    dialog.setVisible(true);
