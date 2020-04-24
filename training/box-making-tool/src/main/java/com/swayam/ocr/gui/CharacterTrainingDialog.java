@@ -21,8 +21,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -133,44 +131,39 @@ public class CharacterTrainingDialog extends JDialog {
 	JButton btStoreChar = new JButton("Store Char");
 	pnlBottom.add(btStoreChar, BorderLayout.EAST);
 
-	btStoreChar.addActionListener(new ActionListener() {
+	btStoreChar.addActionListener(evt -> {
 
-	    @Override
-	    public void actionPerformed(ActionEvent evt) {
+	    String chars = txtCharacters.getText().trim();
 
-		String chars = txtCharacters.getText().trim();
+	    if ("".equals(chars)) {
 
-		if ("".equals(chars)) {
+		JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Please enter some characters", "No characters entered!", JOptionPane.ERROR_MESSAGE);
 
-		    JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Please enter some characters", "No characters entered!", JOptionPane.ERROR_MESSAGE);
+	    } else {
+
+		Matcher match = CHAR_PATTERN.matcher(chars);
+
+		if (match.matches()) {
+
+		    GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
+
+		    // FIXME: do not hardcode
+		    Typeface typeFace = new Typeface();
+		    typeFace.setName("testing");
+		    typeFace.setScript(Script.BANGLA);
+
+		    Glyph glyph = new Glyph(-1, typeFace, chars.toUpperCase(), new BinaryImage(imagePanel.getImage(), BinaryImage.DEFAULT_COLOR_THRESHOLD, false));
+
+		    glyphDB.addGlyph(glyph);
+
+		    JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Character(s) " + chars + " added successfully", "Success!", JOptionPane.INFORMATION_MESSAGE);
+
+		    CharacterTrainingDialog.this.setVisible(false);
+		    CharacterTrainingDialog.this.dispose();
 
 		} else {
 
-		    Matcher match = CHAR_PATTERN.matcher(chars);
-
-		    if (match.matches()) {
-
-			GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
-
-			// FIXME: do not hardcode
-			Typeface typeFace = new Typeface();
-			typeFace.setName("testing");
-			typeFace.setScript(Script.BANGLA);
-
-			Glyph glyph = new Glyph(-1, typeFace, chars.toUpperCase(), new BinaryImage(imagePanel.getImage(), BinaryImage.DEFAULT_COLOR_THRESHOLD, false));
-
-			glyphDB.addGlyph(glyph);
-
-			JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Character(s) " + chars + " added successfully", "Success!", JOptionPane.INFORMATION_MESSAGE);
-
-			CharacterTrainingDialog.this.setVisible(false);
-			CharacterTrainingDialog.this.dispose();
-
-		    } else {
-
-			JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Please enter characters in the right format", "Invalid format!", JOptionPane.ERROR_MESSAGE);
-
-		    }
+		    JOptionPane.showMessageDialog(CharacterTrainingDialog.this, "Please enter characters in the right format", "Invalid format!", JOptionPane.ERROR_MESSAGE);
 
 		}
 
@@ -191,19 +184,14 @@ public class CharacterTrainingDialog extends JDialog {
 	eraserButton.setText("Eraser");
 	eraserButton.setIcon(new ImageIcon(CharacterTrainingDialog.class.getResource(ERASER_IMG)));
 
-	eraserButton.addActionListener(new ActionListener() {
+	eraserButton.addActionListener(e -> {
 
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
+	    boolean state = eraserButton.isSelected();
 
-		boolean state = eraserButton.isSelected();
-
-		if (state) {
-		    setCursor(eraserCursor);
-		} else {
-		    setCursor(Cursor.getDefaultCursor());
-		}
-
+	    if (state) {
+		setCursor(eraserCursor);
+	    } else {
+		setCursor(Cursor.getDefaultCursor());
 	    }
 
 	});
