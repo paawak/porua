@@ -15,11 +15,13 @@
 
 package com.swayam.ocr.gui;
 
+import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,6 +54,7 @@ import com.swayam.ocr.core.WordAnalyser;
 import com.swayam.ocr.core.impl.BanglaGlyphAnalyser;
 import com.swayam.ocr.core.impl.LeftToRightWordAnalyser;
 import com.swayam.ocr.core.impl.TesseractOcrWordAnalyser;
+import com.swayam.ocr.core.model.TextBox;
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.ImageUtils;
 import com.swayam.ocr.core.util.Rectangle;
@@ -441,21 +444,25 @@ public class OcrWorkBench extends JFrame {
 
 	filteredImage = binaryImage.getImage();
 
-	WordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
+	TesseractOcrWordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
 
-	List<Rectangle> wordAreas = wordAnalyser.getWordBoundaries();
+	List<TextBox> words = wordAnalyser.getDetectedWords();
 
-	Graphics g = filteredImage.getGraphics();
+	Graphics2D g = (Graphics2D) filteredImage.getGraphics();
 
-	for (Rectangle wordArea : wordAreas) {
+	words.forEach(textBox -> paintWordBoundary(g, textBox));
 
-	    if (MARK_WORD_BOUNDS) {
-		g.setColor(Color.GREEN);
-		g.drawRect(wordArea.getX(), wordArea.getY(), wordArea.getWidth(), wordArea.getHeight());
-	    }
-
-	}
 	return filteredImage;
+    }
+
+    private void paintWordBoundary(Graphics2D g, TextBox textBox) {
+	float red = (100 - textBox.confidence) / 100;
+	float green = textBox.confidence / 100;
+	Color confidenceColor = new Color(red, green, 0);
+	g.setColor(confidenceColor);
+	g.setStroke(new BasicStroke(2));
+	Rectangle wordArea = new Rectangle(textBox.x1, textBox.y1, textBox.x2 - textBox.x1, textBox.y2 - textBox.y1);
+	g.drawRect(wordArea.getX(), wordArea.getY(), wordArea.getWidth(), wordArea.getHeight());
     }
 
     private class StoreCharacterActionListener implements ActionListener {

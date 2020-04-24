@@ -17,12 +17,9 @@ import org.bytedeco.tesseract.global.tesseract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.WordAnalyser;
 import com.swayam.ocr.core.model.TextBox;
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.Rectangle;
 
-public class TesseractOcrWordAnalyser implements WordAnalyser {
+public class TesseractOcrWordAnalyser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TesseractOcrWordAnalyser.class);
 
@@ -35,11 +32,10 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
 	this.imagePath = imagePath;
     }
 
-    @Override
-    public List<Rectangle> getWordBoundaries() {
+    public List<TextBox> getDetectedWords() {
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
 
-	List<Rectangle> rects = new ArrayList<>();
+	List<TextBox> words = new ArrayList<>();
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
 	    int returnCode = api.Init(TESSDATA_DIRECTORY, LANGUAGE_CODE);
@@ -77,7 +73,7 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
 		TextBox textBox = new TextBox(x1.get(), y1.get(), x2.get(), y2.get(), conf, ocrText);
 		LOGGER.info("{}", textBox);
 
-		rects.add(new Rectangle(textBox.x1, textBox.y1, textBox.x2 - textBox.x1, textBox.y2 - textBox.y1));
+		words.add(textBox);
 
 		x1.deallocate();
 		y1.deallocate();
@@ -86,17 +82,15 @@ public class TesseractOcrWordAnalyser implements WordAnalyser {
 		ocrResult.deallocate();
 	    } while (ri.Next(level));
 
+	    ri.close();
+	    ri.deallocate();
 	    api.End();
 	    api.close();
+	    api.deallocate();
 	    pixDestroy(image);
 	}
 
-	return rects;
-    }
-
-    @Override
-    public BinaryImage getWordMatrix(Rectangle wordBoundary) {
-	throw new UnsupportedOperationException();
+	return words;
     }
 
 }
