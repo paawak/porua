@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.prefs.Preferences;
 
 import javax.imageio.ImageIO;
@@ -405,22 +406,28 @@ public class OcrWorkBench extends JFrame {
 
 	if (matchingTextBoxOpt.isPresent()) {
 	    TextBox matchingTextBox = matchingTextBoxOpt.get();
-	    String toolTipText = "<html><h1 bgcolor=\"#%s%s%s\">%s</h1></html>";
-	    Color confidence = matchingTextBox.getColorCodedConfidence();
-	    String red = getHtmlColor(confidence.getRed());
-	    String green = getHtmlColor(confidence.getGreen());
-	    String blue = getHtmlColor(confidence.getBlue());
-	    imagePanel.setToolTipText(String.format(toolTipText, red, green, blue, matchingTextBox.text));
+	    String toolTipText = "<html><h1 bgcolor=\"%s\">%s</h1></html>";
+	    imagePanel.setToolTipText(String.format(toolTipText, toHtmlColor(matchingTextBox.getColorCodedConfidence()), matchingTextBox.text));
 	}
 
     }
 
-    private String getHtmlColor(int colorValue) {
-	String hex = Integer.toHexString(colorValue);
-	if (hex.length() == 1) {
-	    hex = "0" + hex;
-	}
-	return hex;
+    private String toHtmlColor(Color color) {
+
+	Function<Integer, String> toHex = colorValue -> {
+	    String hex = Integer.toHexString(colorValue);
+	    if (hex.length() == 1) {
+		hex = "0" + hex;
+	    }
+	    return hex;
+	};
+
+	String red = toHex.apply(color.getRed());
+	String green = toHex.apply(color.getGreen());
+	String blue = toHex.apply(color.getBlue());
+
+	return "#" + red + green + blue;
+
     }
 
     private class StoreCharacterActionListener implements ActionListener {
