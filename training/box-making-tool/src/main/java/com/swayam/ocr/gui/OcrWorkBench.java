@@ -177,7 +177,7 @@ public class OcrWorkBench extends JFrame {
 	JMenuItem detectIndividualGlyphsMenuItem = new JMenuItem("Detect Individual Gyphs");
 	ocrMenu.add(detectIndividualGlyphsMenuItem);
 
-	detectIndividualGlyphsMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.DETECT_WORDS_NAIVE));
+	detectIndividualGlyphsMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.DETECT_WORDS_TESSERACT_OCR));
 
 	JMenu trainingMenu = new JMenu("Training");
 	menuBar.add(trainingMenu);
@@ -365,7 +365,7 @@ public class OcrWorkBench extends JFrame {
 
 	    break;
 
-	case DETECT_WORDS_NAIVE:
+	case DETECT_WORDS_TESSERACT_OCR:
 	    filteredImage = detectWordsWithTesseract();
 	    break;
 
@@ -389,9 +389,7 @@ public class OcrWorkBench extends JFrame {
     }
 
     private void paintWordBoundary(Graphics2D g, TextBox textBox) {
-	float red = (100 - textBox.confidence) / 100;
-	float green = textBox.confidence / 100;
-	Color confidenceColor = new Color(red, green, 0);
+	Color confidenceColor = textBox.getColorCodedConfidence();
 	g.setColor(confidenceColor);
 	g.setStroke(new BasicStroke(2));
 	Rectangle wordArea = textBox.getRectangle();
@@ -403,12 +401,26 @@ public class OcrWorkBench extends JFrame {
 	    return;
 	}
 
-	Optional<TextBox> matchingTextBox = detectedWords.parallelStream().filter(textBox -> textBox.getRectangle().contains(point)).findFirst();
+	Optional<TextBox> matchingTextBoxOpt = detectedWords.parallelStream().filter(textBox -> textBox.getRectangle().contains(point)).findFirst();
 
-	if (matchingTextBox.isPresent()) {
-	    imagePanel.setToolTipText(matchingTextBox.get().text);
+	if (matchingTextBoxOpt.isPresent()) {
+	    TextBox matchingTextBox = matchingTextBoxOpt.get();
+	    String toolTipText = "<html><h1 bgcolor=\"#%s%s%s\">%s</h1></html>";
+	    Color confidence = matchingTextBox.getColorCodedConfidence();
+	    String red = getHtmlColor(confidence.getRed());
+	    String green = getHtmlColor(confidence.getGreen());
+	    String blue = getHtmlColor(confidence.getBlue());
+	    imagePanel.setToolTipText(String.format(toolTipText, red, green, blue, matchingTextBox.text));
 	}
 
+    }
+
+    private String getHtmlColor(int colorValue) {
+	String hex = Integer.toHexString(colorValue);
+	if (hex.length() == 1) {
+	    hex = "0" + hex;
+	}
+	return hex;
     }
 
     private class StoreCharacterActionListener implements ActionListener {
@@ -453,7 +465,7 @@ public class OcrWorkBench extends JFrame {
 
     private enum ProcessImageOption {
 
-	BINARY_IMAGE_ONLY, EDGE_DETECTION, DETECT_WORDS_NAIVE, DETECT_WORDS_TESSERACT_OCR;
+	BINARY_IMAGE_ONLY, EDGE_DETECTION, DETECT_WORDS_TESSERACT_OCR;
 
     }
 
@@ -491,7 +503,7 @@ public class OcrWorkBench extends JFrame {
 
 			OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-			setStatusString("The last operation took " + (endTime - startTime) + " ms");
+			LOG.info("The {} operation took {} ms", option, (endTime - startTime));
 
 		    }
 

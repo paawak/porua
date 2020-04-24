@@ -1,5 +1,6 @@
 package com.swayam.ocr.core.model;
 
+import java.awt.Color;
 import java.awt.Rectangle;
 
 public class TextBox {
@@ -22,6 +23,12 @@ public class TextBox {
 
     public Rectangle getRectangle() {
 	return new Rectangle(x1, y1, x2 - x1, y2 - y1);
+    }
+
+    public Color getColorCodedConfidence() {
+	float red = (100 - confidence) / 100;
+	float green = confidence / 100;
+	return new Color(red, green, 0);
     }
 
     @Override
