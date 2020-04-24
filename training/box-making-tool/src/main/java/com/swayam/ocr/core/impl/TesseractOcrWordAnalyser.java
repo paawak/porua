@@ -5,6 +5,8 @@ import static org.bytedeco.leptonica.global.lept.pixRead;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.bytedeco.javacpp.BytePointer;
@@ -32,7 +34,7 @@ public class TesseractOcrWordAnalyser {
 	this.imagePath = imagePath;
     }
 
-    public List<TextBox> getDetectedWords() {
+    public Collection<TextBox> getDetectedWords() {
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
 
 	List<TextBox> words = new ArrayList<>();
@@ -90,7 +92,7 @@ public class TesseractOcrWordAnalyser {
 	    pixDestroy(image);
 	}
 
-	return words;
+	return Collections.unmodifiableList(words);
     }
 
 }

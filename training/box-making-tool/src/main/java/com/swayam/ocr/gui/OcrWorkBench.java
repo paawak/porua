@@ -31,6 +31,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.prefs.Preferences;
 
@@ -439,20 +440,16 @@ public class OcrWorkBench extends JFrame {
     }
 
     private BufferedImage detectWordsWithTesseract() {
-	BufferedImage filteredImage;
-	binaryImage = new BinaryImage(currentImage, BinaryImage.DEFAULT_COLOR_THRESHOLD, true);
-
-	filteredImage = binaryImage.getImage();
 
 	TesseractOcrWordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
 
-	List<TextBox> words = wordAnalyser.getDetectedWords();
+	Collection<TextBox> words = wordAnalyser.getDetectedWords();
 
-	Graphics2D g = (Graphics2D) filteredImage.getGraphics();
+	Graphics2D g = (Graphics2D) currentImage.getGraphics();
 
 	words.forEach(textBox -> paintWordBoundary(g, textBox));
 
-	return filteredImage;
+	return currentImage;
     }
 
     private void paintWordBoundary(Graphics2D g, TextBox textBox) {
