@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.IntPointer;
@@ -37,6 +38,8 @@ public class TesseractOcrWordAnalyser {
     public Collection<TextBox> getDetectedWords() {
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
 
+	Supplier<IntPointer> intPointerSupplier = () -> new IntPointer(new int[1]);
+
 	List<TextBox> words = new ArrayList<>();
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
@@ -62,10 +65,10 @@ public class TesseractOcrWordAnalyser {
 		String ocrText = ocrResult.getString().trim();
 
 		float conf = ri.Confidence(level);
-		IntPointer x1 = new IntPointer(new int[1]);
-		IntPointer y1 = new IntPointer(new int[1]);
-		IntPointer x2 = new IntPointer(new int[1]);
-		IntPointer y2 = new IntPointer(new int[1]);
+		IntPointer x1 = intPointerSupplier.get();
+		IntPointer y1 = intPointerSupplier.get();
+		IntPointer x2 = intPointerSupplier.get();
+		IntPointer y2 = intPointerSupplier.get();
 		boolean foundRectangle = ri.BoundingBox(level, x1, y1, x2, y2);
 
 		if (!foundRectangle) {
