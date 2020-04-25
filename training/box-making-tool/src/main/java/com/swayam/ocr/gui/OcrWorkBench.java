@@ -177,25 +177,19 @@ public class OcrWorkBench extends JFrame {
 
 		OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-		EventQueue.invokeLater(new Runnable() {
+		EventQueue.invokeLater(() -> {
+		    long startTime = System.currentTimeMillis();
 
-		    @Override
-		    public void run() {
+		    setImageInFrame(detectWordsWithTesseract());
 
-			long startTime = System.currentTimeMillis();
+		    long endTime = System.currentTimeMillis();
 
-			setImageInFrame(detectWordsWithTesseract());
+		    OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
-			long endTime = System.currentTimeMillis();
+		    LOG.info("The Tesseract OCR word detection took {} ms", (endTime - startTime));
+		}
 
-			OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-
-			LOG.info("The Tesseract OCR word detection took {} ms", (endTime - startTime));
-
-		    }
-
-		});
-
+		);
 	    }
 
 	});

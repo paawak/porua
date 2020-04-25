@@ -30,7 +30,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-import com.swayam.ocr.core.ImageDigester;
 import com.swayam.ocr.core.matcher.GlyphStore;
 import com.swayam.ocr.core.matcher.HsqlGlyphStore;
 import com.swayam.ocr.core.util.BinaryImage;
@@ -46,78 +45,75 @@ public class GlyphDatabaseViewer extends JPanel {
     private static final long serialVersionUID = 1L;
 
     public GlyphDatabaseViewer() {
-        init();
+	init();
     }
 
     private void init() {
 
-        setLayout(new BorderLayout());
+	setLayout(new BorderLayout());
 
-        JScrollPane scrpn = new JScrollPane();
-        add(scrpn, BorderLayout.CENTER);
-        JTable table = new JTable(getTableData());
-        scrpn.setViewportView(table);
+	JScrollPane scrpn = new JScrollPane();
+	add(scrpn, BorderLayout.CENTER);
+	JTable table = new JTable(getTableData());
+	scrpn.setViewportView(table);
 
-        table.setDefaultRenderer(BufferedImage.class, new GlyphRenderer());
-        table.setRowHeight(60);
+	table.setDefaultRenderer(BufferedImage.class, new GlyphRenderer());
+	table.setRowHeight(60);
 
     }
 
     private TableModel getTableData() {
 
-    	GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
+	GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
 
-        List<Object[]> tableData = new ArrayList<Object[]>();
-        
-        List<Glyph> glyphs = glyphDB.getGlyphs(Script.BANGLA);
+	List<Object[]> tableData = new ArrayList<Object[]>();
 
-        for (Glyph glyph : glyphs) {
+	List<Glyph> glyphs = glyphDB.getGlyphs(Script.BANGLA);
 
-            Object[] row = new Object[4];
-            row[0] = glyph.getId();
-            row[1] = glyph.getUnicodeText();
-            BinaryImage glyphImage = glyph.getImage();
-            row[2] = glyphImage.getImage();
-            row[3] = new ImageDigester(glyphImage).digest().getImage();
-            tableData.add(row);
+	for (Glyph glyph : glyphs) {
 
-        }
+	    Object[] row = new Object[4];
+	    row[0] = glyph.getId();
+	    row[1] = glyph.getUnicodeText();
+	    BinaryImage glyphImage = glyph.getImage();
+	    row[2] = glyphImage.getImage();
+	    row[3] = null;// new ImageDigester(glyphImage).digest().getImage();
+	    tableData.add(row);
 
-        return new DefaultTableModel(tableData.toArray(new Object[0][0]),
-                new String[] { "Id", "Character", "Glyph", "Skeleton"}) {
+	}
 
-            private static final long serialVersionUID = 1L;
+	return new DefaultTableModel(tableData.toArray(new Object[0][0]), new String[] { "Id", "Character", "Glyph", "Skeleton" }) {
 
-            @Override
-            public Class<?> getColumnClass(int columnIndex) {
-                return getValueAt(0, columnIndex).getClass();
-            }
+	    private static final long serialVersionUID = 1L;
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
-            }
+	    @Override
+	    public Class<?> getColumnClass(int columnIndex) {
+		return getValueAt(0, columnIndex).getClass();
+	    }
 
-        };
+	    @Override
+	    public boolean isCellEditable(int rowIndex, int columnIndex) {
+		return false;
+	    }
+
+	};
 
     }
 
     private static class GlyphRenderer implements TableCellRenderer {
 
-        @Override
-        public Component getTableCellRendererComponent(JTable table,
-                Object value, boolean isSelected, boolean hasFocus, int row,
-                int column) {
+	@Override
+	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 
-            JLabel label = new JLabel();
-            label.setOpaque(true);
+	    JLabel label = new JLabel();
+	    label.setOpaque(true);
 
-            BufferedImage img = (BufferedImage) value;
-            label.setIcon(new ImageIcon(img));
+	    BufferedImage img = (BufferedImage) value;
+	    label.setIcon(new ImageIcon(img));
 
-            return label;
+	    return label;
 
-        }
+	}
 
     }
 
