@@ -32,6 +32,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
@@ -69,6 +70,8 @@ public class OcrWorkBench extends JFrame {
 
     private static final String LAST_USED_IMAGE_DIRECTORY = "LAST_USED_IMAGE_DIRECTORY";
 
+    private static final float WORD_BOUNDARY_STROKE_WIDTH = 4;
+
     private GlassPanedImagePanel imagePanel;
 
     private final JLabel statusLabel;
@@ -79,9 +82,9 @@ public class OcrWorkBench extends JFrame {
 
     private File currentSelectedImageFile;
 
-    private Collection<TextBox> detectedWords;
+    private Collection<TextBox> detectedWords = Collections.emptyList();
 
-    private Point currentMousePosition;
+    private Optional<TextBox> matchingTextBox = Optional.empty();
 
     public OcrWorkBench() {
 
@@ -107,7 +110,7 @@ public class OcrWorkBench extends JFrame {
 	    @Override
 	    public void mouseMoved(MouseEvent e) {
 
-		currentMousePosition = e.getPoint();
+		Point currentMousePosition = e.getPoint();
 
 		setStatusString(currentMousePosition.x + ", " + currentMousePosition.y);
 
@@ -238,14 +241,13 @@ public class OcrWorkBench extends JFrame {
 	ocrCorrectionPopup.add(textCorrectionPopupMenuItem);
 	textCorrectionPopupMenuItem.addActionListener(actionEvent -> {
 	    EventQueue.invokeLater(() -> {
-		Optional<TextBox> optionalText = getDetectedOcrText(currentMousePosition);
 
-		if (!optionalText.isPresent()) {
+		if (!matchingTextBox.isPresent()) {
 		    JOptionPane.showMessageDialog(OcrWorkBench.this, "Select a proper word box", "No word found in this region!", JOptionPane.WARNING_MESSAGE);
 		    return;
 		}
 
-		TextBox textBox = optionalText.get();
+		TextBox textBox = matchingTextBox.get();
 		LOG.info("Text for correction: {}", textBox.text);
 		Rectangle area = textBox.getRectangle();
 		JDialog dialog = new CharacterTrainingDialog(currentImage.getSubimage(area.x, area.y, area.width, area.height));
@@ -329,20 +331,20 @@ public class OcrWorkBench extends JFrame {
     private void paintWordBoundary(Graphics2D g, TextBox textBox) {
 	Color confidenceColor = textBox.getColorCodedConfidence();
 	g.setColor(confidenceColor);
-	g.setStroke(new BasicStroke(2));
+	g.setStroke(new BasicStroke(WORD_BOUNDARY_STROKE_WIDTH));
 	Rectangle wordArea = textBox.getRectangle();
 	g.drawRect(wordArea.x, wordArea.y, wordArea.width, wordArea.height);
     }
 
     private void setDetectedTextInToolTip(Point point) {
-	Optional<TextBox> matchingTextBoxOpt = getDetectedOcrText(point);
+	matchingTextBox = getDetectedOcrText(point);
 
-	if (!matchingTextBoxOpt.isPresent()) {
+	if (!matchingTextBox.isPresent()) {
 	    return;
 	}
 
-	TextBox matchingTextBox = matchingTextBoxOpt.get();
-	imagePanel.setToolTipText(String.format("<html><h1 bgcolor=\"%s\">%s</h1></html>", toHtmlColor(matchingTextBox.getColorCodedConfidence()), matchingTextBox.text));
+	TextBox textBox = matchingTextBox.get();
+	imagePanel.setToolTipText(String.format("<html><h1 bgcolor=\"%s\">%s</h1></html>", toHtmlColor(textBox.getColorCodedConfidence()), textBox.text));
     }
 
     private Optional<TextBox> getDetectedOcrText(Point point) {
