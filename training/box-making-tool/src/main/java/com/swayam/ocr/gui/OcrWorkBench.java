@@ -23,8 +23,6 @@ import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -55,8 +53,6 @@ import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.impl.TesseractOcrWordAnalyser;
 import com.swayam.ocr.core.model.TextBox;
-import com.swayam.ocr.core.util.BinaryImage;
-import com.swayam.ocr.core.util.ImageUtils;
 
 /**
  * 
@@ -77,8 +73,6 @@ public class OcrWorkBench extends JFrame {
     private final JLabel statusLabel;
 
     private BufferedImage currentImage;
-
-    private BinaryImage binaryImage;
 
     private File currentSelectedImageFile;
 
@@ -156,8 +150,6 @@ public class OcrWorkBench extends JFrame {
 		    currentImage = ImageIO.read(currentSelectedImageFile);
 		    setImageInFrame(currentImage);
 
-		    binaryImage = null;
-
 		} catch (IOException e) {
 		    LOG.error("could not load image", e);
 		}
@@ -173,47 +165,39 @@ public class OcrWorkBench extends JFrame {
 	JMenuItem detectWordsMenuItem = new JMenuItem("Detect Words");
 	tesseractMenu.add(detectWordsMenuItem);
 
-	detectWordsMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.DETECT_WORDS_TESSERACT_OCR));
+	detectWordsMenuItem.addActionListener(actionEvt -> {
 
-	JMenu trainingMenu = new JMenu("Training");
-	menuBar.add(trainingMenu);
+	    if (currentImage == null) {
 
-	JMenuItem showBinaryImageMenuItem = new JMenuItem("Show Binary Image");
-	trainingMenu.add(showBinaryImageMenuItem);
-	showBinaryImageMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.BINARY_IMAGE_ONLY));
-
-	JMenuItem edgeDetectionMenuItem = new JMenuItem("Edge Detection");
-	trainingMenu.add(edgeDetectionMenuItem);
-	edgeDetectionMenuItem.addActionListener(new ProcessImageActionListener(ProcessImageOption.EDGE_DETECTION));
-
-	JMenuItem markCharacterMenuItem = new JMenuItem("Mark Character");
-	trainingMenu.add(markCharacterMenuItem);
-	markCharacterMenuItem.addActionListener(e -> {
-
-	    if (currentImage == null || binaryImage == null) {
-
-		getGlassPane().setVisible(false);
-
-		JOptionPane.showMessageDialog(OcrWorkBench.this, "Please load an image and select OCR->Mark Texts from the menu", "Binary image not found!", JOptionPane.WARNING_MESSAGE);
+		JOptionPane.showMessageDialog(OcrWorkBench.this, "Please load an image", "No image loaded!", JOptionPane.WARNING_MESSAGE);
 
 	    } else {
 
-		getGlassPane().setVisible(true);
+		setStatusString("Detecting text, please wait...");
+
+		OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+		EventQueue.invokeLater(new Runnable() {
+
+		    @Override
+		    public void run() {
+
+			long startTime = System.currentTimeMillis();
+
+			setImageInFrame(detectWordsWithTesseract());
+
+			long endTime = System.currentTimeMillis();
+
+			OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+
+			LOG.info("The Tesseract OCR word detection took {} ms", (endTime - startTime));
+
+		    }
+
+		});
 
 	    }
 
-	});
-
-	JMenuItem showGlyphDbMenuItem = new JMenuItem("Show Glyph DB");
-	trainingMenu.add(showGlyphDbMenuItem);
-
-	showGlyphDbMenuItem.addActionListener(e -> {
-	    EventQueue.invokeLater(() -> {
-		JFrame frame = new JFrame();
-		GuiUtils.centerWindow(frame, 500, 800);
-		frame.getContentPane().add(new GlyphDatabaseViewer());
-		frame.setVisible(true);
-	    });
 	});
 
 	setJMenuBar(menuBar);
@@ -286,36 +270,6 @@ public class OcrWorkBench extends JFrame {
 
     }
 
-    private BufferedImage textImageManipulation(ProcessImageOption option) {
-
-	BufferedImage filteredImage;
-
-	switch (option) {
-	case EDGE_DETECTION:
-
-	    binaryImage = new BinaryImage(currentImage, BinaryImage.DEFAULT_COLOR_THRESHOLD, true);
-	    binaryImage = ImageUtils.applyRobertsonEdgeDetection(binaryImage);
-	    filteredImage = binaryImage.getImage();
-
-	    break;
-	default:
-	case BINARY_IMAGE_ONLY:
-
-	    binaryImage = new BinaryImage(currentImage, BinaryImage.DEFAULT_COLOR_THRESHOLD, true);
-	    filteredImage = binaryImage.getImage();
-
-	    break;
-
-	case DETECT_WORDS_TESSERACT_OCR:
-	    filteredImage = detectWordsWithTesseract();
-	    break;
-
-	}
-
-	return filteredImage;
-
-    }
-
     private BufferedImage detectWordsWithTesseract() {
 
 	TesseractOcrWordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
@@ -366,58 +320,6 @@ public class OcrWorkBench extends JFrame {
 	};
 
 	return "#" + toHex.apply(color.getRed()) + toHex.apply(color.getGreen()) + toHex.apply(color.getBlue());
-    }
-
-    private enum ProcessImageOption {
-
-	BINARY_IMAGE_ONLY, EDGE_DETECTION, DETECT_WORDS_TESSERACT_OCR;
-
-    }
-
-    private class ProcessImageActionListener implements ActionListener {
-
-	private final ProcessImageOption option;
-
-	ProcessImageActionListener(ProcessImageOption option) {
-	    this.option = option;
-	}
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-
-	    if (currentImage == null) {
-
-		JOptionPane.showMessageDialog(OcrWorkBench.this, "Please load an image", "No image loaded!", JOptionPane.WARNING_MESSAGE);
-
-	    } else {
-
-		setStatusString("Detecting text, please wait...");
-
-		OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-
-		EventQueue.invokeLater(new Runnable() {
-
-		    @Override
-		    public void run() {
-
-			long startTime = System.currentTimeMillis();
-
-			setImageInFrame(textImageManipulation(option));
-
-			long endTime = System.currentTimeMillis();
-
-			OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-
-			LOG.info("The {} operation took {} ms", option, (endTime - startTime));
-
-		    }
-
-		});
-
-	    }
-
-	}
-
     }
 
 }
