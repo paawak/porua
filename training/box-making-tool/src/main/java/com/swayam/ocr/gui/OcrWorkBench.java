@@ -250,7 +250,8 @@ public class OcrWorkBench extends JFrame {
 		TextBox textBox = matchingTextBox.get();
 		LOG.info("Text for correction: {}", textBox.text);
 		Rectangle area = textBox.getRectangle();
-		JDialog dialog = new CharacterTrainingDialog(currentImage.getSubimage(area.x, area.y, area.width, area.height));
+		BufferedImage wordImage = currentImage.getSubimage(area.x, area.y, area.width, area.height);
+		JDialog dialog = new OcrTextCorrectionDialog(this, wordImage);
 		dialog.setVisible(true);
 	    });
 	});
