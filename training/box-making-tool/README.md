@@ -18,7 +18,8 @@ The best trained LSTM models can be found here: <https://github.com/tesseract-oc
 The coordinate system used in the box file has **(0,0)** at the **bottom-left**.
 
 ### Online Documentation
-<https://tesseract-ocr.github.io/tessdoc/TrainingTesseract-4.00.html#making-box-files>
+1. <https://tesseract-ocr.github.io/tessdoc/TrainingTesseract-4.00.html#making-box-files>
+1. <https://github.com/tesseract-ocr/tesseract/issues/2357#issuecomment-477239316>
 
 ### Commands
 
