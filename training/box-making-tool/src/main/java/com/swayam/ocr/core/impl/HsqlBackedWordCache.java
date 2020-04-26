@@ -1,9 +1,13 @@
 package com.swayam.ocr.core.impl;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Collection;
 import java.util.function.Function;
 
@@ -16,6 +20,12 @@ import com.swayam.ocr.core.model.RawOcrWord;
 public class HsqlBackedWordCache implements WordCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(HsqlBackedWordCache.class);
+
+    private static final String INIT_SCRIPT = "/com/swayam/ocr/res/sql/ocr_word_schema.sql";
+
+    public HsqlBackedWordCache() {
+	initSchema();
+    }
 
     @Override
     public void clearAllEntries() {
@@ -46,14 +56,6 @@ public class HsqlBackedWordCache implements WordCache {
 	}, sql);
     }
 
-    private <R> R executePreparedStatement(Function<PreparedStatement, R> task, String sql) {
-	try (Connection con = getHsqlDbConnection(); PreparedStatement pstat = getPreparedStatement(con, sql);) {
-	    return task.apply(pstat);
-	} catch (SQLException e) {
-	    throw new RuntimeException(e);
-	}
-    }
-
     @Override
     public Collection<CachedOcrText> getWords() {
 	// TODO Auto-generated method stub
@@ -76,6 +78,48 @@ public class HsqlBackedWordCache implements WordCache {
     public void removeWord(int wordId) {
 	// TODO Auto-generated method stub
 
+    }
+
+    private void initSchema() {
+
+	try (BufferedReader br = new BufferedReader(new InputStreamReader(HsqlBackedWordCache.class.getResourceAsStream(INIT_SCRIPT)))) {
+	    StringBuilder allLines = new StringBuilder();
+
+	    try {
+
+		while (true) {
+
+		    String line = br.readLine();
+
+		    if (line == null) {
+			break;
+		    }
+
+		    allLines.append(line).append('\n');
+
+		}
+
+		try (Connection con = getHsqlDbConnection(); Statement stat = con.createStatement();) {
+		    stat.execute(allLines.toString());
+		}
+
+	    } catch (IOException e) {
+		throw new RuntimeException(e);
+	    } catch (SQLException e) {
+		throw new RuntimeException(e);
+	    }
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
+
+    }
+
+    private <R> R executePreparedStatement(Function<PreparedStatement, R> task, String sql) {
+	try (Connection con = getHsqlDbConnection(); PreparedStatement pstat = getPreparedStatement(con, sql);) {
+	    return task.apply(pstat);
+	} catch (SQLException e) {
+	    throw new RuntimeException(e);
+	}
     }
 
     private PreparedStatement getPreparedStatement(Connection con, String sql) throws SQLException {
