@@ -21,6 +21,9 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * 
  * @author paawak
@@ -29,92 +32,60 @@ public class ImagePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private BufferedImage image;
+    private static final Logger LOG = LoggerFactory.getLogger(ImagePanel.class);
 
-    // private int offsetX;
-    // private int offsetY;
+    private BufferedImage image;
 
     public ImagePanel() {
 
     }
 
-    // int getOffsetX() {
-    // return offsetX;
-    // }
-    //
-    // int getOffsetY() {
-    // return offsetY;
-    // }
-
     @Override
     protected void paintComponent(Graphics g) {
 
-        // offsetX = 0;
-        // offsetY = 0;
+	super.paintComponent(g);
 
-        super.paintComponent(g);
+	if (image != null) {
 
-        if (image != null) {
+	    int imgWidth = image.getWidth();
+	    int imgHeight = image.getHeight();
 
-            int imgWidth = image.getWidth();
-            int imgHeight = image.getHeight();
+	    int dx1 = 0;
+	    int dy1 = 0;
+	    int dx2 = imgWidth;
+	    int dy2 = imgHeight;
 
-            // int pnlWidth = getWidth();
-            // int pnlHeight = getHeight();
+	    g.drawImage(image, dx1, dy1, dx2, dy2, 0, 0, imgWidth, imgHeight, this);
 
-            int dx1 = 0;
-            int dy1 = 0;
-            int dx2 = imgWidth;
-            int dy2 = imgHeight;
-
-            // if (pnlWidth > imgWidth) {
-            //
-            // offsetX = (pnlWidth - imgWidth) / 2;
-            //
-            // dx1 = offsetX;
-            // dx2 += offsetX;
-            //
-            // }
-            //
-            // if (pnlHeight > imgHeight) {
-            //
-            // offsetY = (pnlHeight - imgHeight) / 2;
-            //
-            // dy1 = offsetY;
-            // dy2 += offsetY;
-            //
-            // }
-
-            g.drawImage(image, dx1, dy1, dx2, dy2, 0, 0, imgWidth, imgHeight,
-                    this);
-
-        }
+	}
 
     }
 
     public BufferedImage getImage() {
-        return image;
+	return image;
     }
 
     public void setImage(BufferedImage image) {
 
-        this.image = image;
+	this.image = image;
 
-        if (image != null) {
+	if (image != null) {
 
-            int imgWidth = image.getWidth();
-            int imgHeight = image.getHeight();
+	    int imgWidth = image.getWidth();
+	    int imgHeight = image.getHeight();
 
-            if (imgWidth > getWidth() || imgHeight > getHeight()) {
+	    LOG.info("An image with width {} and height {} was loaded", imgWidth, imgHeight);
 
-                setPreferredSize(new Dimension(imgWidth, imgHeight));
-                revalidate();
+	    if (imgWidth > getWidth() || imgHeight > getHeight()) {
 
-            }
+		setPreferredSize(new Dimension(imgWidth, imgHeight));
+		revalidate();
 
-        }
+	    }
 
-        repaint();
+	}
+
+	repaint();
 
     }
 

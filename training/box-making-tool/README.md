@@ -20,6 +20,12 @@ The coordinate system used in the box file has **(0,0)** at the **bottom-left**.
 ### Online Documentation
 <https://tesseract-ocr.github.io/tessdoc/TrainingTesseract-4.00.html#making-box-files>
 
+### Commands
+
+The below command will generate a box file called image.box:
+
+    tesseract -l ben bangla-mahabharat-1-page_2.jpg image lstmbox
+
 ## Miscellaneous
 ### Tesseract API Guide
 <https://tesseract-ocr.github.io/tessdoc/APIExample>
