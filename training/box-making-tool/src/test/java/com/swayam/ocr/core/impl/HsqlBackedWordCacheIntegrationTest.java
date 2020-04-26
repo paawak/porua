@@ -1,10 +1,13 @@
 package com.swayam.ocr.core.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,6 +27,9 @@ class HsqlBackedWordCacheIntegrationTest {
     @BeforeEach
     void initDBConnection() throws SQLException {
 	con = DriverManager.getConnection("jdbc:hsqldb:file:./target/ocr/db/ocrdb;shutdown=true", "SA", "");
+	try (Statement stat = con.createStatement();) {
+	    stat.execute("DROP TABLE IF EXISTS ocr_word");
+	}
     }
 
     @AfterEach
@@ -40,6 +46,9 @@ class HsqlBackedWordCacheIntegrationTest {
 	RawOcrWord rawOcrWord2 = new RawOcrWord(111, 222, 333, 444, 555.555f, "DEF456");
 	RawOcrWord rawOcrWord3 = new RawOcrWord(1111, 2222, 3333, 4444, 5555.5555f, "GHI789");
 	Collection<RawOcrWord> rawTexts = Arrays.asList(rawOcrWord1, rawOcrWord2, rawOcrWord3);
+
+	List<CachedOcrText> expected = Arrays.asList(new CachedOcrText(1, rawOcrWord1, null), new CachedOcrText(2, rawOcrWord2, null), new CachedOcrText(3, rawOcrWord3, null));
+
 	HsqlBackedWordCache testClass = new HsqlBackedWordCache();
 
 	// when
@@ -57,7 +66,7 @@ class HsqlBackedWordCacheIntegrationTest {
 	    }
 	}
 
-	System.out.println(results);
+	assertEquals(expected, results);
     }
 
 }
