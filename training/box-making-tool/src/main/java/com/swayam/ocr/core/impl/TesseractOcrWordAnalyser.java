@@ -20,7 +20,7 @@ import org.bytedeco.tesseract.global.tesseract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.model.TextBox;
+import com.swayam.ocr.core.model.RawOcrWord;
 
 public class TesseractOcrWordAnalyser {
 
@@ -35,12 +35,12 @@ public class TesseractOcrWordAnalyser {
 	this.imagePath = imagePath;
     }
 
-    public Collection<TextBox> getDetectedWords() {
+    public Collection<RawOcrWord> getDetectedWords() {
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
 
 	Supplier<IntPointer> intPointerSupplier = () -> new IntPointer(new int[1]);
 
-	List<TextBox> words = new ArrayList<>();
+	List<RawOcrWord> words = new ArrayList<>();
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
 	    int returnCode = api.Init(TESSDATA_DIRECTORY, LANGUAGE_CODE);
@@ -75,7 +75,7 @@ public class TesseractOcrWordAnalyser {
 		    throw new IllegalArgumentException("Could not find any rectangle here");
 		}
 
-		TextBox textBox = new TextBox(x1.get(), y1.get(), x2.get(), y2.get(), conf, ocrText);
+		RawOcrWord textBox = new RawOcrWord(x1.get(), y1.get(), x2.get(), y2.get(), conf, ocrText);
 		LOGGER.info("{}", textBox);
 
 		words.add(textBox);

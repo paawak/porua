@@ -2,7 +2,8 @@ package com.swayam.ocr.core.impl;
 
 import java.util.Collection;
 
-import com.swayam.ocr.core.model.TextBox;
+import com.swayam.ocr.core.model.CachedOcrText;
+import com.swayam.ocr.core.model.RawOcrWord;
 
 public interface WordCache {
 
@@ -10,11 +11,11 @@ public interface WordCache {
 
     int getWordCount();
 
-    void storeWords(Collection<TextBox> texts);
+    void storeRawOcrWords(Collection<RawOcrWord> texts);
 
-    Collection<TextBox> getWords();
+    Collection<CachedOcrText> getWords();
 
-    TextBox getWord(int wordId);
+    CachedOcrText getWord(int wordId);
 
     void modifyWord(int wordId, String text);
 

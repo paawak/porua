@@ -52,7 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.impl.TesseractOcrWordAnalyser;
-import com.swayam.ocr.core.model.TextBox;
+import com.swayam.ocr.core.model.RawOcrWord;
 
 /**
  * 
@@ -76,9 +76,9 @@ public class OcrWorkBench extends JFrame {
 
     private File currentSelectedImageFile;
 
-    private Collection<TextBox> detectedWords = Collections.emptyList();
+    private Collection<RawOcrWord> detectedWords = Collections.emptyList();
 
-    private Optional<TextBox> matchingTextBox = Optional.empty();
+    private Optional<RawOcrWord> matchingTextBox = Optional.empty();
 
     public OcrWorkBench() {
 
@@ -225,7 +225,7 @@ public class OcrWorkBench extends JFrame {
 		    return;
 		}
 
-		TextBox textBox = matchingTextBox.get();
+		RawOcrWord textBox = matchingTextBox.get();
 		LOG.info("Text for correction: {}", textBox.text);
 		Rectangle area = textBox.getRectangle();
 		BufferedImage wordImage = currentImage.getSubimage(area.x, area.y, area.width, area.height);
@@ -277,7 +277,7 @@ public class OcrWorkBench extends JFrame {
 	return currentImage;
     }
 
-    private void paintWordBoundary(Graphics2D g, TextBox textBox) {
+    private void paintWordBoundary(Graphics2D g, RawOcrWord textBox) {
 	Color confidenceColor = textBox.getColorCodedConfidence();
 	g.setColor(confidenceColor);
 	g.setStroke(new BasicStroke(WORD_BOUNDARY_STROKE_WIDTH));
@@ -292,11 +292,11 @@ public class OcrWorkBench extends JFrame {
 	    return;
 	}
 
-	TextBox textBox = matchingTextBox.get();
+	RawOcrWord textBox = matchingTextBox.get();
 	imagePanel.setToolTipText(String.format("<html><h1 bgcolor=\"%s\">%s</h1></html>", toHtmlColor(textBox.getColorCodedConfidence()), textBox.text));
     }
 
-    private Optional<TextBox> getDetectedOcrText(Point point) {
+    private Optional<RawOcrWord> getDetectedOcrText(Point point) {
 	if (detectedWords == null || detectedWords.isEmpty()) {
 	    return Optional.empty();
 	}

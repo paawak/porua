@@ -9,7 +9,7 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
 
-import com.swayam.ocr.core.model.TextBox;
+import com.swayam.ocr.core.model.RawOcrWord;
 
 /**
  *
@@ -22,7 +22,7 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
     /**
      * Creates new form OcrTextCorrectionDialog
      */
-    public OcrTextCorrectionDialog(java.awt.Frame parent, BufferedImage wordImage, TextBox textBox) {
+    public OcrTextCorrectionDialog(java.awt.Frame parent, BufferedImage wordImage, RawOcrWord textBox) {
 	super(parent, true);
 	initComponents();
 	ImagePanel imagePanel = new ImagePanel();

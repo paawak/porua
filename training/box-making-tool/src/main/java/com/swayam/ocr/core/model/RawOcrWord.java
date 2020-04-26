@@ -2,8 +2,11 @@ package com.swayam.ocr.core.model;
 
 import java.awt.Color;
 import java.awt.Rectangle;
+import java.io.Serializable;
 
-public class TextBox {
+public class RawOcrWord implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     public final int x1;
     public final int y1;
@@ -12,7 +15,7 @@ public class TextBox {
     public final float confidence;
     public final String text;
 
-    public TextBox(int x1, int y1, int x2, int y2, float confidence, String text) {
+    public RawOcrWord(int x1, int y1, int x2, int y2, float confidence, String text) {
 	this.x1 = x1;
 	this.y1 = y1;
 	this.x2 = x2;
