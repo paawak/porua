@@ -30,11 +30,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-import com.swayam.ocr.core.matcher.GlyphStore;
-import com.swayam.ocr.core.matcher.HsqlGlyphStore;
 import com.swayam.ocr.core.util.BinaryImage;
 import com.swayam.ocr.core.util.Glyph;
-import com.swayam.ocr.core.util.Script;
 
 /**
  * 
@@ -64,11 +61,11 @@ public class GlyphDatabaseViewer extends JPanel {
 
     private TableModel getTableData() {
 
-	GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
+	// GlyphStore glyphDB = HsqlGlyphStore.INSTANCE;
 
 	List<Object[]> tableData = new ArrayList<Object[]>();
 
-	List<Glyph> glyphs = glyphDB.getGlyphs(Script.BANGLA);
+	List<Glyph> glyphs = null;// glyphDB.getGlyphs(Script.BANGLA);
 
 	for (Glyph glyph : glyphs) {
 
