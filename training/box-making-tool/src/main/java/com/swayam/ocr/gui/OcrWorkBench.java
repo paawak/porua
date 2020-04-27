@@ -31,7 +31,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
@@ -52,7 +51,10 @@ import javax.swing.JScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.swayam.ocr.core.impl.HsqlBackedWordCache;
 import com.swayam.ocr.core.impl.TesseractOcrWordAnalyser;
+import com.swayam.ocr.core.impl.WordCache;
+import com.swayam.ocr.core.model.CachedOcrText;
 import com.swayam.ocr.core.model.RawOcrWord;
 
 /**
@@ -71,22 +73,19 @@ public class OcrWorkBench extends JFrame {
 
     private static final Dimension INITIAL_SIZE = new Dimension(800, 600);
 
+    private final WordCache wordCache;
+
     private GlassPanedImagePanel imagePanel;
 
-    private final JLabel statusLabel;
-
-    private BufferedImage currentImage;
+    private JLabel statusLabel;
 
     private File currentSelectedImageFile;
 
-    private Collection<RawOcrWord> detectedWords = Collections.emptyList();
-
-    private Optional<RawOcrWord> matchingTextBox = Optional.empty();
+    private Optional<CachedOcrText> matchingTextBox = Optional.empty();
 
     public OcrWorkBench() {
 
-	statusLabel = new JLabel();
-
+	wordCache = new HsqlBackedWordCache();
 	init();
 
     }
@@ -96,6 +95,8 @@ public class OcrWorkBench extends JFrame {
 	setTitle("Ocr Workbench");
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setPreferredSize(INITIAL_SIZE);
+
+	statusLabel = new JLabel();
 
 	TextMarkerGlassPane glassPane = new TextMarkerGlassPane();
 
@@ -143,20 +144,13 @@ public class OcrWorkBench extends JFrame {
 
 		OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
-		try {
+		getGlassPane().setVisible(false);
 
-		    getGlassPane().setVisible(false);
+		currentSelectedImageFile = fileChooser.getSelectedFile();
 
-		    currentSelectedImageFile = fileChooser.getSelectedFile();
+		imageDirectoryPrefs.put(LAST_USED_IMAGE_DIRECTORY, currentSelectedImageFile.getParentFile().getAbsolutePath());
 
-		    imageDirectoryPrefs.put(LAST_USED_IMAGE_DIRECTORY, currentSelectedImageFile.getParentFile().getAbsolutePath());
-
-		    currentImage = ImageIO.read(currentSelectedImageFile);
-		    setImageInFrame(currentImage);
-
-		} catch (IOException e) {
-		    LOG.error("could not load image", e);
-		}
+		setImageInFrame(getCurrentImageFromFile());
 
 		OcrWorkBench.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 
@@ -171,7 +165,7 @@ public class OcrWorkBench extends JFrame {
 
 	detectWordsMenuItem.addActionListener(actionEvt -> {
 
-	    if (currentImage == null) {
+	    if (currentSelectedImageFile == null) {
 
 		JOptionPane.showMessageDialog(OcrWorkBench.this, "Please load an image", "No image loaded!", JOptionPane.WARNING_MESSAGE);
 
@@ -184,7 +178,7 @@ public class OcrWorkBench extends JFrame {
 		EventQueue.invokeLater(() -> {
 		    long startTime = System.currentTimeMillis();
 
-		    setImageInFrame(detectWordsWithTesseract());
+		    detectWordsWithTesseract();
 
 		    long endTime = System.currentTimeMillis();
 
@@ -229,12 +223,13 @@ public class OcrWorkBench extends JFrame {
 		    return;
 		}
 
-		RawOcrWord textBox = matchingTextBox.get();
-		LOG.info("Text for correction: {}", textBox.text);
-		Rectangle area = textBox.getRectangle();
-		BufferedImage wordImage = currentImage.getSubimage(area.x, area.y, area.width, area.height);
-		JDialog dialog = new OcrTextCorrectionDialog(this, wordImage, textBox);
+		CachedOcrText textBox = matchingTextBox.get();
+		LOG.info("Text for correction: {}", textBox.rawOcrText.text);
+		Rectangle area = textBox.rawOcrText.getRectangle();
+		BufferedImage wordImage = getCurrentImageFromFile().getSubimage(area.x, area.y, area.width, area.height);
+		JDialog dialog = new OcrTextCorrectionDialog(this, wordCache, wordImage, textBox);
 		dialog.setVisible(true);
+		setImageInFrame(getImageWithPaintedWordBoundaries());
 	    });
 	});
 
@@ -265,20 +260,40 @@ public class OcrWorkBench extends JFrame {
 
     }
 
-    private BufferedImage detectWordsWithTesseract() {
+    private void detectWordsWithTesseract() {
 
 	TesseractOcrWordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
 
-	detectedWords = wordAnalyser.getDetectedWords();
+	Collection<RawOcrWord> detectedWords = wordAnalyser.getDetectedWords();
 
-	Graphics2D g = (Graphics2D) currentImage.getGraphics();
+	wordCache.clearAllEntries();
+	wordCache.storeRawOcrWords(detectedWords);
 
-	detectedWords.forEach(textBox -> paintWordBoundary(g, textBox));
+	setImageInFrame(getImageWithPaintedWordBoundaries());
 
-	return currentImage;
     }
 
-    private void paintWordBoundary(Graphics2D g, RawOcrWord textBox) {
+    private BufferedImage getImageWithPaintedWordBoundaries() {
+	BufferedImage image = getCurrentImageFromFile();
+	Graphics2D g = (Graphics2D) image.getGraphics();
+	wordCache.getWords().forEach(word -> paintSingleWordBoundary(g, word.rawOcrText));
+	return image;
+    }
+
+    private BufferedImage getCurrentImageFromFile() {
+	if (currentSelectedImageFile == null) {
+	    throw new IllegalArgumentException("No image file is currently selected!");
+	}
+	BufferedImage image;
+	try {
+	    image = ImageIO.read(currentSelectedImageFile);
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
+	return image;
+    }
+
+    private void paintSingleWordBoundary(Graphics2D g, RawOcrWord textBox) {
 	Color confidenceColor = textBox.getColorCodedConfidence();
 	g.setColor(confidenceColor);
 	g.setStroke(new BasicStroke(WORD_BOUNDARY_STROKE_WIDTH));
@@ -293,16 +308,17 @@ public class OcrWorkBench extends JFrame {
 	    return;
 	}
 
-	RawOcrWord textBox = matchingTextBox.get();
+	RawOcrWord textBox = matchingTextBox.get().rawOcrText;
 	imagePanel.setToolTipText(String.format("<html><h1 bgcolor=\"%s\">%s</h1></html>", toHtmlColor(textBox.getColorCodedConfidence()), textBox.text));
     }
 
-    private Optional<RawOcrWord> getDetectedOcrText(Point point) {
+    private Optional<CachedOcrText> getDetectedOcrText(Point point) {
+	Collection<CachedOcrText> detectedWords = wordCache.getWords();
 	if (detectedWords == null || detectedWords.isEmpty()) {
 	    return Optional.empty();
 	}
 
-	return detectedWords.parallelStream().filter(textBox -> textBox.getRectangle().contains(point)).findFirst();
+	return detectedWords.parallelStream().filter(text -> text.rawOcrText.getRectangle().contains(point)).findFirst();
     }
 
     private String toHtmlColor(Color color) {
