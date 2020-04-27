@@ -19,6 +19,7 @@ import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -68,6 +69,8 @@ public class OcrWorkBench extends JFrame {
 
     private static final float WORD_BOUNDARY_STROKE_WIDTH = 4;
 
+    private static final Dimension INITIAL_SIZE = new Dimension(800, 600);
+
     private GlassPanedImagePanel imagePanel;
 
     private final JLabel statusLabel;
@@ -92,6 +95,7 @@ public class OcrWorkBench extends JFrame {
 
 	setTitle("Ocr Workbench");
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	setPreferredSize(INITIAL_SIZE);
 
 	TextMarkerGlassPane glassPane = new TextMarkerGlassPane();
 
@@ -245,10 +249,7 @@ public class OcrWorkBench extends JFrame {
 
 	pack();
 
-	int width = 800;
-	int height = 600;
-
-	GuiUtils.centerWindow(this, width, height);
+	setLocationRelativeTo(null);
 
     }
 
