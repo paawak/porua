@@ -15,7 +15,13 @@ You would also need to copy the contents of <https://github.com/tesseract-ocr/te
 The best trained LSTM models can be found here: <https://github.com/tesseract-ocr/tessdata_best>  
 
 ## Creating Box Files
-The coordinate system used in the box file has **(0,0)** at the **bottom-left**.
+The coordinate system used in the box file has **(0,0)** at the **bottom-left** as shown below:
+
+![Box Coordinate System](docs/box-coordinate-system.png)
+
+Contrast it with Tesseract Word Coordinates below:
+
+![Tesseract Word Coordinate System](docs/tess-word-coordinate-system.png)
 
 ### Online Documentation
 1. <https://tesseract-ocr.github.io/tessdoc/TrainingTesseract-4.00.html#making-box-files>
