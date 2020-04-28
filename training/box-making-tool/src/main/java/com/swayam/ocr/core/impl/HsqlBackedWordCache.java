@@ -77,7 +77,7 @@ public class HsqlBackedWordCache implements WordCache {
 
     @Override
     public Collection<CachedOcrText> getWords() {
-	String sql = "SELECT id, raw_ocr_word, corrected_text, line_number FROM ocr_word";
+	String sql = "SELECT id, raw_ocr_word, corrected_text FROM ocr_word";
 	return executePreparedStatement(pstat -> {
 	    try (ResultSet res = pstat.executeQuery()) {
 		List<CachedOcrText> words = new ArrayList<>();
@@ -93,7 +93,7 @@ public class HsqlBackedWordCache implements WordCache {
 
     @Override
     public CachedOcrText getWord(int wordId) {
-	String sql = "SELECT id, raw_ocr_word, corrected_text, line_number FROM ocr_word WHERE id = ?";
+	String sql = "SELECT id, raw_ocr_word, corrected_text FROM ocr_word WHERE id = ?";
 	return executePreparedStatement(pstat -> {
 	    try {
 		pstat.setInt(1, wordId);
@@ -180,8 +180,7 @@ public class HsqlBackedWordCache implements WordCache {
 	int id = res.getInt(1);
 	RawOcrWord rawOcrWord = (RawOcrWord) res.getObject(2);
 	String correctedText = res.getString(3);
-	int lineNumber = res.getInt(4);
-	return new CachedOcrText(id, rawOcrWord, correctedText, lineNumber);
+	return new CachedOcrText(id, rawOcrWord, correctedText, -1);
     }
 
     private <R> R executePreparedStatement(Function<PreparedStatement, R> task, String sql) {
