@@ -12,6 +12,7 @@ import java.text.DecimalFormat;
 import com.swayam.ocr.core.impl.WordCache;
 import com.swayam.ocr.core.model.CachedOcrText;
 import com.swayam.ocr.core.model.RawOcrWord;
+import java.awt.BorderLayout;
 
 /**
  *
@@ -23,6 +24,7 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
 
     private final WordCache wordCache;
     private final CachedOcrText cachedOcrText;
+    private final OcrTextCorrectionPanel ocrTextCorrectionPanel;
 
     /**
      * Creates new form OcrTextCorrectionDialog
@@ -32,13 +34,15 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
 	this.wordCache = wordCache;
 	this.cachedOcrText = cachedOcrText;
 	initComponents();
+        ocrTextCorrectionPanel = new OcrTextCorrectionPanel();
+        pnlCentre.add(ocrTextCorrectionPanel, BorderLayout.CENTER);
 	ImagePanel imagePanel = new ImagePanel();
 	imagePanel.setImage(wordImage);
-	scrPnRawImage.setViewportView(imagePanel);
+	ocrTextCorrectionPanel.scrPnRawImage.setViewportView(imagePanel);
 	RawOcrWord textBox = cachedOcrText.rawOcrText;
-	lblOCRTextValue.setText(textBox.text);
-	lblOCRConfidenceValue.setBackground(textBox.getColorCodedConfidence());
-	lblOCRConfidenceValue.setText(new DecimalFormat("00.00").format(textBox.confidence) + " %");
+	ocrTextCorrectionPanel.lblOCRTextValue.setText(textBox.text);
+	ocrTextCorrectionPanel.lblOCRConfidenceValue.setBackground(textBox.getColorCodedConfidence());
+	ocrTextCorrectionPanel.lblOCRConfidenceValue.setText(new DecimalFormat("00.00").format(textBox.confidence) + " %");
     }
 
     /**
@@ -49,164 +53,103 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
-    // Code">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-	lblTitle = new javax.swing.JLabel();
-	pnlOcr = new javax.swing.JPanel();
-	lblRawImage = new javax.swing.JLabel();
-	scrPnRawImage = new javax.swing.JScrollPane();
-	lblOcrTextName = new javax.swing.JLabel();
-	lblOCRTextValue = new javax.swing.JLabel();
-	lblOCRConfidenceName = new javax.swing.JLabel();
-	lblOCRConfidenceValue = new javax.swing.JLabel();
-	pnlCorrection = new javax.swing.JPanel();
-	lblCorrectText = new javax.swing.JLabel();
-	pnlCorrectText = new javax.swing.JPanel();
-	txtCorrectText = new javax.swing.JTextField();
-	pnlButtons = new javax.swing.JPanel();
-	btnRemove = new javax.swing.JButton();
-	btnModify = new javax.swing.JButton();
-	btnCancel = new javax.swing.JButton();
+        lblTitle = new javax.swing.JLabel();
+        pnlCentre = new javax.swing.JPanel();
+        pnlButtons = new javax.swing.JPanel();
+        btnRemove = new javax.swing.JButton();
+        btnModify = new javax.swing.JButton();
+        btnCancel = new javax.swing.JButton();
 
-	setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-	setTitle("OCR Text Correction Dialog");
-	setAlwaysOnTop(true);
-	setModal(true);
-	setModalityType(java.awt.Dialog.ModalityType.TOOLKIT_MODAL);
-	setResizable(false);
-	setSize(new java.awt.Dimension(500, 350));
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("OCR Text Correction Dialog");
+        setAlwaysOnTop(true);
+        setModal(true);
+        setModalityType(java.awt.Dialog.ModalityType.TOOLKIT_MODAL);
+        setResizable(false);
+        setSize(new java.awt.Dimension(500, 350));
 
-	lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-	lblTitle.setText("OCR Text Correction Dialog");
-	lblTitle.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        lblTitle.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblTitle.setText("OCR Text Correction Dialog");
+        lblTitle.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-	pnlOcr.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "OCR Details", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION));
+        pnlCentre.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        pnlCentre.setPreferredSize(new java.awt.Dimension(566, 322));
+        pnlCentre.setLayout(new java.awt.BorderLayout());
 
-	lblRawImage.setText("Raw Image: ");
+        pnlButtons.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-	scrPnRawImage.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnRemove.setText("Remove Entry");
+        btnRemove.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoveActionPerformed(evt);
+            }
+        });
 
-	lblOcrTextName.setText("Raw Text: ");
+        btnModify.setText("Modify Entry");
+        btnModify.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnModifyActionPerformed(evt);
+            }
+        });
 
-	lblOCRTextValue.setBackground(new java.awt.Color(255, 255, 255));
-	lblOCRTextValue.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
-	lblOCRTextValue.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-	lblOCRTextValue.setText("                                 ");
-	lblOCRTextValue.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-	lblOCRTextValue.setOpaque(true);
+        btnCancel.setText("Cancel");
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCancelActionPerformed(evt);
+            }
+        });
 
-	lblOCRConfidenceName.setText("Confidence: ");
+        javax.swing.GroupLayout pnlButtonsLayout = new javax.swing.GroupLayout(pnlButtons);
+        pnlButtons.setLayout(pnlButtonsLayout);
+        pnlButtonsLayout.setHorizontalGroup(
+            pnlButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlButtonsLayout.createSequentialGroup()
+                .addGap(27, 27, 27)
+                .addComponent(btnRemove)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnModify)
+                .addGap(65, 65, 65)
+                .addComponent(btnCancel)
+                .addGap(26, 26, 26))
+        );
+        pnlButtonsLayout.setVerticalGroup(
+            pnlButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlButtonsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnModify)
+                    .addComponent(btnCancel)
+                    .addComponent(btnRemove))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
 
-	lblOCRConfidenceValue.setBackground(new java.awt.Color(255, 255, 255));
-	lblOCRConfidenceValue.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
-	lblOCRConfidenceValue.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-	lblOCRConfidenceValue.setText("                                 ");
-	lblOCRConfidenceValue.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-	lblOCRConfidenceValue.setOpaque(true);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(pnlButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+            .addComponent(pnlCentre, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlCentre, javax.swing.GroupLayout.DEFAULT_SIZE, 316, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(pnlButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20))
+        );
 
-	javax.swing.GroupLayout pnlOcrLayout = new javax.swing.GroupLayout(pnlOcr);
-	pnlOcr.setLayout(pnlOcrLayout);
-	pnlOcrLayout.setHorizontalGroup(pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-		.addGroup(pnlOcrLayout.createSequentialGroup().addContainerGap()
-			.addGroup(pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(lblOCRConfidenceName).addComponent(lblOcrTextName))
-			.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-			.addGroup(pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addComponent(lblOCRTextValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-				.addComponent(lblOCRConfidenceValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-			.addContainerGap())
-		.addGroup(pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(pnlOcrLayout.createSequentialGroup().addContainerGap().addComponent(lblRawImage)
-			.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED).addComponent(scrPnRawImage).addContainerGap())));
-	pnlOcrLayout.setVerticalGroup(pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-		.addGroup(javax.swing.GroupLayout.Alignment.TRAILING,
-			pnlOcrLayout.createSequentialGroup().addContainerGap(111, Short.MAX_VALUE)
-				.addGroup(pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(lblOcrTextName).addComponent(lblOCRTextValue,
-					javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-				.addGap(19, 19, 19)
-				.addGroup(pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(lblOCRConfidenceName).addComponent(lblOCRConfidenceValue,
-					javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-				.addContainerGap())
-		.addGroup(
-			pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(pnlOcrLayout
-					.createSequentialGroup().addContainerGap().addGroup(pnlOcrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(lblRawImage)
-						.addComponent(scrPnRawImage, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
-					.addContainerGap(85, Short.MAX_VALUE))));
-
-	pnlCorrection.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Correction", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION));
-
-	lblCorrectText.setText("Correct Text: ");
-
-	pnlCorrectText.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-	pnlCorrectText.setLayout(new java.awt.BorderLayout());
-	pnlCorrectText.add(txtCorrectText, java.awt.BorderLayout.CENTER);
-
-	javax.swing.GroupLayout pnlCorrectionLayout = new javax.swing.GroupLayout(pnlCorrection);
-	pnlCorrection.setLayout(pnlCorrectionLayout);
-	pnlCorrectionLayout.setHorizontalGroup(pnlCorrectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-		.addGroup(pnlCorrectionLayout.createSequentialGroup().addContainerGap().addComponent(lblCorrectText)
-			.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-			.addComponent(pnlCorrectText, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE).addContainerGap()));
-	pnlCorrectionLayout
-		.setVerticalGroup(
-			pnlCorrectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-				.addGroup(pnlCorrectionLayout
-					.createSequentialGroup().addContainerGap().addGroup(pnlCorrectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-						.addComponent(lblCorrectText).addComponent(pnlCorrectText, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-					.addContainerGap()));
-
-	pnlButtons.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
-
-	btnRemove.setText("Remove Entry");
-	btnRemove.addActionListener(new java.awt.event.ActionListener() {
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnRemoveActionPerformed(evt);
-	    }
-	});
-
-	btnModify.setText("Modify Entry");
-	btnModify.addActionListener(new java.awt.event.ActionListener() {
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnModifyActionPerformed(evt);
-	    }
-	});
-
-	btnCancel.setText("Cancel");
-	btnCancel.addActionListener(new java.awt.event.ActionListener() {
-	    public void actionPerformed(java.awt.event.ActionEvent evt) {
-		btnCancelActionPerformed(evt);
-	    }
-	});
-
-	javax.swing.GroupLayout pnlButtonsLayout = new javax.swing.GroupLayout(pnlButtons);
-	pnlButtons.setLayout(pnlButtonsLayout);
-	pnlButtonsLayout.setHorizontalGroup(pnlButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-		.addGroup(pnlButtonsLayout.createSequentialGroup().addGap(27, 27, 27).addComponent(btnRemove)
-			.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(btnModify).addGap(65, 65, 65)
-			.addComponent(btnCancel).addGap(26, 26, 26)));
-	pnlButtonsLayout.setVerticalGroup(pnlButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-		.addGroup(pnlButtonsLayout.createSequentialGroup().addContainerGap()
-			.addGroup(pnlButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(btnModify).addComponent(btnCancel).addComponent(btnRemove))
-			.addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)));
-
-	javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-	getContentPane().setLayout(layout);
-	layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-		.addComponent(lblTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-		.addComponent(pnlOcr, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addGroup(layout.createSequentialGroup().addContainerGap()
-			.addComponent(pnlButtons, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addContainerGap())
-		.addComponent(pnlCorrection, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE));
-	layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-		.addGroup(layout.createSequentialGroup().addComponent(lblTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-			.addComponent(pnlOcr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-			.addComponent(pnlCorrection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-			.addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-			.addComponent(pnlButtons, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addGap(20, 20, 20)));
-
-	pack();
-	setLocationRelativeTo(null);
+        pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnRemoveActionPerformed
@@ -231,18 +174,8 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnModify;
     private javax.swing.JButton btnRemove;
-    private javax.swing.JLabel lblCorrectText;
-    private javax.swing.JLabel lblOCRConfidenceName;
-    private javax.swing.JLabel lblOCRConfidenceValue;
-    private javax.swing.JLabel lblOCRTextValue;
-    private javax.swing.JLabel lblOcrTextName;
-    private javax.swing.JLabel lblRawImage;
     private javax.swing.JLabel lblTitle;
     private javax.swing.JPanel pnlButtons;
-    private javax.swing.JPanel pnlCorrectText;
-    private javax.swing.JPanel pnlCorrection;
-    private javax.swing.JPanel pnlOcr;
-    private javax.swing.JScrollPane scrPnRawImage;
-    private javax.swing.JTextField txtCorrectText;
+    private javax.swing.JPanel pnlCentre;
     // End of variables declaration//GEN-END:variables
 }
