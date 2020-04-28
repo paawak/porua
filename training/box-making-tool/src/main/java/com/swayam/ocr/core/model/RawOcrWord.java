@@ -14,16 +14,16 @@ public class RawOcrWord implements Serializable {
     public final int y2;
     public final float confidence;
     public final String text;
-    public final int wordNumber;
+    public final int wordSequenceNumber;
 
-    public RawOcrWord(int x1, int y1, int x2, int y2, float confidence, String text, int wordNumber) {
+    public RawOcrWord(int x1, int y1, int x2, int y2, float confidence, String text, int wordSequenceNumber) {
 	this.x1 = x1;
 	this.y1 = y1;
 	this.x2 = x2;
 	this.y2 = y2;
 	this.confidence = confidence;
 	this.text = text;
-	this.wordNumber = wordNumber;
+	this.wordSequenceNumber = wordSequenceNumber;
     }
 
     public Rectangle getRectangle() {
@@ -42,7 +42,7 @@ public class RawOcrWord implements Serializable {
 	int result = 1;
 	result = prime * result + Float.floatToIntBits(confidence);
 	result = prime * result + ((text == null) ? 0 : text.hashCode());
-	result = prime * result + wordNumber;
+	result = prime * result + wordSequenceNumber;
 	result = prime * result + x1;
 	result = prime * result + x2;
 	result = prime * result + y1;
@@ -66,7 +66,7 @@ public class RawOcrWord implements Serializable {
 		return false;
 	} else if (!text.equals(other.text))
 	    return false;
-	if (wordNumber != other.wordNumber)
+	if (wordSequenceNumber != other.wordSequenceNumber)
 	    return false;
 	if (x1 != other.x1)
 	    return false;
@@ -81,7 +81,7 @@ public class RawOcrWord implements Serializable {
 
     @Override
     public String toString() {
-	return "RawOcrWord [x1=" + x1 + ", y1=" + y1 + ", x2=" + x2 + ", y2=" + y2 + ", confidence=" + confidence + ", text=" + text + ", wordNumber=" + wordNumber + "]";
+	return "RawOcrWord [x1=" + x1 + ", y1=" + y1 + ", x2=" + x2 + ", y2=" + y2 + ", confidence=" + confidence + ", text=" + text + ", wordSequenceNumber=" + wordSequenceNumber + "]";
     }
 
 }

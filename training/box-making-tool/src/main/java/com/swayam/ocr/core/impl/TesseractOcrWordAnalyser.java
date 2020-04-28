@@ -60,7 +60,7 @@ public class TesseractOcrWordAnalyser {
 
 	Map<Integer, RawOcrLine> linesAsMap = lines.parallelStream().collect(Collectors.toMap(line -> line.lineNumber, Function.identity()));
 
-	Map<Integer, List<CachedOcrText>> pagedResults = lines.parallelStream().collect(Collectors.toMap(line -> line.lineNumber, line -> {
+	Map<Integer, List<CachedOcrText>> wordsGroupedByLineNumber = lines.parallelStream().collect(Collectors.toMap(line -> line.lineNumber, line -> {
 	    return words.stream()
 		    .filter(cachedOcrText -> line.rawOcrText.getRectangle().contains(cachedOcrText.rawOcrText.getRectangle()) && line.rawOcrText.text.contains(cachedOcrText.rawOcrText.text))
 		    .map(cachedOcrText -> new CachedOcrText(cachedOcrText.id, cachedOcrText.rawOcrText, cachedOcrText.correctText, line.lineNumber)).collect(Collectors.toList());
@@ -70,7 +70,7 @@ public class TesseractOcrWordAnalyser {
 
 	LOGGER.info("orderedLineNumbers: {}", orderedLineNumbers);
 
-	return orderedLineNumbers.stream().filter(lineNumber -> !pagedResults.get(lineNumber).isEmpty()).flatMap(lineNumber -> {
+	return orderedLineNumbers.stream().filter(lineNumber -> !wordsGroupedByLineNumber.get(lineNumber).isEmpty()).flatMap(lineNumber -> {
 	    int leftTopX = linesAsMap.get(lineNumber).rawOcrText.x1;
 	    int leftTopY = linesAsMap.get(lineNumber).rawOcrText.y1;
 	    int rightBottomX = linesAsMap.get(lineNumber).rawOcrText.x2;
@@ -84,8 +84,14 @@ public class TesseractOcrWordAnalyser {
 
 	    String positionData = String.format(" %d %d %d %d 0", leftBottomX, leftBottomY, rightTopX, rightTopY);
 
-	    List<String> boxes = pagedResults.get(lineNumber).stream().map(cachedOcrText -> cachedOcrText.rawOcrText.text).flatMap(text -> text.chars().mapToObj(c -> Character.toString((char) c)))
-		    .map(text -> text + positionData).collect(Collectors.toList());
+	    int lastWordSequence = wordsGroupedByLineNumber.get(lineNumber).parallelStream().mapToInt(cachedOcrText -> cachedOcrText.rawOcrText.wordSequenceNumber).max().getAsInt();
+
+	    List<String> boxes = wordsGroupedByLineNumber.get(lineNumber).stream().map(cachedOcrText -> {
+		if (lastWordSequence == cachedOcrText.rawOcrText.wordSequenceNumber) {
+		    return cachedOcrText.rawOcrText.text;
+		}
+		return cachedOcrText.rawOcrText.text + " ";
+	    }).flatMap(text -> text.chars().mapToObj(c -> Character.toString((char) c))).map(text -> text + positionData).collect(Collectors.toList());
 	    boxes.add("\t" + positionData);
 	    return boxes.stream();
 	}).collect(Collectors.toList());
@@ -95,7 +101,6 @@ public class TesseractOcrWordAnalyser {
 
 	LOGGER.info("Analyzing image file for lines...");
 	List<RawOcrLine> lines;
-	int imageWidth;
 	int imageHeight;
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
@@ -106,7 +111,6 @@ public class TesseractOcrWordAnalyser {
 
 	    PIX image = pixRead(imagePath.toFile().getAbsolutePath());
 
-	    imageWidth = image.w();
 	    imageHeight = image.h();
 
 	    api.SetImage(image);
@@ -138,7 +142,7 @@ public class TesseractOcrWordAnalyser {
 	    pixDestroy(image);
 	}
 
-	return new ExtractedLineDetails(imageWidth, imageHeight, Collections.unmodifiableList(lines));
+	return new ExtractedLineDetails(imageHeight, Collections.unmodifiableList(lines));
 
     }
 
@@ -205,12 +209,10 @@ public class TesseractOcrWordAnalyser {
     }
 
     private static class ExtractedLineDetails {
-	private final int imageWidth;
 	private final int imageHeight;
 	private final List<RawOcrLine> lines;
 
-	ExtractedLineDetails(int imageWidth, int imageHeight, List<RawOcrLine> lines) {
-	    this.imageWidth = imageWidth;
+	ExtractedLineDetails(int imageHeight, List<RawOcrLine> lines) {
 	    this.imageHeight = imageHeight;
 	    this.lines = lines;
 	}
