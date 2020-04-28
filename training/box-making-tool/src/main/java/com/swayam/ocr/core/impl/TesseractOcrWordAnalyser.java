@@ -66,7 +66,7 @@ public class TesseractOcrWordAnalyser {
 		    .map(cachedOcrText -> new CachedOcrText(cachedOcrText.id, cachedOcrText.rawOcrText, cachedOcrText.correctText, line.lineNumber)).collect(Collectors.toList());
 	}));
 
-	Set<Integer> orderedLineNumbers = new TreeSet<>();
+	Set<Integer> orderedLineNumbers = new TreeSet<>(linesAsMap.keySet());
 
 	LOGGER.info("orderedLineNumbers: {}", orderedLineNumbers);
 
@@ -77,9 +77,10 @@ public class TesseractOcrWordAnalyser {
 	    int rightBottomY = linesAsMap.get(lineNumber).rawOcrText.y2;
 
 	    int leftBottomX = leftTopX;
-	    int leftBottomY = extractedLineDetails.imageHeight - leftTopY;
-	    int rightTopX = rightBottomX;
-	    int rightTopY = extractedLineDetails.imageHeight - rightBottomY;
+	    int leftBottomY = extractedLineDetails.imageHeight - rightBottomY;
+	    // +5 pixels to be on the safer side
+	    int rightTopX = rightBottomX + 5;
+	    int rightTopY = extractedLineDetails.imageHeight - leftTopY;
 
 	    String positionData = String.format(" %d %d %d %d 0", leftBottomX, leftBottomY, rightTopX, rightTopY);
 

@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
@@ -290,7 +291,9 @@ public class OcrWorkBench extends JFrame {
 	List<String> boxes = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath()).getBoxStrings(wordCache.getWords());
 
 	try {
-	    Files.write(Paths.get(currentSelectedImageFile.getParent(), currentSelectedImageFile.getName() + ".box"), boxes);
+	    Path boxFilePath = Paths.get(currentSelectedImageFile.getParent(), currentSelectedImageFile.getName() + ".box");
+	    Files.write(boxFilePath, boxes);
+	    LOG.info("box file {} generated successfully", boxFilePath);
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
