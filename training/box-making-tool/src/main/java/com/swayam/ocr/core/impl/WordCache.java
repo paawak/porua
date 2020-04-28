@@ -1,6 +1,7 @@
 package com.swayam.ocr.core.impl;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.swayam.ocr.core.model.CachedOcrText;
 import com.swayam.ocr.core.model.RawOcrWord;
@@ -11,7 +12,7 @@ public interface WordCache {
 
     int getWordCount();
 
-    void storeRawOcrWords(Collection<RawOcrWord> texts);
+    void storeRawOcrWords(List<RawOcrWord> texts);
 
     Collection<CachedOcrText> getWords();
 

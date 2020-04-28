@@ -31,6 +31,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
@@ -192,6 +193,12 @@ public class OcrWorkBench extends JFrame {
 
 	});
 
+	JMenuItem generateBoxFileMenuItem = new JMenuItem("Generate Box File");
+	generateBoxFileMenuItem.addActionListener(actionEvt -> {
+	    generateBoxFile();
+	});
+	tesseractMenu.add(generateBoxFileMenuItem);
+
 	setJMenuBar(menuBar);
 
 	getContentPane().setLayout(new BorderLayout());
@@ -264,7 +271,7 @@ public class OcrWorkBench extends JFrame {
 
 	TesseractOcrWordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
 
-	Collection<RawOcrWord> detectedWords = wordAnalyser.getDetectedWords();
+	List<RawOcrWord> detectedWords = wordAnalyser.getDetectedText();
 
 	wordCache.clearAllEntries();
 	wordCache.storeRawOcrWords(detectedWords);
@@ -273,11 +280,12 @@ public class OcrWorkBench extends JFrame {
 
     }
 
-    private BufferedImage getImageWithPaintedWordBoundaries() {
-	BufferedImage image = getCurrentImageFromFile();
-	Graphics2D g = (Graphics2D) image.getGraphics();
-	wordCache.getWords().forEach(word -> paintSingleWordBoundary(g, word.rawOcrText));
-	return image;
+    private void generateBoxFile() {
+	if (currentSelectedImageFile == null) {
+	    throw new IllegalArgumentException("No image file is currently selected!");
+	}
+
+	new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath()).getBoxStrings(wordCache.getWords());
     }
 
     private BufferedImage getCurrentImageFromFile() {
@@ -290,6 +298,13 @@ public class OcrWorkBench extends JFrame {
 	} catch (IOException e) {
 	    throw new RuntimeException(e);
 	}
+	return image;
+    }
+
+    private BufferedImage getImageWithPaintedWordBoundaries() {
+	BufferedImage image = getCurrentImageFromFile();
+	Graphics2D g = (Graphics2D) image.getGraphics();
+	wordCache.getWords().forEach(word -> paintSingleWordBoundary(g, word.rawOcrText));
 	return image;
     }
 

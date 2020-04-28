@@ -24,7 +24,7 @@ public class HsqlBackedWordCache implements WordCache {
 
     private static final Logger LOG = LoggerFactory.getLogger(HsqlBackedWordCache.class);
 
-    private static final String INIT_SCRIPT = "/com/swayam/ocr/res/sql/ocr_word_schema.sql";
+    private static final String INIT_SCRIPT = "/sql/ocr_word_schema.sql";
 
     public HsqlBackedWordCache() {
 	initSchema();
@@ -59,7 +59,7 @@ public class HsqlBackedWordCache implements WordCache {
     }
 
     @Override
-    public void storeRawOcrWords(Collection<RawOcrWord> rawTexts) {
+    public void storeRawOcrWords(List<RawOcrWord> rawTexts) {
 	String sql = "INSERT INTO ocr_word (id, raw_ocr_word) VALUES (DEFAULT, ?)";
 
 	executePreparedStatement(pstat -> {
@@ -77,7 +77,7 @@ public class HsqlBackedWordCache implements WordCache {
 
     @Override
     public Collection<CachedOcrText> getWords() {
-	String sql = "SELECT id, raw_ocr_word, corrected_text FROM ocr_word";
+	String sql = "SELECT id, raw_ocr_word, corrected_text, line_number FROM ocr_word";
 	return executePreparedStatement(pstat -> {
 	    try (ResultSet res = pstat.executeQuery()) {
 		List<CachedOcrText> words = new ArrayList<>();
@@ -93,7 +93,7 @@ public class HsqlBackedWordCache implements WordCache {
 
     @Override
     public CachedOcrText getWord(int wordId) {
-	String sql = "SELECT id, raw_ocr_word, corrected_text FROM ocr_word WHERE id = ?";
+	String sql = "SELECT id, raw_ocr_word, corrected_text, line_number FROM ocr_word WHERE id = ?";
 	return executePreparedStatement(pstat -> {
 	    try {
 		pstat.setInt(1, wordId);
@@ -180,7 +180,8 @@ public class HsqlBackedWordCache implements WordCache {
 	int id = res.getInt(1);
 	RawOcrWord rawOcrWord = (RawOcrWord) res.getObject(2);
 	String correctedText = res.getString(3);
-	return new CachedOcrText(id, rawOcrWord, correctedText);
+	int lineNumber = res.getInt(4);
+	return new CachedOcrText(id, rawOcrWord, correctedText, lineNumber);
     }
 
     private <R> R executePreparedStatement(Function<PreparedStatement, R> task, String sql) {

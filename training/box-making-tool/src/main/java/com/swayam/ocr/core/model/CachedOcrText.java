@@ -9,11 +9,13 @@ public class CachedOcrText implements Serializable {
     public final int id;
     public final RawOcrWord rawOcrText;
     public final String correctText;
+    public final int lineNumber;
 
-    public CachedOcrText(int id, RawOcrWord rawOcrText, String correctText) {
+    public CachedOcrText(int id, RawOcrWord rawOcrText, String correctText, int lineNumber) {
 	this.id = id;
 	this.rawOcrText = rawOcrText;
 	this.correctText = correctText;
+	this.lineNumber = lineNumber;
     }
 
     @Override
@@ -22,6 +24,7 @@ public class CachedOcrText implements Serializable {
 	int result = 1;
 	result = prime * result + ((correctText == null) ? 0 : correctText.hashCode());
 	result = prime * result + id;
+	result = prime * result + lineNumber;
 	result = prime * result + ((rawOcrText == null) ? 0 : rawOcrText.hashCode());
 	return result;
     }
@@ -42,6 +45,8 @@ public class CachedOcrText implements Serializable {
 	    return false;
 	if (id != other.id)
 	    return false;
+	if (lineNumber != other.lineNumber)
+	    return false;
 	if (rawOcrText == null) {
 	    if (other.rawOcrText != null)
 		return false;
@@ -52,7 +57,7 @@ public class CachedOcrText implements Serializable {
 
     @Override
     public String toString() {
-	return "CachedOcrText [id=" + id + ", rawOcrText=" + rawOcrText + ", correctText=" + correctText + "]";
+	return "CachedOcrText [id=" + id + ", rawOcrText=" + rawOcrText + ", correctText=" + correctText + ", lineNumber=" + lineNumber + "]";
     }
 
 }

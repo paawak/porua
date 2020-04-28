@@ -2,14 +2,14 @@
 <Configuration>
 	<Appenders>
 		<Console name="CONSOLE" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{ISO8601} %p [%t] %c{1}.%M(%L) | %m%n" />
+			<PatternLayout pattern="%d{ISO8601} %p [%t] %c{36}.%M(%L) | %m%n" />
 		</Console>
 
 		<RollingRandomAccessFile name="FILE"
 			fileName="./logs/box-making-tool.log" filePattern="./logs/box-making-tool-%d{yyyy-MM-dd-HH}-%i.log.gz"
 			immediateFlush="true" append="false">
 			<PatternLayout>
-				<pattern>%d{ISO8601} %p [%t] %c{1}.%M(%L) | %m%n</pattern>
+				<pattern>%d{ISO8601} %p [%t] %c{36}.%M(%L) | %m%n</pattern>
 				<charset>utf-8</charset>
 			</PatternLayout>
 			<Policies>
@@ -21,6 +21,7 @@
 	</Appenders>
 
 	<Loggers>
+		<Logger name="hsqldb.db" level="WARN"/>
 		<root level="debug">
 			<AppenderRef ref="CONSOLE" />
 			<AppenderRef ref="FILE" />
