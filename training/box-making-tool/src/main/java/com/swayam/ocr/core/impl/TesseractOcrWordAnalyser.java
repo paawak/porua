@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -54,7 +55,10 @@ public class TesseractOcrWordAnalyser {
     }
 
     public List<String> getBoxStrings(Collection<CachedOcrText> words) {
-	List<RawOcrLine> lines = extractLinesFromImage();
+	ExtractedLineDetails extractedLineDetails = extractLinesFromImage();
+	List<RawOcrLine> lines = extractedLineDetails.lines;
+
+	Map<Integer, RawOcrLine> linesAsMap = lines.parallelStream().collect(Collectors.toMap(line -> line.lineNumber, Function.identity()));
 
 	Map<Integer, List<CachedOcrText>> pagedResults = lines.parallelStream().collect(Collectors.toMap(line -> line.lineNumber, line -> {
 	    return words.stream()
@@ -62,21 +66,36 @@ public class TesseractOcrWordAnalyser {
 		    .map(cachedOcrText -> new CachedOcrText(cachedOcrText.id, cachedOcrText.rawOcrText, cachedOcrText.correctText, line.lineNumber)).collect(Collectors.toList());
 	}));
 
-	Set<Integer> orderedLineNumbers = new TreeSet<>(pagedResults.keySet());
+	Set<Integer> orderedLineNumbers = new TreeSet<>();
 
 	LOGGER.info("orderedLineNumbers: {}", orderedLineNumbers);
 
-	orderedLineNumbers.stream().filter(lineNumber -> !pagedResults.get(lineNumber).isEmpty()).forEach(lineNumber -> {
-	    LOGGER.info("{}", pagedResults.get(lineNumber).stream().map(cachedOcrText -> cachedOcrText.rawOcrText.wordNumber).collect(Collectors.toList()));
-	});
+	return orderedLineNumbers.stream().filter(lineNumber -> !pagedResults.get(lineNumber).isEmpty()).flatMap(lineNumber -> {
+	    int leftTopX = linesAsMap.get(lineNumber).rawOcrText.x1;
+	    int leftTopY = linesAsMap.get(lineNumber).rawOcrText.y1;
+	    int rightBottomX = linesAsMap.get(lineNumber).rawOcrText.x2;
+	    int rightBottomY = linesAsMap.get(lineNumber).rawOcrText.y2;
 
-	return null;
+	    int leftBottomX = leftTopX;
+	    int leftBottomY = extractedLineDetails.imageHeight - leftTopY;
+	    int rightTopX = rightBottomX;
+	    int rightTopY = extractedLineDetails.imageHeight - rightBottomY;
+
+	    String positionData = String.format(" %d %d %d %d 0", leftBottomX, leftBottomY, rightTopX, rightTopY);
+
+	    List<String> boxes = pagedResults.get(lineNumber).stream().map(cachedOcrText -> cachedOcrText.rawOcrText.text).flatMap(text -> text.chars().mapToObj(c -> Character.toString((char) c)))
+		    .map(text -> text + positionData).collect(Collectors.toList());
+	    boxes.add("\t" + positionData);
+	    return boxes.stream();
+	}).collect(Collectors.toList());
     }
 
-    private List<RawOcrLine> extractLinesFromImage() {
+    private ExtractedLineDetails extractLinesFromImage() {
 
 	LOGGER.info("Analyzing image file for lines...");
 	List<RawOcrLine> lines;
+	int imageWidth;
+	int imageHeight;
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
 	    int returnCode = api.Init(TESSDATA_DIRECTORY, LANGUAGE_CODE);
@@ -85,6 +104,9 @@ public class TesseractOcrWordAnalyser {
 	    }
 
 	    PIX image = pixRead(imagePath.toFile().getAbsolutePath());
+
+	    imageWidth = image.w();
+	    imageHeight = image.h();
 
 	    api.SetImage(image);
 
@@ -115,7 +137,7 @@ public class TesseractOcrWordAnalyser {
 	    pixDestroy(image);
 	}
 
-	return Collections.unmodifiableList(lines);
+	return new ExtractedLineDetails(imageWidth, imageHeight, Collections.unmodifiableList(lines));
 
     }
 
@@ -179,6 +201,18 @@ public class TesseractOcrWordAnalyser {
 	}
 
 	return Collections.unmodifiableList(words);
+    }
+
+    private static class ExtractedLineDetails {
+	private final int imageWidth;
+	private final int imageHeight;
+	private final List<RawOcrLine> lines;
+
+	ExtractedLineDetails(int imageWidth, int imageHeight, List<RawOcrLine> lines) {
+	    this.imageWidth = imageWidth;
+	    this.imageHeight = imageHeight;
+	    this.lines = lines;
+	}
     }
 
 }

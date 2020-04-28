@@ -30,6 +30,8 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -285,7 +287,13 @@ public class OcrWorkBench extends JFrame {
 	    throw new IllegalArgumentException("No image file is currently selected!");
 	}
 
-	new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath()).getBoxStrings(wordCache.getWords());
+	List<String> boxes = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath()).getBoxStrings(wordCache.getWords());
+
+	try {
+	    Files.write(Paths.get(currentSelectedImageFile.getParent(), currentSelectedImageFile.getName() + ".box"), boxes);
+	} catch (IOException e) {
+	    throw new RuntimeException(e);
+	}
     }
 
     private BufferedImage getCurrentImageFromFile() {
