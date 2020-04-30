@@ -14,6 +14,8 @@ You would also need to copy the contents of <https://github.com/tesseract-ocr/te
 
 The best trained LSTM models can be found here: <https://github.com/tesseract-ocr/tessdata_best>  
 
+Download the *langdata* as well from: <https://github.com/tesseract-ocr/langdata_lstm>
+
 ## Creating Box Files
 The coordinate system used in the box file has **(0,0)** at the **bottom-left** as shown below:
 
