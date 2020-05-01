@@ -55,10 +55,10 @@ import javax.swing.JScrollPane;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.core.impl.HsqlBackedWordCache;
 import com.swayam.ocr.core.impl.TesseractOcrWordAnalyser;
 import com.swayam.ocr.core.impl.WordCache;
 import com.swayam.ocr.core.model.CachedOcrText;
+import com.swayam.ocr.core.model.Language;
 import com.swayam.ocr.core.model.RawOcrWord;
 
 /**
@@ -77,6 +77,8 @@ public class OcrWorkBench extends JFrame {
 
     private static final Dimension INITIAL_SIZE = new Dimension(800, 600);
 
+    private final Language LANGUAGE = Language.BENGALI;
+
     private final WordCache wordCache;
 
     private GlassPanedImagePanel imagePanel;
@@ -87,9 +89,9 @@ public class OcrWorkBench extends JFrame {
 
     private Optional<CachedOcrText> matchingTextBox = Optional.empty();
 
-    public OcrWorkBench() {
+    public OcrWorkBench(WordCache wordCache) {
 
-	wordCache = new HsqlBackedWordCache();
+	this.wordCache = wordCache;
 	init();
 
     }
@@ -272,12 +274,11 @@ public class OcrWorkBench extends JFrame {
 
     private void detectWordsWithTesseract() {
 
-	TesseractOcrWordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath());
+	TesseractOcrWordAnalyser wordAnalyser = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), LANGUAGE);
 
 	List<RawOcrWord> detectedWords = wordAnalyser.getDetectedText();
 
-	wordCache.clearAllEntries();
-	wordCache.storeRawOcrWords(detectedWords);
+	wordCache.storeRawOcrWords(currentSelectedImageFile.getName(), LANGUAGE, detectedWords);
 
 	setImageInFrame(getImageWithPaintedWordBoundaries());
 
@@ -288,7 +289,7 @@ public class OcrWorkBench extends JFrame {
 	    throw new IllegalArgumentException("No image file is currently selected!");
 	}
 
-	List<String> boxes = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath()).getBoxStrings(wordCache.getWords());
+	List<String> boxes = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), LANGUAGE).getBoxStrings(wordCache.getWords(currentSelectedImageFile.getName()));
 
 	try {
 	    Path boxFilePath = Paths.get(currentSelectedImageFile.getParent(), currentSelectedImageFile.getName() + ".box");
@@ -315,7 +316,7 @@ public class OcrWorkBench extends JFrame {
     private BufferedImage getImageWithPaintedWordBoundaries() {
 	BufferedImage image = getCurrentImageFromFile();
 	Graphics2D g = (Graphics2D) image.getGraphics();
-	wordCache.getWords().forEach(word -> paintSingleWordBoundary(g, word.rawOcrText));
+	wordCache.getWords(currentSelectedImageFile.getName()).forEach(word -> paintSingleWordBoundary(g, word.rawOcrText));
 	return image;
     }
 
@@ -339,7 +340,7 @@ public class OcrWorkBench extends JFrame {
     }
 
     private Optional<CachedOcrText> getDetectedOcrText(Point point) {
-	Collection<CachedOcrText> detectedWords = wordCache.getWords();
+	Collection<CachedOcrText> detectedWords = wordCache.getWords(currentSelectedImageFile.getName());
 	if (detectedWords == null || detectedWords.isEmpty()) {
 	    return Optional.empty();
 	}

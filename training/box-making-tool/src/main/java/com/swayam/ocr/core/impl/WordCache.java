@@ -4,17 +4,18 @@ import java.util.Collection;
 import java.util.List;
 
 import com.swayam.ocr.core.model.CachedOcrText;
+import com.swayam.ocr.core.model.Language;
 import com.swayam.ocr.core.model.RawOcrWord;
 
 public interface WordCache {
 
-    void clearAllEntries();
+    void clearAllEntries(String rawImageFileName);
 
-    int getWordCount();
+    int getWordCount(String rawImageFileName);
 
-    void storeRawOcrWords(List<RawOcrWord> texts);
+    void storeRawOcrWords(String rawImageFileName, Language language, List<RawOcrWord> texts);
 
-    Collection<CachedOcrText> getWords();
+    Collection<CachedOcrText> getWords(String rawImageFileName);
 
     CachedOcrText getWord(int wordId);
 

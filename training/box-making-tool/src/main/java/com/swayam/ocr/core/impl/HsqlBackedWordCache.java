@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.model.CachedOcrText;
+import com.swayam.ocr.core.model.Language;
 import com.swayam.ocr.core.model.RawOcrWord;
 
 public class HsqlBackedWordCache implements WordCache {
@@ -26,29 +27,38 @@ public class HsqlBackedWordCache implements WordCache {
 
     private static final String INIT_SCRIPT = "/sql/ocr_word_schema.sql";
 
-    public HsqlBackedWordCache() {
+    private final String hsqlDataStoreJdbcUrl;
+
+    public HsqlBackedWordCache(String hsqlDataStoreJdbcUrl) {
+	this.hsqlDataStoreJdbcUrl = hsqlDataStoreJdbcUrl;
 	initSchema();
     }
 
     @Override
-    public void clearAllEntries() {
-	String sql = "TRUNCATE TABLE ocr_word";
+    public void clearAllEntries(String rawImageFileName) {
+	String sql = "DELETE FROM ocr_word WHERE raw_image_id = (SELECT id FROM raw_image WHERE name = ?)";
 
 	executePreparedStatement(pstat -> {
 	    try {
+		pstat.setString(1, rawImageFileName);
 		pstat.executeUpdate();
 	    } catch (SQLException e) {
-		LOG.warn("failed to truncate table ocr_word", e);
+		LOG.warn("failed to delete records for the " + rawImageFileName, e);
 	    }
 	    return null;
 	}, sql);
     }
 
     @Override
-    public int getWordCount() {
-	String sql = "SELECT COUNT(*) FROM ocr_word";
+    public int getWordCount(String rawImageFileName) {
+	String sql = "SELECT COUNT(*) FROM ocr_word ocr, raw_image img WHERE ocr.raw_image_id = img.id AND img.name = ?";
 
 	return executePreparedStatement(pstat -> {
+	    try {
+		pstat.setString(1, rawImageFileName);
+	    } catch (SQLException e) {
+		throw new RuntimeException(e);
+	    }
 	    try (ResultSet res = pstat.executeQuery()) {
 		res.next();
 		return res.getInt(1);
@@ -59,26 +69,54 @@ public class HsqlBackedWordCache implements WordCache {
     }
 
     @Override
-    public void storeRawOcrWords(List<RawOcrWord> rawTexts) {
-	String sql = "INSERT INTO ocr_word (id, raw_ocr_word) VALUES (DEFAULT, ?)";
+    public void storeRawOcrWords(String rawImageFileName, Language language, List<RawOcrWord> rawTexts) {
+
+	String rawImageInsertSql = "INSERT INTO raw_image (id, name, language) VALUES (DEFAULT, ?, ?)";
+	int rawImageId;
+
+	try (Connection con = getHsqlDbConnection(); PreparedStatement pstat = con.prepareStatement(rawImageInsertSql, Statement.RETURN_GENERATED_KEYS);) {
+	    pstat.setString(1, rawImageFileName);
+	    pstat.setString(2, language.name());
+	    int rowsChanged = pstat.executeUpdate();
+	    if (rowsChanged == 0) {
+		throw new RuntimeException("Insert to raw_image failed");
+	    }
+	    try (ResultSet generatedKeys = pstat.getGeneratedKeys()) {
+		if (generatedKeys.next()) {
+		    rawImageId = generatedKeys.getInt(1);
+		} else {
+		    throw new RuntimeException("Insert to raw_image failed, no ID obtained.");
+		}
+	    }
+	} catch (SQLException e) {
+	    throw new RuntimeException(e);
+	}
+
+	String wordInsertSql = "INSERT INTO ocr_word (id, raw_ocr_word, raw_image_id) VALUES (DEFAULT, ?, ?)";
 
 	executePreparedStatement(pstat -> {
 	    rawTexts.forEach(rawText -> {
 		try {
 		    pstat.setObject(1, rawText);
+		    pstat.setInt(2, rawImageId);
 		    pstat.executeUpdate();
 		} catch (SQLException e) {
 		    throw new RuntimeException(e);
 		}
 	    });
 	    return null;
-	}, sql);
+	}, wordInsertSql);
     }
 
     @Override
-    public Collection<CachedOcrText> getWords() {
-	String sql = "SELECT id, raw_ocr_word, corrected_text FROM ocr_word";
+    public Collection<CachedOcrText> getWords(String rawImageFileName) {
+	String sql = "SELECT ocr.id, ocr.raw_ocr_word, ocr.corrected_text FROM ocr_word ocr, raw_image img WHERE ocr.raw_image_id = img.id AND img.name = ?";
 	return executePreparedStatement(pstat -> {
+	    try {
+		pstat.setString(1, rawImageFileName);
+	    } catch (SQLException e) {
+		throw new RuntimeException(e);
+	    }
 	    try (ResultSet res = pstat.executeQuery()) {
 		List<CachedOcrText> words = new ArrayList<>();
 		while (res.next()) {
@@ -196,7 +234,7 @@ public class HsqlBackedWordCache implements WordCache {
     }
 
     private Connection getHsqlDbConnection() throws SQLException {
-	return DriverManager.getConnection("jdbc:hsqldb:file:./target/ocr/db/ocrdb;shutdown=true", "SA", "");
+	return DriverManager.getConnection(hsqlDataStoreJdbcUrl, "SA", "");
     }
 
 }

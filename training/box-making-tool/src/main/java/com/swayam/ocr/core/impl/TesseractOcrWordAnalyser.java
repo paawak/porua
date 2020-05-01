@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.swayam.ocr.core.model.CachedOcrText;
+import com.swayam.ocr.core.model.Language;
 import com.swayam.ocr.core.model.RawOcrLine;
 import com.swayam.ocr.core.model.RawOcrWord;
 
@@ -41,12 +42,13 @@ public class TesseractOcrWordAnalyser {
     private static final Logger LOGGER = LoggerFactory.getLogger(TesseractOcrWordAnalyser.class);
 
     private static final String TESSDATA_DIRECTORY = "/kaaj/installs/tesseract/tessdata_best-4.0.0";
-    private static final String LANGUAGE_CODE = "ben";
 
     private final Path imagePath;
+    private final Language language;
 
-    public TesseractOcrWordAnalyser(Path imagePath) {
+    public TesseractOcrWordAnalyser(Path imagePath, Language language) {
 	this.imagePath = imagePath;
+	this.language = language;
     }
 
     public List<RawOcrWord> getDetectedText() {
@@ -104,7 +106,7 @@ public class TesseractOcrWordAnalyser {
 	int imageHeight;
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, LANGUAGE_CODE);
+	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.code);
 	    if (returnCode != 0) {
 		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }
@@ -152,7 +154,7 @@ public class TesseractOcrWordAnalyser {
 	List<RawOcrWord> words = new ArrayList<>();
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, LANGUAGE_CODE);
+	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.code);
 	    if (returnCode != 0) {
 		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }
