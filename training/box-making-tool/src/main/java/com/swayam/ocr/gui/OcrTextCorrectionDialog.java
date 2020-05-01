@@ -5,6 +5,7 @@
  */
 package com.swayam.ocr.gui;
 
+import java.awt.BorderLayout;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.text.DecimalFormat;
@@ -12,7 +13,6 @@ import java.text.DecimalFormat;
 import com.swayam.ocr.core.impl.WordCache;
 import com.swayam.ocr.core.model.CachedOcrText;
 import com.swayam.ocr.core.model.RawOcrWord;
-import java.awt.BorderLayout;
 
 /**
  *
@@ -34,8 +34,8 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
 	this.wordCache = wordCache;
 	this.cachedOcrText = cachedOcrText;
 	initComponents();
-        ocrTextCorrectionPanel = new OcrTextCorrectionPanel();
-        pnlCentre.add(ocrTextCorrectionPanel, BorderLayout.CENTER);
+	ocrTextCorrectionPanel = new OcrTextCorrectionPanel();
+	pnlCentre.add(ocrTextCorrectionPanel, BorderLayout.CENTER);
 	ImagePanel imagePanel = new ImagePanel();
 	imagePanel.setImage(wordImage);
 	ocrTextCorrectionPanel.scrPnRawImage.setViewportView(imagePanel);
@@ -43,6 +43,9 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
 	ocrTextCorrectionPanel.lblOCRTextValue.setText(textBox.text);
 	ocrTextCorrectionPanel.lblOCRConfidenceValue.setBackground(textBox.getColorCodedConfidence());
 	ocrTextCorrectionPanel.lblOCRConfidenceValue.setText(new DecimalFormat("00.00").format(textBox.confidence) + " %");
+	if (cachedOcrText.correctText != null) {
+	    ocrTextCorrectionPanel.txtCorrectText.setText(cachedOcrText.correctText);
+	}
     }
 
     /**
@@ -53,15 +56,16 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated
+    // <editor-fold defaultstate="collapsed" desc="Generated
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lblTitle = new javax.swing.JLabel();
+        javax.swing.JLabel lblTitle = new javax.swing.JLabel();
         pnlCentre = new javax.swing.JPanel();
-        pnlButtons = new javax.swing.JPanel();
-        btnRemove = new javax.swing.JButton();
-        btnModify = new javax.swing.JButton();
-        btnCancel = new javax.swing.JButton();
+        javax.swing.JPanel pnlButtons = new javax.swing.JPanel();
+        javax.swing.JButton btnRemove = new javax.swing.JButton();
+        javax.swing.JButton btnModify = new javax.swing.JButton();
+        javax.swing.JButton btnCancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("OCR Text Correction Dialog");
@@ -158,6 +162,10 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
     }// GEN-LAST:event_btnRemoveActionPerformed
 
     private void btnModifyActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btnOkActionPerformed
+	String correctText = ocrTextCorrectionPanel.txtCorrectText.getText();
+	if (correctText != null && correctText.trim().length() > 0) {
+	    wordCache.modifyWord(cachedOcrText.id, correctText);
+	}
 	closeDialog();
     }// GEN-LAST:event_btnOkActionPerformed
 
@@ -171,11 +179,6 @@ public class OcrTextCorrectionDialog extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnCancel;
-    private javax.swing.JButton btnModify;
-    private javax.swing.JButton btnRemove;
-    private javax.swing.JLabel lblTitle;
-    private javax.swing.JPanel pnlButtons;
     private javax.swing.JPanel pnlCentre;
     // End of variables declaration//GEN-END:variables
 }

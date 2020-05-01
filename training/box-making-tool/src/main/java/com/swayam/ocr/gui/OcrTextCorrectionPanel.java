@@ -10,6 +10,8 @@ package com.swayam.ocr.gui;
  * @author paawak
  */
 public class OcrTextCorrectionPanel extends javax.swing.JPanel {
+    
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates new form OcrTextCorrectionPanel
@@ -27,16 +29,16 @@ public class OcrTextCorrectionPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlOcr = new javax.swing.JPanel();
-        lblRawImage = new javax.swing.JLabel();
+        javax.swing.JPanel pnlOcr = new javax.swing.JPanel();
+        javax.swing.JLabel lblRawImage = new javax.swing.JLabel();
         scrPnRawImage = new javax.swing.JScrollPane();
-        lblOcrTextName = new javax.swing.JLabel();
+        javax.swing.JLabel lblOcrTextName = new javax.swing.JLabel();
         lblOCRTextValue = new javax.swing.JLabel();
-        lblOCRConfidenceName = new javax.swing.JLabel();
+        javax.swing.JLabel lblOCRConfidenceName = new javax.swing.JLabel();
         lblOCRConfidenceValue = new javax.swing.JLabel();
-        pnlCorrection = new javax.swing.JPanel();
-        lblCorrectText = new javax.swing.JLabel();
-        pnlCorrectText = new javax.swing.JPanel();
+        javax.swing.JPanel pnlCorrection = new javax.swing.JPanel();
+        javax.swing.JLabel lblCorrectText = new javax.swing.JLabel();
+        javax.swing.JPanel pnlCorrectText = new javax.swing.JPanel();
         txtCorrectText = new javax.swing.JTextField();
 
         pnlOcr.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "OCR Details", javax.swing.border.TitledBorder.LEFT, javax.swing.border.TitledBorder.DEFAULT_POSITION));
@@ -155,16 +157,9 @@ public class OcrTextCorrectionPanel extends javax.swing.JPanel {
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lblCorrectText;
-    private javax.swing.JLabel lblOCRConfidenceName;
     javax.swing.JLabel lblOCRConfidenceValue;
     javax.swing.JLabel lblOCRTextValue;
-    private javax.swing.JLabel lblOcrTextName;
-    private javax.swing.JLabel lblRawImage;
-    private javax.swing.JPanel pnlCorrectText;
-    private javax.swing.JPanel pnlCorrection;
-    private javax.swing.JPanel pnlOcr;
     javax.swing.JScrollPane scrPnRawImage;
-    private javax.swing.JTextField txtCorrectText;
+    javax.swing.JTextField txtCorrectText;
     // End of variables declaration//GEN-END:variables
 }
