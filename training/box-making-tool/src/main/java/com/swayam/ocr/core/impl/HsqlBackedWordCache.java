@@ -110,7 +110,7 @@ public class HsqlBackedWordCache implements WordCache {
 
     @Override
     public Collection<CachedOcrText> getWords(String rawImageFileName) {
-	String sql = "SELECT ocr.id, ocr.raw_ocr_word, ocr.corrected_text FROM ocr_word ocr, raw_image img WHERE ocr.raw_image_id = img.id AND img.name = ?";
+	String sql = "SELECT ocr.id, ocr.raw_ocr_word, ocr.corrected_text FROM ocr_word ocr, raw_image img WHERE ocr.raw_image_id = img.id AND img.name = ? ORDER BY ocr.id ASC";
 	return executePreparedStatement(pstat -> {
 	    try {
 		pstat.setString(1, rawImageFileName);
