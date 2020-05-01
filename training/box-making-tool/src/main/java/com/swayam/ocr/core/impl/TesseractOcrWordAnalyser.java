@@ -89,10 +89,16 @@ public class TesseractOcrWordAnalyser {
 	    int lastWordSequence = wordsGroupedByLineNumber.get(lineNumber).parallelStream().mapToInt(cachedOcrText -> cachedOcrText.rawOcrText.wordSequenceNumber).max().getAsInt();
 
 	    List<String> boxes = wordsGroupedByLineNumber.get(lineNumber).stream().map(cachedOcrText -> {
-		if (lastWordSequence == cachedOcrText.rawOcrText.wordSequenceNumber) {
-		    return cachedOcrText.rawOcrText.text;
+		String ocrText;
+		if (cachedOcrText.correctText != null && cachedOcrText.correctText.trim().length() > 0) {
+		    ocrText = cachedOcrText.correctText.trim();
+		} else {
+		    ocrText = cachedOcrText.rawOcrText.text;
 		}
-		return cachedOcrText.rawOcrText.text + " ";
+		if (lastWordSequence == cachedOcrText.rawOcrText.wordSequenceNumber) {
+		    return ocrText;
+		}
+		return ocrText + " ";
 	    }).flatMap(text -> text.chars().mapToObj(c -> Character.toString((char) c))).map(text -> text + positionData).collect(Collectors.toList());
 	    boxes.add("\t" + positionData);
 	    return boxes.stream();
