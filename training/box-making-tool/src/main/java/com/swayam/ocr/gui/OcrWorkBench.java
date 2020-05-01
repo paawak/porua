@@ -352,7 +352,12 @@ public class OcrWorkBench extends JFrame {
 	    return Optional.empty();
 	}
 
-	return detectedWords.parallelStream().filter(text -> text.rawOcrText.getRectangle().contains(point)).findFirst();
+	return detectedWords.parallelStream().filter(text -> {
+	    Rectangle originaWordArea = text.rawOcrText.getRectangle();
+	    int expandBy = 10;
+	    Rectangle expandedWordArea = new Rectangle(originaWordArea.x - expandBy, originaWordArea.y - expandBy, originaWordArea.width + expandBy * 2, originaWordArea.height + expandBy * 2);
+	    return expandedWordArea.contains(point);
+	}).findFirst();
     }
 
     private String toHtmlColor(Color color) {
