@@ -278,7 +278,11 @@ public class OcrWorkBench extends JFrame {
 
 	List<RawOcrWord> detectedWords = wordAnalyser.getDetectedText();
 
-	wordCache.storeRawOcrWords(currentSelectedImageFile.getName(), LANGUAGE, detectedWords);
+	if (wordCache.getWordCount(currentSelectedImageFile.getName()) != 0) {
+	    LOG.warn("Entries already present for {}: using existing entries", currentSelectedImageFile);
+	} else {
+	    wordCache.storeRawOcrWords(currentSelectedImageFile.getName(), LANGUAGE, detectedWords);
+	}
 
 	setImageInFrame(getImageWithPaintedWordBoundaries());
 
@@ -340,6 +344,9 @@ public class OcrWorkBench extends JFrame {
     }
 
     private Optional<CachedOcrText> getDetectedOcrText(Point point) {
+	if (currentSelectedImageFile == null) {
+	    return Optional.empty();
+	}
 	Collection<CachedOcrText> detectedWords = wordCache.getWords(currentSelectedImageFile.getName());
 	if (detectedWords == null || detectedWords.isEmpty()) {
 	    return Optional.empty();
