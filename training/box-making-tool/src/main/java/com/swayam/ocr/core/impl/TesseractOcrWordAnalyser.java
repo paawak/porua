@@ -5,6 +5,7 @@ import static org.bytedeco.leptonica.global.lept.boxaGetBox;
 import static org.bytedeco.leptonica.global.lept.pixDestroy;
 import static org.bytedeco.leptonica.global.lept.pixRead;
 
+import java.awt.Rectangle;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -12,8 +13,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -57,22 +56,26 @@ public class TesseractOcrWordAnalyser {
     }
 
     public List<String> getBoxStrings(Collection<CachedOcrText> words) {
+	LOGGER.trace("words: {}", words);
 	ExtractedLineDetails extractedLineDetails = extractLinesFromImage();
 	List<RawOcrLine> lines = extractedLineDetails.lines;
+
+	LOGGER.trace("lines: {}", lines);
 
 	Map<Integer, RawOcrLine> linesAsMap = lines.parallelStream().collect(Collectors.toMap(line -> line.lineNumber, Function.identity()));
 
 	Map<Integer, List<CachedOcrText>> wordsGroupedByLineNumber = lines.parallelStream().collect(Collectors.toMap(line -> line.lineNumber, line -> {
-	    return words.stream()
-		    .filter(cachedOcrText -> line.rawOcrText.getRectangle().contains(cachedOcrText.rawOcrText.getRectangle()) && line.rawOcrText.text.contains(cachedOcrText.rawOcrText.text))
-		    .map(cachedOcrText -> new CachedOcrText(cachedOcrText.id, cachedOcrText.rawOcrText, cachedOcrText.correctText, line.lineNumber)).collect(Collectors.toList());
+	    return words.parallelStream().filter(cachedOcrText -> {
+		Rectangle originalLineArea = line.rawOcrText.getRectangle();
+		int expandBy = 5;
+		Rectangle expandedLineArea = new Rectangle(originalLineArea.x - expandBy, originalLineArea.y - expandBy, originalLineArea.width + expandBy, originalLineArea.height + expandBy);
+		return expandedLineArea.contains(cachedOcrText.rawOcrText.getRectangle()) && line.rawOcrText.text.contains(cachedOcrText.rawOcrText.text);
+	    }).map(cachedOcrText -> new CachedOcrText(cachedOcrText.id, cachedOcrText.rawOcrText, cachedOcrText.correctText, line.lineNumber)).collect(Collectors.toList());
 	}));
 
-	Set<Integer> orderedLineNumbers = new TreeSet<>(linesAsMap.keySet());
+	LOGGER.trace("wordsGroupedByLineNumber: {}", wordsGroupedByLineNumber);
 
-	LOGGER.info("orderedLineNumbers: {}", orderedLineNumbers);
-
-	return orderedLineNumbers.stream().filter(lineNumber -> !wordsGroupedByLineNumber.get(lineNumber).isEmpty()).flatMap(lineNumber -> {
+	return linesAsMap.keySet().stream().sorted().filter(lineNumber -> !wordsGroupedByLineNumber.get(lineNumber).isEmpty()).flatMap(lineNumber -> {
 	    int leftTopX = linesAsMap.get(lineNumber).rawOcrText.x1;
 	    int leftTopY = linesAsMap.get(lineNumber).rawOcrText.y1;
 	    int rightBottomX = linesAsMap.get(lineNumber).rawOcrText.x2;
@@ -88,18 +91,19 @@ public class TesseractOcrWordAnalyser {
 
 	    int lastWordSequence = wordsGroupedByLineNumber.get(lineNumber).parallelStream().mapToInt(cachedOcrText -> cachedOcrText.rawOcrText.wordSequenceNumber).max().getAsInt();
 
-	    List<String> boxes = wordsGroupedByLineNumber.get(lineNumber).stream().map(cachedOcrText -> {
-		String ocrText;
-		if (cachedOcrText.correctText != null && cachedOcrText.correctText.trim().length() > 0) {
-		    ocrText = cachedOcrText.correctText.trim();
-		} else {
-		    ocrText = cachedOcrText.rawOcrText.text;
-		}
-		if (lastWordSequence == cachedOcrText.rawOcrText.wordSequenceNumber) {
-		    return ocrText;
-		}
-		return ocrText + " ";
-	    }).flatMap(text -> text.chars().mapToObj(c -> Character.toString((char) c))).map(text -> text + positionData).collect(Collectors.toList());
+	    List<String> boxes = wordsGroupedByLineNumber.get(lineNumber).parallelStream()
+		    .sorted((CachedOcrText o1, CachedOcrText o2) -> o1.rawOcrText.wordSequenceNumber - o2.rawOcrText.wordSequenceNumber).map(cachedOcrText -> {
+			String ocrText;
+			if (cachedOcrText.correctText != null && cachedOcrText.correctText.trim().length() > 0) {
+			    ocrText = cachedOcrText.correctText.trim();
+			} else {
+			    ocrText = cachedOcrText.rawOcrText.text;
+			}
+			if (lastWordSequence == cachedOcrText.rawOcrText.wordSequenceNumber) {
+			    return ocrText;
+			}
+			return ocrText + " ";
+		    }).flatMap(text -> text.chars().mapToObj(c -> Character.toString((char) c))).map(text -> text + positionData).collect(Collectors.toList());
 	    boxes.add("\t" + positionData);
 	    return boxes.stream();
 	}).collect(Collectors.toList());
@@ -141,7 +145,7 @@ public class TesseractOcrWordAnalyser {
 
 		// line number starts from 1
 		RawOcrLine lineTextBox = new RawOcrLine(lineNumber + 1, new RawOcrWord(x1, y1, x1 + width, y1 + height, confidence, ocrLineText, -1));
-		LOGGER.info("lineTextBox: {}", lineTextBox);
+		LOGGER.debug("lineTextBox: {}", lineTextBox);
 		return lineTextBox;
 	    }).collect(Collectors.toList());
 
@@ -176,7 +180,7 @@ public class TesseractOcrWordAnalyser {
 
 	    try (ResultIterator ri = api.GetIterator();) {
 		int level = tesseract.RIL_WORD;
-		int wordNumber = 0;
+		int wordNumber = 1;
 		Supplier<IntPointer> intPointerSupplier = () -> new IntPointer(new int[1]);
 		do {
 		    BytePointer ocrResult = ri.GetUTF8Text(level);
