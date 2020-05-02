@@ -339,8 +339,14 @@ public class OcrWorkBench extends JFrame {
 	    return;
 	}
 
-	RawOcrWord textBox = matchingTextBox.get().rawOcrText;
-	imagePanel.setToolTipText(String.format("<html><h1 bgcolor=\"%s\">%s</h1></html>", toHtmlColor(textBox.getColorCodedConfidence()), textBox.text));
+	CachedOcrText ocrText = matchingTextBox.get();
+	String toolTipText;
+	if (ocrText.correctText != null && ocrText.correctText.trim().length() > 0) {
+	    toolTipText = ocrText.correctText.trim();
+	} else {
+	    toolTipText = ocrText.rawOcrText.text;
+	}
+	imagePanel.setToolTipText(String.format("<html><h1 bgcolor=\"%s\">%s</h1></html>", toHtmlColor(ocrText.rawOcrText.getColorCodedConfidence()), toolTipText));
     }
 
     private Optional<CachedOcrText> getDetectedOcrText(Point point) {
