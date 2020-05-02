@@ -69,7 +69,7 @@ public class TesseractOcrWordAnalyser {
 		Rectangle originalLineArea = line.rawOcrText.getRectangle();
 		int expandBy = 5;
 		Rectangle expandedLineArea = new Rectangle(originalLineArea.x - expandBy, originalLineArea.y - expandBy, originalLineArea.width + expandBy, originalLineArea.height + expandBy);
-		return expandedLineArea.contains(cachedOcrText.rawOcrText.getRectangle()) && line.rawOcrText.text.contains(cachedOcrText.rawOcrText.text);
+		return expandedLineArea.contains(cachedOcrText.rawOcrText.getRectangle());
 	    }).map(cachedOcrText -> new CachedOcrText(cachedOcrText.id, cachedOcrText.rawOcrText, cachedOcrText.correctText, line.lineNumber)).collect(Collectors.toList());
 	}));
 
