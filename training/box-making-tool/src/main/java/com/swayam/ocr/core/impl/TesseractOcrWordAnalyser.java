@@ -17,6 +17,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.javacpp.IntPointer;
@@ -76,9 +77,21 @@ public class TesseractOcrWordAnalyser {
 	LOGGER.trace("wordsGroupedByLineNumber: {}", wordsGroupedByLineNumber);
 
 	return linesAsMap.keySet().stream().sorted().filter(lineNumber -> !wordsGroupedByLineNumber.get(lineNumber).isEmpty()).flatMap(lineNumber -> {
-	    int leftTopX = linesAsMap.get(lineNumber).rawOcrText.x1;
+
+	    Supplier<Stream<CachedOcrText>> ocrWords = () -> wordsGroupedByLineNumber.get(lineNumber).parallelStream();
+	    Supplier<IntStream> wordSequenceNumbers = () -> ocrWords.get().mapToInt(cachedOcrText -> cachedOcrText.rawOcrText.wordSequenceNumber);
+
+	    int firstWordSequence = wordSequenceNumbers.get().min().getAsInt();
+	    int lastWordSequence = wordSequenceNumbers.get().max().getAsInt();
+
+	    Function<Integer, CachedOcrText> findWordFromSequenceNumber = sequenceNumber -> ocrWords.get().filter(ocrWord -> ocrWord.rawOcrText.wordSequenceNumber == sequenceNumber).findAny().get();
+
+	    CachedOcrText firstWord = findWordFromSequenceNumber.apply(firstWordSequence);
+	    CachedOcrText lastWord = findWordFromSequenceNumber.apply(lastWordSequence);
+
+	    int leftTopX = firstWord.rawOcrText.x1;
 	    int leftTopY = linesAsMap.get(lineNumber).rawOcrText.y1;
-	    int rightBottomX = linesAsMap.get(lineNumber).rawOcrText.x2;
+	    int rightBottomX = lastWord.rawOcrText.x2;
 	    int rightBottomY = linesAsMap.get(lineNumber).rawOcrText.y2;
 
 	    int leftBottomX = leftTopX;
@@ -89,21 +102,18 @@ public class TesseractOcrWordAnalyser {
 
 	    String positionData = String.format(" %d %d %d %d 0", leftBottomX, leftBottomY, rightTopX, rightTopY);
 
-	    int lastWordSequence = wordsGroupedByLineNumber.get(lineNumber).parallelStream().mapToInt(cachedOcrText -> cachedOcrText.rawOcrText.wordSequenceNumber).max().getAsInt();
-
-	    List<String> boxes = wordsGroupedByLineNumber.get(lineNumber).parallelStream()
-		    .sorted((CachedOcrText o1, CachedOcrText o2) -> o1.rawOcrText.wordSequenceNumber - o2.rawOcrText.wordSequenceNumber).map(cachedOcrText -> {
-			String ocrText;
-			if (cachedOcrText.correctText != null && cachedOcrText.correctText.trim().length() > 0) {
-			    ocrText = cachedOcrText.correctText.trim();
-			} else {
-			    ocrText = cachedOcrText.rawOcrText.text;
-			}
-			if (lastWordSequence == cachedOcrText.rawOcrText.wordSequenceNumber) {
-			    return ocrText;
-			}
-			return ocrText + " ";
-		    }).flatMap(text -> text.chars().mapToObj(c -> Character.toString((char) c))).map(text -> text + positionData).collect(Collectors.toList());
+	    List<String> boxes = ocrWords.get().sorted((CachedOcrText o1, CachedOcrText o2) -> o1.rawOcrText.wordSequenceNumber - o2.rawOcrText.wordSequenceNumber).map(cachedOcrText -> {
+		String ocrText;
+		if (cachedOcrText.correctText != null && cachedOcrText.correctText.trim().length() > 0) {
+		    ocrText = cachedOcrText.correctText.trim();
+		} else {
+		    ocrText = cachedOcrText.rawOcrText.text;
+		}
+		if (lastWordSequence == cachedOcrText.rawOcrText.wordSequenceNumber) {
+		    return ocrText;
+		}
+		return ocrText + " ";
+	    }).flatMap(text -> text.chars().mapToObj(c -> Character.toString((char) c))).map(text -> text + positionData).collect(Collectors.toList());
 	    boxes.add("\t" + positionData);
 	    return boxes.stream();
 	}).collect(Collectors.toList());
