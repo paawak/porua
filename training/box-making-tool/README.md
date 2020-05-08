@@ -47,22 +47,33 @@ The below command will generate a box file called my-box-file.box from an image:
 1. <https://tesseract-ocr.github.io/tessdoc/TrainingTesseract-4.00.html#making-box-files>
 1. <https://github.com/tesseract-ocr/tesseract/issues/2357#issuecomment-477239316>    
     
-## Training Tesseract 4.x
+## Training Tesseract 4.x from existing model
 
-### Creating lstmf file
+### From tiff/box pairs
 
-The first step in training is to obtain a *lstmf* binary file. There are many ways to obtain the *lstmf* file.
+#### Step 1: Extract recognition model
 
-#### From a tiff/box pair
-
-The below command will create a *lstmf* binary file, given a *tiff* and *box* file pair:
-
-    tesseract eng.DejaVu_Math_TeX_Gyre.exp0.tif eng.DejaVu_Math_TeX_Gyre.exp0 --psm 6 lstm.train
-
-A recognition model can be extracted from an existing *traineddata* file:
+A recognition model can be extracted from an existing *traineddata* file. The output of this would be a *lstm* file.
     
     combine_tessdata -e /kaaj/installs/tesseract/tessdata_best-4.0.0/eng.traineddata ./eng.lstm
+
+#### Step 2: Creating lstmf file from a tiff/box pair
+
+We would need to obtain a *lstmf* binary file from a *tiff* image and its corresponding *box* file. The below command will create a *lstmf* binary file, given a *tiff* and *box* file pair:
+
+    tesseract eng.DejaVu_Math_TeX_Gyre.exp0.tif eng.DejaVu_Math_TeX_Gyre.exp0 --psm 6 lstm.train
     
+You can create multiple *lstmf* files from several *tiff/box* pairs.    
+    
+#### Step 3: Creating a list of lstmf files
+
+Create a *eng.training_files.txt* containing all the *lstmf* files that you have created in the previous step. The contents of this file will be the full path of each of the *lstmf* file as shown below:
+
+```
+/kaaj/source/porua/training/engtrain/eng.DejaVu_Math_TeX_Gyre.exp0.lstmf
+```
+#### Step 4: Run training command    
+
 Then run the below command to train:
 
     lstmtraining --model_output ./my_output \
@@ -71,7 +82,7 @@ Then run the below command to train:
     --train_listfile ./eng.training_files.txt \
     --max_iterations 400    
 
-#### From a given font
+### From a given font
 
 The below command will generate a *lstmf* binary file from a list of texts and a given font:
 
