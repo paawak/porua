@@ -59,12 +59,23 @@ The below command will create a *lstmf* binary file, given a *tiff* and *box* fi
 
     tesseract eng.DejaVu_Math_TeX_Gyre.exp0.tif eng.DejaVu_Math_TeX_Gyre.exp0 --psm 6 lstm.train
 
+The below command will then create a *traineddata* file:
+
+    combine_lang_model --input_unicharset /kaaj/installs/tesseract/langdata_lstm-master/eng/eng.unicharset  \
+    --script_dir /kaaj/installs/tesseract/langdata --words /kaaj/installs/tesseract/langdata_lstm-master/eng/eng.wordlist  \
+    --numbers /kaaj/installs/tesseract/langdata_lstm-master/eng/eng.numbers  \
+    --puncs /kaaj/installs/tesseract/langdata_lstm-master/eng/eng.punc  \
+    --output_dir . --lang eng
+
+A recognition model can be extracted from an existing *traineddata* file:
+    
+    combine_tessdata -e /kaaj/installs/tesseract/tessdata_best-4.0.0/eng.traineddata ./eng.lstm
 
 #### From a given font
 
 The below command will generate a *lstmf* binary file from a list of texts and a given font:
 
-    src/training/tesstrain.sh --fonts_dir /usr/share/fonts/truetype/dejavu --lang eng --linedata_only \
+    tesstrain.sh --fonts_dir /usr/share/fonts/truetype/dejavu --lang eng --linedata_only \
     --fontlist "DejaVu Math TeX Gyre" --noextract_font_properties --langdata_dir /kaaj/installs/tesseract/langdata \
     --tessdata_dir /kaaj/installs/tesseract/tessdata_best-4.0.0 --output_dir /kaaj/source/porua/training/engtrain
      
