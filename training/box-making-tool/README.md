@@ -17,6 +17,10 @@ The best trained LSTM models can be found here: <https://github.com/tesseract-oc
 Download the *langdata* as well from: <https://github.com/tesseract-ocr/langdata_lstm>
 
 ## Creating Box Files
+Creating *box files* is the first step. Box file is a *plain-text* file that is used to specify the text, or a character, at a given coordinate in the image. For the *lstm* system, the coordinates of an entire line is considered and *NOT* the individual coordinates of the character in the image. Note that, this is significantly different from the earlier *Tesseract 3.x*, where the coordinates of that character was needed. The format of the box file is:
+
+    <character> <LeftBottom x1> <LeftBottom y1> <RightTop x2> <RightTop y2> <tiff image page number>
+   
 The coordinate system used in the box file has **(0,0)** at the **bottom-left** as shown below:
 
 ![Box Coordinate System](docs/box-coordinate-system.png)
@@ -25,22 +29,63 @@ Contrast it with Tesseract Word Coordinates below:
 
 ![Tesseract Word Coordinate System](docs/tess-word-coordinate-system.png)
 
+In a box file, every end of a word is marked with:
+
+    <space> <LeftBottom x1> <LeftBottom y1> <RightTop x2> <RightTop y2> <tiff image page number>
+    
+Similarly, every end of a line is marked with:
+
+    <tab> <LeftBottom x1> <LeftBottom y1> <RightTop x2> <RightTop y2> <tiff image page number>        
+
+### Basic Command
+
+The below command will generate a box file called my-box-file.box from an image:
+
+    tesseract -l ben bangla-mahabharat-1-page_2.jpg my-box-file lstmbox
+    
 ### Online Documentation
 1. <https://tesseract-ocr.github.io/tessdoc/TrainingTesseract-4.00.html#making-box-files>
-1. <https://github.com/tesseract-ocr/tesseract/issues/2357#issuecomment-477239316>
+1. <https://github.com/tesseract-ocr/tesseract/issues/2357#issuecomment-477239316>    
+    
+## Training Tesseract 4.x
 
-### Commands
+### Creating lstmf file
 
-The below command will generate a box file called image.box:
+The first step in training is to obtain a *lstmf* binary file. There are many ways to obtain the *lstmf* file.
 
-    tesseract -l ben bangla-mahabharat-1-page_2.jpg image lstmbox
+#### From a tiff/box pair
 
-The below command will generate tiff/box pairs:
+The below command will create a *lstmf* binary file, given a *tiff* and *box* file pair:
+
+    tesseract eng.DejaVu_Math_TeX_Gyre.exp0.tif eng.DejaVu_Math_TeX_Gyre.exp0 --psm 6 lstm.train
+
+
+#### From a given font
+
+The below command will generate a *lstmf* binary file from a list of texts and a given font:
 
     src/training/tesstrain.sh --fonts_dir /usr/share/fonts/truetype/dejavu --lang eng --linedata_only \
-     --fontlist "DejaVu Math TeX Gyre" --noextract_font_properties --langdata_dir /kaaj/installs/tesseract/langdata \
-     --tessdata_dir /kaaj/installs/tesseract/tessdata_best-4.0.0 --output_dir /kaaj/source/porua/training/engtrain
+    --fontlist "DejaVu Math TeX Gyre" --noextract_font_properties --langdata_dir /kaaj/installs/tesseract/langdata \
+    --tessdata_dir /kaaj/installs/tesseract/tessdata_best-4.0.0 --output_dir /kaaj/source/porua/training/engtrain
+     
+The above command internally does multiple steps to generate the lstmf file. For example, the below command generates a *tiff* image from a list of texts and a given font:
 
+    text2image --fontconfig_tmpdir=./temp-fonts-dir --fonts_dir=/usr/share/fonts/truetype/dejavu  \
+    --strip_unrenderable_words --leading=32 --xsize=3600 --char_spacing=0.0 --exposure=0  \
+    --outputbase=eng.DejaVu_Math_TeX_Gyre.exp0 --max_pages=0 --font="DejaVu Math TeX Gyre"   \
+    --ptsize 12 --text=/kaaj/installs/tesseract/langdata/eng/eng.training_text
+    
+In the *fontconfig_tmpdir*, we would need a file called *fonts.conf* having contents:
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+	<dir>/usr/share/fonts/truetype/dejavu</dir>
+	<cachedir>/tmp/font_tmp.A6newLIaIu</cachedir>
+	<config></config>
+</fontconfig>
+```
 
 ## Miscellaneous
 ### Tesseract API Guide
