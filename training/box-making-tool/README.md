@@ -70,6 +70,14 @@ The below command will then create a *traineddata* file:
 A recognition model can be extracted from an existing *traineddata* file:
     
     combine_tessdata -e /kaaj/installs/tesseract/tessdata_best-4.0.0/eng.traineddata ./eng.lstm
+    
+Then run the below command to train:
+
+    lstmtraining --model_output ./my_output \
+    --continue_from ./eng.lstm \
+    --traineddata /kaaj/installs/tesseract/tessdata_best-4.0.0/eng.traineddata \
+    --train_listfile ./eng.training_files.txt \
+    --max_iterations 400    
 
 #### From a given font
 
