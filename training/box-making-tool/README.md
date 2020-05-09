@@ -84,7 +84,7 @@ Then run the below command to train:
     
 The output from the above will be a *my_output_checkpoint* file.
 
-#### Step 5: Combining the ouputs
+#### Step 5: Combining the outputs
 
 In the final step, we have to combine the *my_output_checkpoint* file with the existing *traineddata* file
 
