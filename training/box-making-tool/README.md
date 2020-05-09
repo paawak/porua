@@ -80,9 +80,24 @@ Then run the below command to train:
     --continue_from ./eng.lstm \
     --traineddata /kaaj/installs/tesseract/tessdata_best-4.0.0/eng.traineddata \
     --train_listfile ./eng.training_files.txt \
-    --max_iterations 400    
+    --max_iterations 400
+    
+The output from the above will be a *my_output_checkpoint* file.
+
+#### Step 5: Combining the ouputs
+
+In the final step, we have to combine the *my_output_checkpoint* file with the existing *traineddata* file
+
+    lstmtraining --stop_training \
+    --continue_from ./my_output_checkpoint \
+    --traineddata /kaaj/installs/tesseract/tessdata_best-4.0.0/eng.traineddata \
+    --model_output /kaaj/source/tessdata_best/eng.traineddata
+
+You can now use the new *traineddata* file.        
 
 ### From a given font
+
+Most of the above steps hold true if we want to train from a given font, with subtle differences as highlighted below.
 
 The below command will generate a *lstmf* binary file from a list of texts and a given font:
 
