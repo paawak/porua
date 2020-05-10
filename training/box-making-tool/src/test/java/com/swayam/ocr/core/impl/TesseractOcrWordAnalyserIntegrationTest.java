@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
 import com.swayam.ocr.core.model.Language;
+import com.swayam.ocr.core.model.RawOcrWord;
 
 class TesseractOcrWordAnalyserIntegrationTest {
 
@@ -23,8 +25,10 @@ class TesseractOcrWordAnalyserIntegrationTest {
 	TesseractOcrWordAnalyser testClass =
 		new TesseractOcrWordAnalyser(Paths.get(TesseractOcrWordAnalyserIntegrationTest.class.getResource("/box-files/eng.Arial_Unicode_MS.exp0.png").toURI()), Language.ENGLISH);
 
+	Collection<RawOcrWord> rawOcrWords = testClass.getDetectedText();
+
 	// when
-	List<String> result = testClass.getBoxStrings(Collections.emptyMap());
+	List<String> result = testClass.getBoxStrings(Collections.emptyMap(), rawOcrWords);
 
 	// then
 	assertEquals(expected, result);
