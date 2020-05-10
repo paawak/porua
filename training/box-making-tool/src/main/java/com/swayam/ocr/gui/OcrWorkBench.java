@@ -34,10 +34,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
@@ -293,7 +296,11 @@ public class OcrWorkBench extends JFrame {
 	    throw new IllegalArgumentException("No image file is currently selected!");
 	}
 
-	List<String> boxes = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), LANGUAGE).getBoxStrings(wordCache.getWords(currentSelectedImageFile.getName()));
+	Collection<CachedOcrText> cachedWords = wordCache.getWords(currentSelectedImageFile.getName());
+	Map<Integer, String> correctTextLookupBySequenceNumber = cachedWords.parallelStream().filter(cachedWord -> cachedWord.correctText != null && cachedWord.correctText.trim().length() > 0)
+		.collect(Collectors.toMap(cachedWord -> cachedWord.rawOcrText.wordSequenceNumber, cachedWord -> cachedWord.correctText.trim()));
+
+	List<String> boxes = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), LANGUAGE).getBoxStrings(Collections.unmodifiableMap(correctTextLookupBySequenceNumber));
 
 	try {
 	    Path boxFilePath = Paths.get(currentSelectedImageFile.getParent(), currentSelectedImageFile.getName() + ".box");
