@@ -39,8 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.JDialog;
@@ -297,10 +299,12 @@ public class OcrWorkBench extends JFrame {
 	}
 
 	Collection<CachedOcrText> cachedWords = wordCache.getWords(currentSelectedImageFile.getName());
-	Map<Integer, String> correctTextLookupBySequenceNumber = cachedWords.parallelStream().filter(cachedWord -> cachedWord.correctText != null && cachedWord.correctText.trim().length() > 0)
+	Supplier<Stream<CachedOcrText>> cachedOcrTexts = () -> cachedWords.parallelStream();
+	Map<Integer, String> correctTextLookupBySequenceNumber = cachedOcrTexts.get().filter(cachedWord -> cachedWord.correctText != null && cachedWord.correctText.trim().length() > 0)
 		.collect(Collectors.toMap(cachedWord -> cachedWord.rawOcrText.wordSequenceNumber, cachedWord -> cachedWord.correctText.trim()));
+	Collection<RawOcrWord> rawOcrWords = Collections.unmodifiableList(cachedOcrTexts.get().map(cachedOcrText -> cachedOcrText.rawOcrText).collect(Collectors.toList()));
 
-	List<String> boxes = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), LANGUAGE).getBoxStrings(Collections.unmodifiableMap(correctTextLookupBySequenceNumber));
+	List<String> boxes = new TesseractOcrWordAnalyser(currentSelectedImageFile.toPath(), LANGUAGE).getBoxStrings(Collections.unmodifiableMap(correctTextLookupBySequenceNumber), rawOcrWords);
 
 	try {
 	    Path boxFilePath = Paths.get(currentSelectedImageFile.getParent(), currentSelectedImageFile.getName() + ".box");

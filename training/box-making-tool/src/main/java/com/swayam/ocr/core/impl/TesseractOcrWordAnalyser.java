@@ -56,7 +56,10 @@ public class TesseractOcrWordAnalyser {
     }
 
     public List<String> getBoxStrings(Map<Integer, String> correctTextLookupBySequenceNumber) {
-	Collection<RawOcrWord> rawOcrWords = getDetectedText();
+	return getBoxStrings(correctTextLookupBySequenceNumber, getDetectedText());
+    }
+
+    public List<String> getBoxStrings(Map<Integer, String> correctTextLookupBySequenceNumber, Collection<RawOcrWord> rawOcrWords) {
 	LOGGER.trace("words: {}", rawOcrWords);
 	ExtractedLineDetails extractedLineDetails = extractLinesFromImage();
 	List<RawOcrLine> lines = extractedLineDetails.lines;
