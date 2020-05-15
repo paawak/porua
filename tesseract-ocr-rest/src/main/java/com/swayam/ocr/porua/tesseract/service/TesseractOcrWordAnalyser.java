@@ -230,7 +230,7 @@ public class TesseractOcrWordAnalyser {
 	return Collections.unmodifiableList(words);
     }
 
-    private Rectangle getWordArea(RawOcrWord rawOcrWord) {
+    public static Rectangle getWordArea(RawOcrWord rawOcrWord) {
 	return new Rectangle(rawOcrWord.getX1(), rawOcrWord.getY1(), rawOcrWord.getX2() - rawOcrWord.getX1(), rawOcrWord.getY2() - rawOcrWord.getY1());
     }
 
