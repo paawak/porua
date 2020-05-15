@@ -3,11 +3,10 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
-import ocrJsonData from './ocr.json';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App ocrWords={ocrJsonData}/>
+    <App/>
   </React.StrictMode>,
   document.getElementById('root')
 );

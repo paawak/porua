@@ -3,8 +3,23 @@ import OcrWord from './OcrWord'
 
 class App extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasErrors: false,
+      ocrWords: []
+    };
+  }
+
+  componentDidMount() {
+    fetch("http://localhost:3000/mockups/ocr.json")
+      .then(rawData => rawData.json())
+      .then(ocrWords => this.setState({ ocrWords: ocrWords }))
+      .catch(() => this.setState({ hasErrors: true }));
+  }
+
   render() {
-    const ocrWords = this.props.ocrWords.map((ocrWord) =>
+    const ocrWords = this.state.ocrWords.map((ocrWord) =>
       <OcrWord wordId={ocrWord.wordId} givenText={ocrWord.givenText}/>
     );
 
@@ -16,7 +31,7 @@ class App extends React.Component {
       </div>
     );
   }
-  
+
 }
 
 export default App;
