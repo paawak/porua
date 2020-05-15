@@ -32,6 +32,12 @@ The REST API is at /rest/ocr. It takes in the below form data:
 
 	There is also a simple HTML front-end at: http://localhost:8080/
 	
+# Training
+
+Getting a list of words and their bounds:
+
+    curl -X GET "http://localhost:8080/train/words?imagePath=/kaaj/source/porua/training/box-making-tool/src/test/resources/images/bangla-mahabharat-1-page_2.jpg&language=ben"	
+	
 # Sources
 		
 		https://github.com/paawak/porua/tree/master/tesseract-ocr-rest
