@@ -1,4 +1,4 @@
-package com.swayam.ocr.porua.tesseract.service;
+package com.swayam.ocr.core.impl;
 
 import static org.bytedeco.leptonica.global.lept.L_CLONE;
 import static org.bytedeco.leptonica.global.lept.boxaGetBox;
@@ -32,9 +32,9 @@ import org.bytedeco.tesseract.global.tesseract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.swayam.ocr.porua.tesseract.model.Language;
-import com.swayam.ocr.porua.tesseract.model.RawOcrLine;
-import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
+import com.swayam.ocr.core.model.Language;
+import com.swayam.ocr.core.model.RawOcrLine;
+import com.swayam.ocr.core.model.RawOcrWord;
 
 public class TesseractOcrWordAnalyser {
 
@@ -126,7 +126,7 @@ public class TesseractOcrWordAnalyser {
 	int imageHeight;
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.name());
+	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.code);
 	    if (returnCode != 0) {
 		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }
@@ -174,7 +174,7 @@ public class TesseractOcrWordAnalyser {
 	List<RawOcrWord> words = new ArrayList<>();
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.name());
+	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.code);
 	    if (returnCode != 0) {
 		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }
