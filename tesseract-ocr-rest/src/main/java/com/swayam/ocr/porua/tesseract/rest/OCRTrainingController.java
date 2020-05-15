@@ -11,15 +11,20 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.swayam.ocr.porua.tesseract.model.Language;
 import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
+import com.swayam.ocr.porua.tesseract.service.HsqlBackedWordCache;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
+import com.swayam.ocr.porua.tesseract.service.WordCache;
 
 @RestController
 @RequestMapping("/train")
 public class OCRTrainingController {
 
-    @GetMapping(value = "/words", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RawOcrWord> getDetectedText(@RequestParam("imagePath") Path imagePath, @RequestParam("language") Language language) {
-	return new TesseractOcrWordAnalyser(imagePath, language).getDetectedText();
+	List<RawOcrWord> words = new TesseractOcrWordAnalyser(imagePath, language).getDetectedText();
+	WordCache cache = new HsqlBackedWordCache("jdbc:hsqldb:file:./target/hsql-db/ocrdb;shutdown=true");
+	cache.storeRawOcrWords(imagePath.getFileName().toString(), language, words);
+	return words;
     }
 
 }

@@ -82,6 +82,11 @@
             <artifactId>tesseract-platform</artifactId>
             <version>4.1.1-1.5.3</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
