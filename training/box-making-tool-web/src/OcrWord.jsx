@@ -1,6 +1,12 @@
 import React from 'react';
 
 class OcrWord extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {};
+  }
+
   render() {
     const givenTextInputId = `givenText_${this.props.wordId}`;
     const correctedTextInputId = `correctedText_${this.props.wordId}`;
@@ -28,6 +34,7 @@ class OcrWord extends React.Component {
       </div>
     );
   }
+
 }
 
 export default OcrWord;
