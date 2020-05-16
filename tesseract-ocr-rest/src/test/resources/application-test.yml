@@ -20,7 +20,7 @@ spring:
   flyway:
     locations: classpath:/sql
   datasource:
-    url: jdbc:hsqldb:file:./target/test-hsql-db/ocrdb;shutdown=true
+    url: jdbc:hsqldb:mem:ocr-test-db;shutdown=true
     username: SA
     password: ''
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
