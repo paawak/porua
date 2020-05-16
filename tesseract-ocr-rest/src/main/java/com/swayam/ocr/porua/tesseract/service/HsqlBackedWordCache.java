@@ -5,7 +5,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
-import java.util.List;
 
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -38,7 +37,7 @@ public class HsqlBackedWordCache implements WordCache {
     }
 
     @Override
-    public void storeRawOcrWords(String rawImageFileName, Language language, List<RawOcrWord> rawTexts) {
+    public int storeImageFile(String rawImageFileName, Language language) {
 	String rawImageInsertSql = "INSERT INTO raw_image (id, name, language) VALUES (DEFAULT, ?, ?)";
 
 	KeyHolder keyHolder = new GeneratedKeyHolder();
@@ -50,11 +49,13 @@ public class HsqlBackedWordCache implements WordCache {
 	    return pstat;
 	}, keyHolder);
 
-	int rawImageId = keyHolder.getKey().intValue();
+	return keyHolder.getKey().intValue();
+    }
 
+    @Override
+    public void storeRawOcrWord(int imageFileId, RawOcrWord rawOcrWord) {
 	String wordInsertSql = "INSERT INTO ocr_word (id, raw_ocr_word, raw_image_id) VALUES (DEFAULT, ?, ?)";
-
-	rawTexts.forEach(rawText -> jdbcTemplate.update(wordInsertSql, rawText, rawImageId));
+	jdbcTemplate.update(wordInsertSql, rawOcrWord, imageFileId);
     }
 
     @Override

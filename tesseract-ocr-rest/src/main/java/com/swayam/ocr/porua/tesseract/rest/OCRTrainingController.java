@@ -6,8 +6,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -28,6 +26,8 @@ import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
 import com.swayam.ocr.porua.tesseract.service.WordCache;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -43,24 +43,26 @@ public class OCRTrainingController {
     }
 
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<RawOcrWord> getDetectedText(@RequestParam("imagePath") Path imagePath, @RequestParam("language") Language language) {
+    public Flux<RawOcrWord> getDetectedText(@RequestParam("imagePath") Path imagePath, @RequestParam("language") Language language) {
 
 	String imageFile = imagePath.toFile().getName();
 
 	if (wordCache.getWordCount(imageFile) == 0) {
-	    List<RawOcrWord> words = new TesseractOcrWordAnalyser(imagePath, language).getDetectedText();
-	    wordCache.storeRawOcrWords(imageFile, language, words);
-	    return words;
+	    int imageFileId = wordCache.storeImageFile(imageFile, Language.ben);
+	    return Flux.create((FluxSink<RawOcrWord> fluxSink) -> {
+		new TesseractOcrWordAnalyser(imagePath, language).extractWordsFromImage(fluxSink);
+	    }).doOnNext(rawText -> wordCache.storeRawOcrWord(imageFileId, rawText));
 	}
 
 	LOG.warn("Entries already present for {}: using existing entries", imageFile);
 
-	return wordCache.getWords(imageFile).stream().map(CachedOcrText::getRawOcrText).collect(Collectors.toList());
+	return Flux.fromIterable(wordCache.getWords(imageFile)).map(CachedOcrText::getRawOcrText);
 
     }
 
     @GetMapping(value = "/word/image")
     public Mono<ResponseEntity<byte[]>> getOcrWordImage(@RequestParam("wordId") int wordId, @RequestParam("imagePath") Path imagePath) throws IOException {
+	LOG.info("serving ocr word image for id: {}", wordId);
 	CachedOcrText ocrText = wordCache.getWord(wordId);
 	BufferedImage fullImage = ImageIO.read(Files.newInputStream(imagePath));
 	Rectangle wordArea = TesseractOcrWordAnalyser.getWordArea(ocrText.getRawOcrText());

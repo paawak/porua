@@ -8,7 +8,6 @@ import static org.bytedeco.leptonica.global.lept.pixRead;
 import java.awt.Rectangle;
 import java.nio.IntBuffer;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +35,8 @@ import com.swayam.ocr.porua.tesseract.model.Language;
 import com.swayam.ocr.porua.tesseract.model.RawOcrLine;
 import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
 
+import reactor.core.publisher.FluxSink;
+
 public class TesseractOcrWordAnalyser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TesseractOcrWordAnalyser.class);
@@ -50,9 +51,66 @@ public class TesseractOcrWordAnalyser {
 	this.language = language;
     }
 
-    public List<RawOcrWord> getDetectedText() {
+    public void extractWordsFromImage(FluxSink<RawOcrWord> ocrWordSink) {
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
-	return extractWordsFromImage();
+
+	LOGGER.info("Analyzing image file for words...");
+
+	try (TessBaseAPI api = new TessBaseAPI();) {
+	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.name());
+	    if (returnCode != 0) {
+		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
+	    }
+
+	    PIX image = pixRead(imagePath.toFile().getAbsolutePath());
+
+	    api.SetImage(image);
+	    int code = api.Recognize(new ETEXT_DESC());
+
+	    if (code != 0) {
+		throw new IllegalArgumentException("could not recognize text");
+	    }
+
+	    try (ResultIterator ri = api.GetIterator();) {
+		int level = tesseract.RIL_WORD;
+		int wordNumber = 1;
+		Supplier<IntPointer> intPointerSupplier = () -> new IntPointer(new int[1]);
+		do {
+		    BytePointer ocrResult = ri.GetUTF8Text(level);
+		    String ocrText = ocrResult.getString().trim();
+
+		    float confidence = ri.Confidence(level);
+		    IntPointer x1 = intPointerSupplier.get();
+		    IntPointer y1 = intPointerSupplier.get();
+		    IntPointer x2 = intPointerSupplier.get();
+		    IntPointer y2 = intPointerSupplier.get();
+		    boolean foundRectangle = ri.BoundingBox(level, x1, y1, x2, y2);
+
+		    if (!foundRectangle) {
+			throw new IllegalArgumentException("Could not find any rectangle here");
+		    }
+
+		    RawOcrWord wordTextBox = new RawOcrWord(x1.get(), y1.get(), x2.get(), y2.get(), confidence, ocrText, wordNumber++);
+		    LOGGER.info("wordTextBox: {}", wordTextBox);
+
+		    ocrWordSink.next(wordTextBox);
+
+		    x1.deallocate();
+		    y1.deallocate();
+		    x2.deallocate();
+		    y2.deallocate();
+		    ocrResult.deallocate();
+
+		} while (ri.Next(level));
+
+		ri.deallocate();
+	    }
+	    api.End();
+	    api.deallocate();
+	    pixDestroy(image);
+	    ocrWordSink.complete();
+	}
+
     }
 
     public List<String> getBoxStrings(Map<Integer, String> correctTextLookupBySequenceNumber, Collection<RawOcrWord> rawOcrWords) {
@@ -166,68 +224,6 @@ public class TesseractOcrWordAnalyser {
 
 	return new ExtractedLineDetails(imageHeight, Collections.unmodifiableList(lines));
 
-    }
-
-    private List<RawOcrWord> extractWordsFromImage() {
-	LOGGER.info("Analyzing image file for words...");
-
-	List<RawOcrWord> words = new ArrayList<>();
-
-	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.name());
-	    if (returnCode != 0) {
-		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
-	    }
-
-	    PIX image = pixRead(imagePath.toFile().getAbsolutePath());
-
-	    api.SetImage(image);
-	    int code = api.Recognize(new ETEXT_DESC());
-
-	    if (code != 0) {
-		throw new IllegalArgumentException("could not recognize text");
-	    }
-
-	    try (ResultIterator ri = api.GetIterator();) {
-		int level = tesseract.RIL_WORD;
-		int wordNumber = 1;
-		Supplier<IntPointer> intPointerSupplier = () -> new IntPointer(new int[1]);
-		do {
-		    BytePointer ocrResult = ri.GetUTF8Text(level);
-		    String ocrText = ocrResult.getString().trim();
-
-		    float confidence = ri.Confidence(level);
-		    IntPointer x1 = intPointerSupplier.get();
-		    IntPointer y1 = intPointerSupplier.get();
-		    IntPointer x2 = intPointerSupplier.get();
-		    IntPointer y2 = intPointerSupplier.get();
-		    boolean foundRectangle = ri.BoundingBox(level, x1, y1, x2, y2);
-
-		    if (!foundRectangle) {
-			throw new IllegalArgumentException("Could not find any rectangle here");
-		    }
-
-		    RawOcrWord wordTextBox = new RawOcrWord(x1.get(), y1.get(), x2.get(), y2.get(), confidence, ocrText, wordNumber++);
-		    LOGGER.info("wordTextBox: {}", wordTextBox);
-
-		    words.add(wordTextBox);
-
-		    x1.deallocate();
-		    y1.deallocate();
-		    x2.deallocate();
-		    y2.deallocate();
-		    ocrResult.deallocate();
-
-		} while (ri.Next(level));
-
-		ri.deallocate();
-	    }
-	    api.End();
-	    api.deallocate();
-	    pixDestroy(image);
-	}
-
-	return Collections.unmodifiableList(words);
     }
 
     public static Rectangle getWordArea(RawOcrWord rawOcrWord) {

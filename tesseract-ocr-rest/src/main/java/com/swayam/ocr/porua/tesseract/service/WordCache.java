@@ -1,7 +1,6 @@
 package com.swayam.ocr.porua.tesseract.service;
 
 import java.util.Collection;
-import java.util.List;
 
 import com.swayam.ocr.porua.tesseract.model.CachedOcrText;
 import com.swayam.ocr.porua.tesseract.model.Language;
@@ -13,7 +12,9 @@ public interface WordCache {
 
     int getWordCount(String rawImageFileName);
 
-    void storeRawOcrWords(String rawImageFileName, Language language, List<RawOcrWord> texts);
+    int storeImageFile(String rawImageFileName, Language language);
+
+    void storeRawOcrWord(int imageFileId, RawOcrWord rawOcrWord);
 
     Collection<CachedOcrText> getWords(String rawImageFileName);
 
