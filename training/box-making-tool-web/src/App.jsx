@@ -20,7 +20,7 @@ class App extends React.Component {
 
   render() {
     const ocrWords = this.state.ocrWords.map((ocrWord) =>
-      <OcrWord wordId={ocrWord.wordId} givenText={ocrWord.givenText}/>
+      <OcrWord key={ocrWord.wordId} wordId={ocrWord.wordId} givenText={ocrWord.givenText}/>
     );
 
     return (
