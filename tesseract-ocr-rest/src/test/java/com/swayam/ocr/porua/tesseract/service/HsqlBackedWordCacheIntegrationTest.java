@@ -16,14 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import com.swayam.ocr.porua.tesseract.model.CachedOcrText;
 import com.swayam.ocr.porua.tesseract.model.Language;
 import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
 
 @ActiveProfiles("test")
-@TestPropertySource("classpath:/application-test.yml")
 @SpringBootTest
 class HsqlBackedWordCacheIntegrationTest {
 
