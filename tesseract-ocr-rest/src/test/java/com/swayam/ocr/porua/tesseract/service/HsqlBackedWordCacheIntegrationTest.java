@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,12 +32,6 @@ class HsqlBackedWordCacheIntegrationTest {
 
     @Autowired
     private JdbcOperations jdbcTemplate;
-
-    @BeforeEach
-    void initDBConnection() {
-	jdbcTemplate.execute("TRUNCATE TABLE ocr_word");
-	jdbcTemplate.execute("TRUNCATE TABLE raw_image");
-    }
 
     @Test
     void testStoreRawOcrWords() throws SQLException {
