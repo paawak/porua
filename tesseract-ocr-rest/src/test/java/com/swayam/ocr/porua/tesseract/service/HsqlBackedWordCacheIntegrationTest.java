@@ -53,7 +53,7 @@ class HsqlBackedWordCacheIntegrationTest {
 
 	List<CachedOcrText> expected = Arrays.asList(new CachedOcrText(1, rawOcrWord1, null, -1), new CachedOcrText(2, rawOcrWord2, null, -1), new CachedOcrText(3, rawOcrWord3, null, -1));
 
-	HsqlBackedWordCache testClass = new HsqlBackedWordCache(HSQL_TEST_JDBC_URL);
+	HsqlBackedWordCache testClass = null;
 
 	// when
 	testClass.storeRawOcrWords("MyRandomFileForTest.tiff", Language.ben, rawTexts);
@@ -90,7 +90,7 @@ class HsqlBackedWordCacheIntegrationTest {
 
 	List<CachedOcrText> expected = Arrays.asList(new CachedOcrText(1, rawOcrWord1, null, -1), new CachedOcrText(3, rawOcrWord3, null, -1));
 
-	HsqlBackedWordCache testClass = new HsqlBackedWordCache(HSQL_TEST_JDBC_URL);
+	HsqlBackedWordCache testClass = null;
 	testClass.storeRawOcrWords("MyRandomFileForTest.tiff", Language.ben, rawTexts);
 
 	// when
@@ -119,7 +119,7 @@ class HsqlBackedWordCacheIntegrationTest {
 	RawOcrWord rawOcrWord3 = new RawOcrWord(1111, 2222, 3333, 4444, 5555.5555f, "GHI789", 3);
 	List<RawOcrWord> rawTexts = Arrays.asList(rawOcrWord1, rawOcrWord2, rawOcrWord3);
 
-	HsqlBackedWordCache testClass = new HsqlBackedWordCache(HSQL_TEST_JDBC_URL);
+	HsqlBackedWordCache testClass = null;
 	testClass.storeRawOcrWords("MyRandomFileForTest.tiff", Language.ben, rawTexts);
 
 	// when
@@ -145,7 +145,7 @@ class HsqlBackedWordCacheIntegrationTest {
 
 	List<CachedOcrText> expected = Arrays.asList(new CachedOcrText(1, rawOcrWord1, null, -1), new CachedOcrText(2, rawOcrWord2, "I have changed", -1), new CachedOcrText(3, rawOcrWord3, null, -1));
 
-	HsqlBackedWordCache testClass = new HsqlBackedWordCache(HSQL_TEST_JDBC_URL);
+	HsqlBackedWordCache testClass = null;
 	testClass.storeRawOcrWords("MyRandomFileForTest.tiff", Language.ben, rawTexts);
 
 	// when
@@ -176,7 +176,7 @@ class HsqlBackedWordCacheIntegrationTest {
 
 	List<CachedOcrText> expected = Arrays.asList(new CachedOcrText(1, rawOcrWord1, null, -1), new CachedOcrText(2, rawOcrWord2, null, -1), new CachedOcrText(3, rawOcrWord3, null, -1));
 
-	HsqlBackedWordCache testClass = new HsqlBackedWordCache(HSQL_TEST_JDBC_URL);
+	HsqlBackedWordCache testClass = null;
 	testClass.storeRawOcrWords("MyRandomFileForTest.tiff", Language.ben, rawTexts);
 
 	// when
@@ -194,7 +194,7 @@ class HsqlBackedWordCacheIntegrationTest {
 	RawOcrWord rawOcrWord3 = new RawOcrWord(1111, 2222, 3333, 4444, 5555.5555f, "GHI789", 3);
 	List<RawOcrWord> rawTexts = Arrays.asList(rawOcrWord1, rawOcrWord2, rawOcrWord3);
 
-	HsqlBackedWordCache testClass = new HsqlBackedWordCache(HSQL_TEST_JDBC_URL);
+	HsqlBackedWordCache testClass = null;
 	testClass.storeRawOcrWords("MyRandomFileForTest.tiff", Language.ben, rawTexts);
 
 	// when

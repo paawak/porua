@@ -14,3 +14,10 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 20MB
+  flyway:
+    locations: classpath:/sql
+  datasource:
+    url: jdbc:hsqldb:file:./target/hsql-db/ocrdb;shutdown=true
+    username: SA
+    password: ''
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver

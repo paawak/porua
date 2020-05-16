@@ -25,7 +25,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.swayam.ocr.porua.tesseract.model.CachedOcrText;
 import com.swayam.ocr.porua.tesseract.model.Language;
 import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
-import com.swayam.ocr.porua.tesseract.service.HsqlBackedWordCache;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
 import com.swayam.ocr.porua.tesseract.service.WordCache;
 
@@ -37,8 +36,8 @@ public class OCRTrainingController {
 
     private final WordCache wordCache;
 
-    public OCRTrainingController() {
-	wordCache = new HsqlBackedWordCache("jdbc:hsqldb:file:./target/hsql-db/ocrdb;shutdown=true");
+    public OCRTrainingController(WordCache wordCache) {
+	this.wordCache = wordCache;
     }
 
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
