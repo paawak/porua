@@ -1,0 +1,26 @@
+app.config.ocr.tesseract.tessdata-location: /kaaj/installs/tesseract/tessdata_best-4.0.0
+app.config.server.image-write-directory: ./target/image-temp
+
+server:
+  port: 8080
+  servlet:
+    contextPath: /
+  
+logging:
+  level:
+    root: INFO
+    com.swayam.ocr.porua: DEBUG
+    org.springframework.web: INFO
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 20MB
+  flyway:
+    locations: classpath:/sql
+  datasource:
+    url: jdbc:hsqldb:file:./target/hsql-db-test/ocrdb;shutdown=true
+    username: SA
+    password: ''
+    driver-class-name: org.hsqldb.jdbc.JDBCDriver
