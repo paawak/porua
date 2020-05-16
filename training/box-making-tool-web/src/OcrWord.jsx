@@ -8,14 +8,17 @@ class OcrWord extends React.Component {
   }
 
   render() {
-    const givenTextInputId = `givenText_${this.props.wordId}`;
-    const correctedTextInputId = `correctedText_${this.props.wordId}`;
+
+    const idGenerator = (prefix) => prefix + "_" + this.props.wordId;
+    const givenTextInputId = idGenerator("givenText");
+    const correctedTextInputId = idGenerator("correctedText");
+
     return (
       <div className="col">
-        <div className="container" id="word_1">
+        <div className="container">
           <div className="row row-cols-1">
             <div className="col">
-              <img id="word-1" alt="..." src={"http://localhost:8080/train/word/image?wordId=" + this.props.wordId + "&imagePath=/kaaj/source/porua/training/box-making-tool/src/test/resources/images/bangla-mahabharat-1-page_2.jpg"}/>
+              <img id={idGenerator("ocrImage")} alt="..." src={"http://localhost:8080/train/word/image?wordId=" + this.props.wordId + "&imagePath=/kaaj/source/porua/training/box-making-tool/src/test/resources/images/bangla-mahabharat-1-page_2.jpg"}/>
             </div>
             <div className="col">
               <label htmlFor={givenTextInputId}>OCR:</label>
