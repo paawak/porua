@@ -2,7 +2,6 @@ package com.swayam.ocr.porua.tesseract.rest;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,12 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,6 +27,8 @@ import com.swayam.ocr.porua.tesseract.model.Language;
 import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
 import com.swayam.ocr.porua.tesseract.service.WordCache;
+
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/train")
@@ -58,17 +60,18 @@ public class OCRTrainingController {
     }
 
     @GetMapping(value = "/word/image")
-    public void getOcrWordImage(@RequestParam("wordId") int wordId, @RequestParam("imagePath") Path imagePath, HttpServletResponse response) throws IOException {
+    public Mono<ResponseEntity<byte[]>> getOcrWordImage(@RequestParam("wordId") int wordId, @RequestParam("imagePath") Path imagePath) throws IOException {
 	CachedOcrText ocrText = wordCache.getWord(wordId);
 	BufferedImage fullImage = ImageIO.read(Files.newInputStream(imagePath));
 	Rectangle wordArea = TesseractOcrWordAnalyser.getWordArea(ocrText.getRawOcrText());
 	BufferedImage wordImage = fullImage.getSubimage(wordArea.x, wordArea.y, wordArea.width, wordArea.height);
 	String extension = imagePath.toFile().getName().split("\\.")[1];
-	response.setContentType("image/" + extension);
 	ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	ImageIO.write(wordImage, extension, bos);
 	bos.flush();
-	IOUtils.copy(new ByteArrayInputStream(bos.toByteArray()), response.getOutputStream());
+	HttpHeaders responseHeaders = new HttpHeaders();
+	responseHeaders.set("content-type", "image/" + extension);
+	return Mono.just(new ResponseEntity<byte[]>(bos.toByteArray(), responseHeaders, HttpStatus.OK));
     }
 
 }
