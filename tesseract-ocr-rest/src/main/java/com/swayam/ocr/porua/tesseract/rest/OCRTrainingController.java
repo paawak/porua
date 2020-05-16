@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
@@ -42,14 +43,19 @@ public class OCRTrainingController {
 
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RawOcrWord> getDetectedText(@RequestParam("imagePath") Path imagePath, @RequestParam("language") Language language) {
-	List<RawOcrWord> words = new TesseractOcrWordAnalyser(imagePath, language).getDetectedText();
+
 	String imageFile = imagePath.toFile().getName();
-	if (wordCache.getWordCount(imageFile) != 0) {
-	    LOG.warn("Entries already present for {}: using existing entries", imageFile);
-	} else {
+
+	if (wordCache.getWordCount(imageFile) == 0) {
+	    List<RawOcrWord> words = new TesseractOcrWordAnalyser(imagePath, language).getDetectedText();
 	    wordCache.storeRawOcrWords(imageFile, language, words);
+	    return words;
 	}
-	return words;
+
+	LOG.warn("Entries already present for {}: using existing entries", imageFile);
+
+	return wordCache.getWords(imageFile).stream().map(CachedOcrText::getRawOcrText).collect(Collectors.toList());
+
     }
 
     @GetMapping(value = "/word/image")
