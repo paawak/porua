@@ -15,7 +15,7 @@ class OcrWord extends React.Component {
         <div className="container" id="word_1">
           <div className="row row-cols-1">
             <div className="col">
-              <img id="word-1" alt="..." src={"mockups/images/" + this.props.wordId + ".png"}/>
+              <img id="word-1" alt="..." src={"http://localhost:8080/train/word/image?wordId=" + this.props.wordId + "&imagePath=/kaaj/source/porua/training/box-making-tool/src/test/resources/images/bangla-mahabharat-1-page_2.jpg"}/>
             </div>
             <div className="col">
               <label htmlFor={givenTextInputId}>OCR:</label>
