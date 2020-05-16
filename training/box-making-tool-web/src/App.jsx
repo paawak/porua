@@ -24,8 +24,8 @@ class App extends React.Component {
     );
 
     return (
-      <div class="container">
-        <div class="row row-cols-5">
+      <div className="container">
+        <div className="row row-cols-5">
           {ocrWords}
         </div>
       </div>
