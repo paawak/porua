@@ -13,6 +13,8 @@ import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +32,8 @@ import com.swayam.ocr.porua.tesseract.service.WordCache;
 @RequestMapping("/train")
 public class OCRTrainingController {
 
+    private static final Logger LOG = LoggerFactory.getLogger(OCRTrainingController.class);
+
     private final WordCache wordCache;
 
     public OCRTrainingController() {
@@ -39,7 +43,12 @@ public class OCRTrainingController {
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<RawOcrWord> getDetectedText(@RequestParam("imagePath") Path imagePath, @RequestParam("language") Language language) {
 	List<RawOcrWord> words = new TesseractOcrWordAnalyser(imagePath, language).getDetectedText();
-	wordCache.storeRawOcrWords(imagePath.getFileName().toString(), language, words);
+	String imageFile = imagePath.toFile().getName();
+	if (wordCache.getWordCount(imageFile) != 0) {
+	    LOG.warn("Entries already present for {}: using existing entries", imageFile);
+	} else {
+	    wordCache.storeRawOcrWords(imageFile, language, words);
+	}
 	return words;
     }
 
@@ -47,7 +56,7 @@ public class OCRTrainingController {
     public void getOcrWordImage(@RequestParam("wordId") int wordId, @RequestParam("imagePath") Path imagePath, HttpServletResponse response) throws IOException {
 	CachedOcrText ocrText = wordCache.getWord(wordId);
 	BufferedImage fullImage = ImageIO.read(Files.newInputStream(imagePath));
-	Rectangle wordArea = TesseractOcrWordAnalyser.getWordArea(ocrText.rawOcrText);
+	Rectangle wordArea = TesseractOcrWordAnalyser.getWordArea(ocrText.getRawOcrText());
 	BufferedImage wordImage = fullImage.getSubimage(wordArea.x, wordArea.y, wordArea.width, wordArea.height);
 	String extension = imagePath.toFile().getName().split("\\.")[1];
 	response.setContentType("image/" + extension);
