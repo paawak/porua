@@ -7,14 +7,18 @@ class ImageUploader extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
     this.imageFileInput = React.createRef();
     this.state = {
-      imageFileSelected: 'Choose file...'
+      isImageFileSelected: false,
+      selectedImageFileName: 'Choose file...'
     };
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    const selectedFile = this.imageFileInput.current.files[0].name;
-    alert(`Selected file - ${selectedFile}`);
+    if (this.state.isImageFileSelected) {
+      alert(`Selected file - ${this.state.selectedImageFileName}`);
+    } else {
+      alert("Please select an image to upload");
+    }
   }
 
   render() {
@@ -42,11 +46,14 @@ class ImageUploader extends React.Component {
       			<div className="custom-file">
       				<input type="file" ref={this.imageFileInput} className="custom-file-input" name="image" id="image" aria-describedby="imageAddon"
               onChange={e => {
-                  this.setState({imageFileSelected: this.imageFileInput.current.files[0].name});
+                  this.setState({
+                    isImageFileSelected: true,
+                    selectedImageFileName: this.imageFileInput.current.files[0].name
+                  });
                 }
               }
               />
-              <label className="custom-file-label" htmlFor="image">{this.state.imageFileSelected}</label>
+              <label className="custom-file-label" htmlFor="image">{this.state.selectedImageFileName}</label>
       			</div>
       		</div>
       		<button type="submit" className="btn btn-primary">Send To OCR</button>
