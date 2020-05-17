@@ -7,7 +7,7 @@ class App extends React.Component {
   render() {
     return (
       <div className="jumbotron jumbotron-fluid">
-        <div className="container">
+        <div className="container-xl">
           <h1 className="display-4">OCR Training Workbench</h1>
           <p className="lead">Choose the language and upload an image to OCR</p>
           <div className="d-flex flex-column bd-highlight mb-2">
