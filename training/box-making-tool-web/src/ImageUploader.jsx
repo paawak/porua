@@ -10,36 +10,31 @@ class ImageUploader extends React.Component {
   render() {
     return (
       	<form>
-      		<fieldset class="form-group">
-      			<div class="row">
-      				<legend class="col-form-label col-sm-2 pt-0">Language Selection</legend>
-      				<div class="col-sm-10">
-      					<div class="form-group form-check">
-      						<input className="form-check-input" type="radio" name="language"
-      							id="languageBengali" value="ben" checked={true} /> <label
-      							className="form-check-label" htmlFor="languageBengali">
-      							Bengali </label>
+      		<fieldset className="form-group">
+      			<div className="row">
+      				<legend className="col-form-label col-sm-2 pt-0">Language Selection</legend>
+      				<div className="col-sm-10">
+      					<div className="form-group form-check">
+      						<input className="form-check-input" type="radio" name="language" id="languageBengali" value="ben" defaultChecked={true} />
+                    <label	className="form-check-label" htmlFor="languageBengali">Bengali </label>
       					</div>
-      					<div class="form-group form-check">
-      						<input className="form-check-input" type="radio" name="language"
-      							id="languageEnglish" value="eng" /> <label
-      							className="form-check-label" htmlFor="languageEnglish">
-      							English </label>
+      					<div className="form-group form-check">
+      						<input className="form-check-input" type="radio" name="language" id="languageEnglish" value="eng" />
+                  <label className="form-check-label" htmlFor="languageEnglish">English </label>
       					</div>
       				</div>
       			</div>
       		</fieldset>
-      		<div class="input-group mb-3">
-      			<div class="input-group-prepend">
-      				<span class="input-group-text" id="inputGroupFileAddon01">Upload</span>
+      		<div className="input-group mb-3">
+      			<div className="input-group-prepend">
+      				<span className="input-group-text" id="inputGroupFileAddon01">Upload</span>
       			</div>
-      			<div class="custom-file">
-      				<input type="file" class="custom-file-input" id="inputGroupFile01"
-      					aria-describedby="inputGroupFileAddon01" /> <label
-      					class="custom-file-label" for="inputGroupFile01">Choose file</label>
+      			<div className="custom-file">
+      				<input type="file" className="custom-file-input" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01" />
+              <label className="custom-file-label" htmlFor="inputGroupFile01">Choose file</label>
       			</div>
       		</div>
-      		<button type="submit" class="btn btn-primary">Submit</button>
+      		<button type="submit" className="btn btn-primary">Submit</button>
       	</form>
     );
   }
