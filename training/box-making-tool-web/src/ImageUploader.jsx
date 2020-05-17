@@ -4,12 +4,22 @@ class ImageUploader extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.imageFileInput = React.createRef();
+    this.state = {
+      imageFileSelected: 'Choose file...'
+    };
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    const selectedFile = this.imageFileInput.current.files[0].name;
+    alert(`Selected file - ${selectedFile}`);
   }
 
   render() {
     return (
-      	<form>
+      	<form onSubmit={this.handleSubmit}>
       		<fieldset className="form-group">
       			<div className="row">
       				<legend className="col-form-label col-sm-2 pt-0">Language Selection</legend>
@@ -30,11 +40,16 @@ class ImageUploader extends React.Component {
       				<span className="input-group-text" id="imageAddon">Upload Image</span>
       			</div>
       			<div className="custom-file">
-      				<input type="file" className="custom-file-input" id="image" aria-describedby="imageAddon" />
-              <label className="custom-file-label" htmlFor="image">Choose file...</label>
+      				<input type="file" ref={this.imageFileInput} className="custom-file-input" name="image" id="image" aria-describedby="imageAddon"
+              onChange={e => {
+                  this.setState({imageFileSelected: this.imageFileInput.current.files[0].name});
+                }
+              }
+              />
+              <label className="custom-file-label" htmlFor="image">{this.state.imageFileSelected}</label>
       			</div>
       		</div>
-      		<button type="button" className="btn btn-primary">Send To OCR</button>
+      		<button type="submit" className="btn btn-primary">Send To OCR</button>
       	</form>
     );
   }
