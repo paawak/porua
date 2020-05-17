@@ -25,7 +25,7 @@ class OcrCorrectionPage extends React.Component {
 
     return (
       <div className="container">
-        <div className="row row-cols-5">
+        <div className="row row-cols-4">
           {ocrWords}
         </div>
       </div>
