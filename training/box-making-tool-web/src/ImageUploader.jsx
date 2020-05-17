@@ -34,7 +34,7 @@ class ImageUploader extends React.Component {
               <label className="custom-file-label" htmlFor="inputGroupFile01">Choose file</label>
       			</div>
       		</div>
-      		<button type="submit" className="btn btn-primary">Submit</button>
+      		<button type="button" class="btn btn-primary">Send To OCR</button>
       	</form>
     );
   }
