@@ -16,6 +16,7 @@ class ImageUploader extends React.Component {
     event.preventDefault();
     if (this.state.isImageFileSelected) {
       const data = new FormData();
+      //TODO: get language from the Form
       data.append('language', 'ben');
       data.append('image', this.imageFileInput.current.files[0]);
 
