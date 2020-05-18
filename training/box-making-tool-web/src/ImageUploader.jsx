@@ -15,7 +15,18 @@ class ImageUploader extends React.Component {
   handleSubmit(event) {
     event.preventDefault();
     if (this.state.isImageFileSelected) {
-      alert(`Selected file - ${this.state.selectedImageFileName}`);
+      const data = new FormData();
+      data.append('language', 'ben');
+      data.append('image', this.imageFileInput.current.files[0]);
+
+      fetch('http://localhost:8080/rest/ocr', {
+        method: 'POST',
+        body: data,
+      }).then((response) => {
+        response.json().then((body) => {
+          console.log(body);
+        });
+      });
     } else {
       alert("Please select an image to upload");
     }
