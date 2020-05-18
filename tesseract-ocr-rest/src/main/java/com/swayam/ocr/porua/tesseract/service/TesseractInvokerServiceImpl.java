@@ -6,7 +6,6 @@ import static org.bytedeco.leptonica.global.lept.pixRead;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.bytedeco.javacpp.BytePointer;
 import org.bytedeco.leptonica.PIX;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.swayam.ocr.porua.tesseract.model.ImageData;
 import com.swayam.ocr.porua.tesseract.model.Language;
 
 @Service
@@ -27,27 +25,21 @@ public class TesseractInvokerServiceImpl implements TesseractInvokerService {
     private static final String UTF_8 = "utf-8";
 
     private final String tessdataDirectory;
-    private final String imageWriteDirectory;
 
-    public TesseractInvokerServiceImpl(
-	    @Value("${app.config.ocr.tesseract.tessdata-location}") String tessdataDirectory,
+    public TesseractInvokerServiceImpl(@Value("${app.config.ocr.tesseract.tessdata-location}") String tessdataDirectory,
 	    @Value("${app.config.server.image-write-directory}") String imageWriteDirectory) {
 	this.tessdataDirectory = tessdataDirectory;
-	this.imageWriteDirectory = imageWriteDirectory;
     }
 
     @Override
-    public String submitToOCR(Language language, ImageData imageData) throws IOException {
-
-	Path imagePath = saveFile(imageData);
+    public String submitToOCR(Language language, Path imagePath) throws IOException {
 
 	LOGGER.info("saved image file at: {}", imagePath);
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
 	    int returnCode = api.Init(tessdataDirectory, language.name());
 	    if (returnCode != 0) {
-		throw new RuntimeException(
-			"could not initialize tesseract, error code: " + returnCode);
+		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }
 
 	    PIX image = pixRead(imagePath.toFile().getAbsolutePath());
@@ -69,13 +61,6 @@ public class TesseractInvokerServiceImpl implements TesseractInvokerService {
 	    Files.delete(imagePath);
 	}
 
-    }
-
-    private Path saveFile(ImageData imageData) throws IOException {
-	Path outputFile = Paths.get(imageWriteDirectory,
-		System.currentTimeMillis() + "_" + imageData.getFileName());
-	Files.copy(imageData.getFileContents(), outputFile);
-	return outputFile;
     }
 
 }
