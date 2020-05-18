@@ -23,8 +23,8 @@ class ImageUploader extends React.Component {
         method: 'POST',
         body: data,
       }).then((response) => {
-        response.json().then((body) => {
-          console.log(body);
+        response.text().then((body) => {
+          console.log("Ocr Text:\n" + body);
         });
       });
     } else {
