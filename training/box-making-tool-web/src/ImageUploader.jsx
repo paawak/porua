@@ -36,6 +36,7 @@ class ImageUploader extends React.Component {
   render() {
     return (
       	<form onSubmit={this.handleSubmit}>
+          <p className="lead">Choose the language and upload an image to OCR</p>
       		<fieldset className="form-group">
       			<div className="row">
       				<legend className="col-form-label col-sm-2 pt-0">Language Selection</legend>
