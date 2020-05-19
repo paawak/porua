@@ -21,7 +21,7 @@ class App extends React.Component {
   render() {
     let panelToDisplay;
 
-    if (this.state.displayMode == DisplayMode.IMAGE_UPLOADER) {
+    if (this.state.displayMode === DisplayMode.IMAGE_UPLOADER) {
       panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><ImageUploader
       imageSubmittedForAnalysis={() => {
           this.setState({
@@ -36,13 +36,13 @@ class App extends React.Component {
           });
         }
       }/></div>;
-    } else if (this.state.displayMode == DisplayMode.IMAGE_PROCESSING_IN_PROGRESS) {
+    } else if (this.state.displayMode === DisplayMode.IMAGE_PROCESSING_IN_PROGRESS) {
       panelToDisplay =
-      <button class="btn btn-primary btn-lg btn-block" type="button" disabled>
-        <span class="spinner-border spinner-border-sm float-right" role="status" aria-hidden="true"></span>
+      <button className="btn btn-primary btn-lg btn-block" type="button" disabled>
+        <span className="spinner-border spinner-border-sm float-right" role="status" aria-hidden="true"></span>
         Image is being analysed...
       </button>
-    } else if (this.state.displayMode == DisplayMode.OCR_CORRECTION_PAGE) {
+    } else if (this.state.displayMode === DisplayMode.OCR_CORRECTION_PAGE) {
       panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><OcrCorrectionPage ocrWords={this.state.ocrWords}/></div>
     } else {
       panelToDisplay = <div/>;

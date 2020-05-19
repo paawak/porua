@@ -3,10 +3,6 @@ import OcrWord from './OcrWord'
 
 class OcrCorrectionPage extends React.Component {
 
-  constructor(props) {
-    super(props);
-  }
-
   render() {
     const ocrWords = this.props.ocrWords.map((ocrWord) =>
       <OcrWord key={ocrWord.wordSequenceNumber} wordId={ocrWord.wordSequenceNumber} givenText={ocrWord.text}/>
