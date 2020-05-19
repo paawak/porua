@@ -20,16 +20,13 @@ class ImageUploader extends React.Component {
       data.append('language', 'ben');
       data.append('image', this.imageFileInput.current.files[0]);
 
-      fetch('http://localhost:8080/rest/ocr', {
+      fetch('http://localhost:8080/train/word', {
         method: 'POST',
         body: data,
-      }).then((response) => {
-        response.text().then((body) => {
-          console.log("Ocr Text:\n" + body);
-        });
-      });
-    } else {
-      alert("Please select an image to upload");
+      }).then(response => response.json())
+        .then(data => console.log(data));
+      } else {
+        alert("Please select an image to upload");
     }
   }
 

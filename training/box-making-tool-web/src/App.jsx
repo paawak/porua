@@ -23,7 +23,7 @@ class App extends React.Component {
     return (
       <div className="jumbotron jumbotron-fluid">
         <div className="container-xl">
-          <h1 className="display-4">OCR Training Workbench</h1>          
+          <h1 className="display-4">OCR Training Workbench</h1>
           {panelToDisplay}
           </div>
       </div>
