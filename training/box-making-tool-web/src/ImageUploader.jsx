@@ -31,7 +31,11 @@ class ImageUploader extends React.Component {
         method: 'POST',
         body: data,
       }).then(response => response.json())
-        .then(data => console.log(data));
+        .then(data => {
+          this.props.ocrWordsRecieved(data);
+        });
+
+        this.props.imageSubmittedForAnalysis();
       } else {
         alert("Please select an image to upload");
     }

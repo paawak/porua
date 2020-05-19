@@ -7,7 +7,9 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      displayImageUploader: true
+      displayImageUploader: true,
+      imageProcessingInProgress: true,
+      ocrWords: []
     };
   }
 
@@ -15,9 +17,24 @@ class App extends React.Component {
     let panelToDisplay;
 
     if (this.state.displayImageUploader) {
-      panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><ImageUploader/></div>;
+      panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><ImageUploader
+      imageSubmittedForAnalysis={() => {
+          this.setState({
+            displayImageUploader: false
+          });
+        }
+      }
+      ocrWordsRecieved={ocrWordListData => {
+          this.setState({
+            ocrWords: ocrWordListData,
+            imageProcessingInProgress: false
+          });
+        }
+      }/></div>;
+    } else if (this.state.imageProcessingInProgress) {
+      panelToDisplay = <p className="lead">Image is being analysed...</p>
     } else {
-      panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><OcrCorrectionPage/></div>
+      panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><OcrCorrectionPage ocrWords={this.state.ocrWords}/></div>
     }
 
     return (
