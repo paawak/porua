@@ -5,19 +5,26 @@ class ImageUploader extends React.Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleLanguageChange = this.handleLanguageChange.bind(this);
     this.imageFileInput = React.createRef();
     this.state = {
       isImageFileSelected: false,
+      selectedLanguage: 'ben',
       selectedImageFileName: 'Choose file...'
     };
+  }
+
+  handleLanguageChange(event) {
+    this.setState({
+      selectedLanguage: event.target.value
+    });
   }
 
   handleSubmit(event) {
     event.preventDefault();
     if (this.state.isImageFileSelected) {
       const data = new FormData();
-      //TODO: get language from the Form
-      data.append('language', 'ben');
+      data.append('language', this.state.selectedLanguage);
       data.append('image', this.imageFileInput.current.files[0]);
 
       fetch('http://localhost:8080/train/word', {
@@ -39,11 +46,11 @@ class ImageUploader extends React.Component {
       				<legend className="col-form-label col-sm-2 pt-0">Language Selection</legend>
       				<div className="col-sm-10">
       					<div className="form-group form-check">
-      						<input className="form-check-input" type="radio" name="language" id="languageBengali" value="ben" defaultChecked={true} />
+      						<input className="form-check-input" type="radio" name="language" id="languageBengali" value="ben" defaultChecked={true} onChange={this.handleLanguageChange} />
                     <label	className="form-check-label" htmlFor="languageBengali">Bengali </label>
       					</div>
       					<div className="form-group form-check">
-      						<input className="form-check-input" type="radio" name="language" id="languageEnglish" value="eng" />
+      						<input className="form-check-input" type="radio" name="language" id="languageEnglish" value="eng" onChange={this.handleLanguageChange} />
                   <label className="form-check-label" htmlFor="languageEnglish">English </label>
       					</div>
       				</div>
