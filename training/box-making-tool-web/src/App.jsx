@@ -37,7 +37,11 @@ class App extends React.Component {
         }
       }/></div>;
     } else if (this.state.displayMode == DisplayMode.IMAGE_PROCESSING_IN_PROGRESS) {
-      panelToDisplay = <p className="lead">Image is being analysed...</p>
+      panelToDisplay =
+      <button class="btn btn-primary btn-lg btn-block" type="button" disabled>
+        <span class="spinner-border spinner-border-sm float-right" role="status" aria-hidden="true"></span>
+        Image is being analysed...
+      </button>
     } else if (this.state.displayMode == DisplayMode.OCR_CORRECTION_PAGE) {
       panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><OcrCorrectionPage ocrWords={this.state.ocrWords}/></div>
     } else {
