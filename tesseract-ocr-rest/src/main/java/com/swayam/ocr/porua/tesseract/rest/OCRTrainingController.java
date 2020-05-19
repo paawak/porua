@@ -15,14 +15,18 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swayam.ocr.porua.tesseract.model.CachedOcrText;
 import com.swayam.ocr.porua.tesseract.model.Language;
 import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
+import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
 import com.swayam.ocr.porua.tesseract.service.WordCache;
 
@@ -37,26 +41,31 @@ public class OCRTrainingController {
     private static final Logger LOG = LoggerFactory.getLogger(OCRTrainingController.class);
 
     private final WordCache wordCache;
+    private final FileSystemUtil fileSystemUtil;
 
-    public OCRTrainingController(WordCache wordCache) {
+    public OCRTrainingController(WordCache wordCache, FileSystemUtil fileSystemUtil) {
 	this.wordCache = wordCache;
+	this.fileSystemUtil = fileSystemUtil;
+
     }
 
-    @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<RawOcrWord> getDetectedText(@RequestParam("imagePath") Path imagePath, @RequestParam("language") Language language) {
+    @PostMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<RawOcrWord> getDetectedText(@RequestPart("language") String languageAsString, @RequestPart("image") FilePart image) {
+	Language language = Language.valueOf(languageAsString);
 
-	String imageFile = imagePath.toFile().getName();
+	String imageFileName = image.filename();
+	Path savedImagePath = fileSystemUtil.saveMultipartFileAsImage(image);
 
-	if (wordCache.getWordCount(imageFile) == 0) {
-	    int imageFileId = wordCache.storeImageFile(imageFile, Language.ben);
+	if (wordCache.getWordCount(imageFileName) == 0) {
+	    int imageFileId = wordCache.storeImageFile(imageFileName, Language.ben);
 	    return Flux.create((FluxSink<RawOcrWord> fluxSink) -> {
-		new TesseractOcrWordAnalyser(imagePath, language).extractWordsFromImage(fluxSink);
+		new TesseractOcrWordAnalyser(savedImagePath, language).extractWordsFromImage(fluxSink);
 	    }).doOnNext(rawText -> wordCache.storeRawOcrWord(imageFileId, rawText));
 	}
 
-	LOG.warn("Entries already present for {}: using existing entries", imageFile);
+	LOG.warn("Entries already present for {}: using existing entries", imageFileName);
 
-	return Flux.fromIterable(wordCache.getWords(imageFile)).map(CachedOcrText::getRawOcrText);
+	return Flux.fromIterable(wordCache.getWords(imageFileName)).map(CachedOcrText::getRawOcrText);
 
     }
 

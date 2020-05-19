@@ -2,13 +2,11 @@ package com.swayam.ocr.porua.tesseract.rest;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swayam.ocr.porua.tesseract.model.Language;
+import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.TesseractInvokerService;
 
 import reactor.core.publisher.Mono;
@@ -31,11 +30,11 @@ public class OCRFrontController {
     private static final List<MediaType> SUPPORTED_CONTENT_TYPES = Arrays.asList(MediaType.IMAGE_JPEG, MediaType.IMAGE_PNG, MediaType.APPLICATION_OCTET_STREAM, new MediaType("image", "tiff"));
 
     private final TesseractInvokerService tesseractInvokerService;
-    private final String imageWriteDirectory;
+    private final FileSystemUtil fileSystemUtil;
 
-    public OCRFrontController(TesseractInvokerService tesseractInvokerService, @Value("${app.config.server.image-write-directory}") String imageWriteDirectory) {
+    public OCRFrontController(TesseractInvokerService tesseractInvokerService, FileSystemUtil fileSystemUtil) {
 	this.tesseractInvokerService = tesseractInvokerService;
-	this.imageWriteDirectory = imageWriteDirectory;
+	this.fileSystemUtil = fileSystemUtil;
 
     }
 
@@ -54,15 +53,9 @@ public class OCRFrontController {
 	    return Mono.just(ResponseEntity.badRequest().body("unsupported content-type: " + contentType));
 	}
 
-	Path savedPath = saveFile(image);
+	Path imageSavedPath = fileSystemUtil.saveMultipartFileAsImage(image);
 
-	return Mono.just(ResponseEntity.ok(tesseractInvokerService.submitToOCR(language, savedPath)));
-    }
-
-    private Path saveFile(FilePart image) throws IOException {
-	Path outputFile = Paths.get(imageWriteDirectory, System.currentTimeMillis() + "_" + image.filename());
-	image.transferTo(outputFile).block();
-	return outputFile;
+	return Mono.just(ResponseEntity.ok(tesseractInvokerService.submitToOCR(language, imageSavedPath)));
     }
 
 }
