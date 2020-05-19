@@ -51,6 +51,9 @@ public class OCRTrainingController {
 
     @PostMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<RawOcrWord> getDetectedText(@RequestPart("language") String languageAsString, @RequestPart("image") FilePart image) {
+
+	LOG.info("FileName: {}, language: {}", image.filename(), languageAsString);
+
 	Language language = Language.valueOf(languageAsString);
 
 	String imageFileName = image.filename();
