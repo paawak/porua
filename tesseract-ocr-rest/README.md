@@ -42,9 +42,26 @@ The REST API is at /rest/ocr. It takes in the below form data:
 
 The below GET request does the trick:
 <http://localhost:8080/train/word/image?wordId=3&imagePath=/kaaj/source/porua/training/box-making-tool/src/test/resources/images/bangla-mahabharat-1-page_2.jpg>	
+
+## Retrieving corrected text from Hsql DB
+
+Start the *sqltool.jar* bundled with the Hsql distribution
+    
+    java -jar sqltool.jar 
+    
+Then connect to the Hsql DB using
+    
+    \j SA jdbc:hsqldb:file:/kaaj/source/porua/training/box-making-tool/hsql-db/ocrdb;shutdown=true
+    
+Select the corrected words:    
+
+    select id, corrected_text from ocr_word where corrected_text IS NOT NULL;
+    
+Exporting the corrected words to a CSV file:   
+    
+    * *DSV_TARGET_FILE=correctedtexts.csv
+    \xq select id, corrected_text from ocr_word where corrected_text IS NOT NULL
 		
 # Sources
 		
-		https://github.com/paawak/porua/tree/master/tesseract-ocr-rest
-	
-	
+<https://github.com/paawak/porua/tree/master/tesseract-ocr-rest>
