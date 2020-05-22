@@ -81,13 +81,20 @@ public class OCRTrainingController {
 	    return originalWord;
 	};
 
-	return Flux.fromIterable(wordCache.getWords(imageFileName)).map(transformWithCorrectedText);
+	return Flux.fromIterable(wordCache.getWords(imageFileName)).doOnNext(cachedOcrText -> {
+	    // FIXME: remove this
+	    String sql = "INSERT INTO ocr_word (id, page_sequence_id, raw_image_id, raw_text, corrected_text, x1, y1, x2, y2, confidence) VALUES (%d, %d, %d, \"%s\", %s, %d, %d, %d, %d, %f);";
+	    String sqlWithValues = String.format(sql, cachedOcrText.getId(), cachedOcrText.getId(), 1, cachedOcrText.getRawOcrText().getText(),
+		    cachedOcrText.getCorrectText() == null ? "NULL" : "'" + cachedOcrText.getCorrectText() + "'", cachedOcrText.getRawOcrText().getX1(), cachedOcrText.getRawOcrText().getY1(),
+		    cachedOcrText.getRawOcrText().getX2(), cachedOcrText.getRawOcrText().getY2(), cachedOcrText.getRawOcrText().getConfidence());
+	    System.out.println(sqlWithValues);
+	}).map(transformWithCorrectedText);
 
     }
 
     @GetMapping(value = "/word/image")
     public Mono<ResponseEntity<byte[]>> getOcrWordImage(@RequestParam("wordId") int wordId, @RequestParam("imagePath") Path imagePath) throws IOException {
-	LOG.info("serving ocr word image for id: {}", wordId);
+	LOG.trace("serving ocr word image for id: {}", wordId);
 	CachedOcrText ocrText = wordCache.getWord(wordId);
 	BufferedImage fullImage = ImageIO.read(Files.newInputStream(imagePath));
 	Rectangle wordArea = TesseractOcrWordAnalyser.getWordArea(ocrText.getRawOcrText());
