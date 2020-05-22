@@ -39,8 +39,8 @@ class App extends React.Component {
     } else if (this.state.displayMode === DisplayMode.IMAGE_PROCESSING_IN_PROGRESS) {
       panelToDisplay =
       <button className="btn btn-primary btn-lg btn-block" type="button" disabled>
-        <span className="spinner-border spinner-border-sm float-right" role="status" aria-hidden="true"></span>
-        Image is being analysed...
+        <span className="spinner-border spinner-border-sm float-left" role="status" aria-hidden="true"></span>
+        Please wait while we analyse the uploaded image...
       </button>
     } else if (this.state.displayMode === DisplayMode.OCR_CORRECTION_PAGE) {
       panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><OcrCorrectionPage ocrWords={this.state.ocrWords}/></div>
