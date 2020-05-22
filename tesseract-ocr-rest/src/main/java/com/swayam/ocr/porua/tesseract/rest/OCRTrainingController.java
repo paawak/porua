@@ -4,8 +4,10 @@ import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 import javax.imageio.ImageIO;
 
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -50,7 +53,7 @@ public class OCRTrainingController {
     }
 
     @PostMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<RawOcrWord> getDetectedText(@RequestPart("language") String languageAsString, @RequestPart("image") FilePart image) {
+    public Flux<RawOcrWord> getDetectedText(@RequestPart("language") String languageAsString, @RequestPart("image") FilePart image) throws IOException, URISyntaxException {
 
 	LOG.info("FileName: {}, language: {}", image.filename(), languageAsString);
 
@@ -68,7 +71,17 @@ public class OCRTrainingController {
 
 	LOG.warn("Entries already present for {}: using existing entries", imageFileName);
 
-	return Flux.fromIterable(wordCache.getWords(imageFileName)).map(CachedOcrText::getRawOcrText);
+	Function<CachedOcrText, RawOcrWord> transformWithCorrectedText = (cachedOcrText) -> {
+	    RawOcrWord originalWord = cachedOcrText.getRawOcrText();
+	    if (StringUtils.hasText(cachedOcrText.getCorrectText())) {
+		return new RawOcrWord(originalWord.getX1(), originalWord.getY1(), originalWord.getX2(), originalWord.getY2(), originalWord.getConfidence(), cachedOcrText.getCorrectText(),
+			originalWord.getWordSequenceNumber());
+	    }
+
+	    return originalWord;
+	};
+
+	return Flux.fromIterable(wordCache.getWords(imageFileName)).map(transformWithCorrectedText);
 
     }
 
