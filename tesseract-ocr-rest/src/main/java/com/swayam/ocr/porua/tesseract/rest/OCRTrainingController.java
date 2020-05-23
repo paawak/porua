@@ -83,10 +83,23 @@ public class OCRTrainingController {
 
 	return Flux.fromIterable(wordCache.getWords(imageFileName)).doOnNext(cachedOcrText -> {
 	    // FIXME: remove this
-	    String sql = "INSERT INTO ocr_word (id, page_sequence_id, raw_image_id, raw_text, corrected_text, x1, y1, x2, y2, confidence) VALUES (%d, %d, %d, \"%s\", %s, %d, %d, %d, %d, %f);";
-	    String sqlWithValues = String.format(sql, cachedOcrText.getId(), cachedOcrText.getId(), 1, cachedOcrText.getRawOcrText().getText(),
-		    cachedOcrText.getCorrectText() == null ? "NULL" : "'" + cachedOcrText.getCorrectText() + "'", cachedOcrText.getRawOcrText().getX1(), cachedOcrText.getRawOcrText().getY1(),
-		    cachedOcrText.getRawOcrText().getX2(), cachedOcrText.getRawOcrText().getY2(), cachedOcrText.getRawOcrText().getConfidence());
+	    Function<String, String> convertToSqlStringValue = (text) -> {
+		if (StringUtils.hasText(text)) {
+		    String escapedSingleQuotes;
+		    if (text.contains("'")) {
+			escapedSingleQuotes = text.replaceAll("'", "''");
+		    } else {
+			escapedSingleQuotes = text;
+		    }
+		    return "'" + escapedSingleQuotes + "'";
+		} else {
+		    return "NULL";
+		}
+	    };
+	    String sql = "INSERT INTO ocr_word (raw_image_id, page_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence) VALUES (%d, %d, %s, %s, %d, %d, %d, %d, %f);";
+	    String sqlWithValues = String.format(sql, 1, cachedOcrText.getId(), convertToSqlStringValue.apply(cachedOcrText.getRawOcrText().getText()),
+		    convertToSqlStringValue.apply(cachedOcrText.getCorrectText()), cachedOcrText.getRawOcrText().getX1(), cachedOcrText.getRawOcrText().getY1(), cachedOcrText.getRawOcrText().getX2(),
+		    cachedOcrText.getRawOcrText().getY2(), cachedOcrText.getRawOcrText().getConfidence());
 	    System.out.println(sqlWithValues);
 	}).map(transformWithCorrectedText);
 
