@@ -2,26 +2,24 @@ package com.swayam.ocr.porua.tesseract.service;
 
 import java.util.Collection;
 
-import com.swayam.ocr.porua.tesseract.model.CachedOcrText;
-import com.swayam.ocr.porua.tesseract.model.Language;
-import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
+import com.swayam.ocr.porua.tesseract.OcrWordId;
+import com.swayam.ocr.porua.tesseract.model.OcrWord;
+import com.swayam.ocr.porua.tesseract.model.RawImage;
 
 public interface WordCache {
 
-    void clearAllEntries(String rawImageFileName);
+    RawImage storeImageFile(RawImage rawImage);
 
-    int getWordCount(String rawImageFileName);
+    int getWordCount(long bookId, long rawImageId);
 
-    int storeImageFile(String rawImageFileName, Language language);
+    Collection<OcrWord> getWords(long bookId, long rawImageId);
 
-    void storeRawOcrWord(int imageFileId, RawOcrWord rawOcrWord);
+    OcrWord addOcrWord(OcrWord rawOcrWord);
 
-    Collection<CachedOcrText> getWords(String rawImageFileName);
+    void updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText);
 
-    CachedOcrText getWord(int wordId);
+    OcrWord getWord(OcrWordId ocrWordId);
 
-    void modifyWord(int wordId, String text);
-
-    void removeWord(int wordId);
+    void removeWord(OcrWordId ocrWordId);
 
 }
