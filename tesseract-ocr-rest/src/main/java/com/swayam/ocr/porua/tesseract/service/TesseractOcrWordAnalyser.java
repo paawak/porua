@@ -31,10 +31,11 @@ import org.bytedeco.tesseract.global.tesseract;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.Language;
-import com.swayam.ocr.porua.tesseract.model.RawOcrLine;
-import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
+import com.swayam.ocr.porua.tesseract.model.OcrWord;
 
+import lombok.Value;
 import reactor.core.publisher.FluxSink;
 
 public class TesseractOcrWordAnalyser {
@@ -51,7 +52,7 @@ public class TesseractOcrWordAnalyser {
 	this.language = language;
     }
 
-    public void extractWordsFromImage(FluxSink<RawOcrWord> ocrWordSink) {
+    public void extractWordsFromImage(FluxSink<OcrWord> ocrWordSink, Function<Integer, OcrWordId> ocrWordIdGenerator) {
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
 
 	LOGGER.info("Analyzing image file for words...");
@@ -90,10 +91,18 @@ public class TesseractOcrWordAnalyser {
 			throw new IllegalArgumentException("Could not find any rectangle here");
 		    }
 
-		    RawOcrWord wordTextBox = new RawOcrWord(x1.get(), y1.get(), x2.get(), y2.get(), confidence, ocrText, wordNumber++);
-		    LOGGER.info("wordTextBox: {}", wordTextBox);
+		    OcrWord ocrWord = new OcrWord();
+		    ocrWord.setX1(x1.get());
+		    ocrWord.setY1(y1.get());
+		    ocrWord.setX2(x2.get());
+		    ocrWord.setY2(y2.get());
+		    ocrWord.setConfidence(confidence);
+		    ocrWord.setRawText(ocrText);
+		    ocrWord.setOcrWordId(ocrWordIdGenerator.apply(wordNumber++));
 
-		    ocrWordSink.next(wordTextBox);
+		    LOGGER.info("ocrWord: {}", ocrWord);
+
+		    ocrWordSink.next(ocrWord);
 
 		    x1.deallocate();
 		    y1.deallocate();
@@ -113,7 +122,7 @@ public class TesseractOcrWordAnalyser {
 
     }
 
-    public List<String> getBoxStrings(Map<Integer, String> correctTextLookupBySequenceNumber, Collection<RawOcrWord> rawOcrWords) {
+    public List<String> getBoxStrings(Map<Integer, String> correctTextLookupBySequenceNumber, Collection<OcrWord> rawOcrWords) {
 	LOGGER.trace("words: {}", rawOcrWords);
 	ExtractedLineDetails extractedLineDetails = extractLinesFromImage();
 	List<RawOcrLine> lines = extractedLineDetails.lines;
@@ -122,9 +131,9 @@ public class TesseractOcrWordAnalyser {
 
 	Map<Integer, RawOcrLine> linesAsMap = lines.parallelStream().collect(Collectors.toMap(RawOcrLine::getLineNumber, Function.identity()));
 
-	Map<Integer, List<RawOcrWord>> wordsGroupedByLineNumber = lines.parallelStream().collect(Collectors.toMap(RawOcrLine::getLineNumber, line -> {
+	Map<Integer, List<OcrWord>> wordsGroupedByLineNumber = lines.parallelStream().collect(Collectors.toMap(RawOcrLine::getLineNumber, line -> {
 	    return rawOcrWords.parallelStream().filter(rawOcrText -> {
-		Rectangle originalLineArea = getWordArea(line.getRawOcrText());
+		Rectangle originalLineArea = getWordArea(line.getX1(), line.getY1(), line.getX2(), line.getY2());
 		int expandBy = 5;
 		Rectangle expandedLineArea = new Rectangle(originalLineArea.x - expandBy, originalLineArea.y - expandBy, originalLineArea.width + expandBy, originalLineArea.height + expandBy);
 		return expandedLineArea.contains(getWordArea(rawOcrText));
@@ -135,21 +144,21 @@ public class TesseractOcrWordAnalyser {
 
 	return linesAsMap.keySet().stream().sorted().filter(lineNumber -> !wordsGroupedByLineNumber.get(lineNumber).isEmpty()).flatMap(lineNumber -> {
 
-	    Supplier<Stream<RawOcrWord>> ocrWords = () -> wordsGroupedByLineNumber.get(lineNumber).parallelStream();
-	    Supplier<IntStream> wordSequenceNumbers = () -> ocrWords.get().mapToInt(RawOcrWord::getWordSequenceNumber);
+	    Supplier<Stream<OcrWord>> ocrWords = () -> wordsGroupedByLineNumber.get(lineNumber).parallelStream();
+	    Supplier<IntStream> wordSequenceNumbers = () -> ocrWords.get().mapToInt(ocrWord -> ocrWord.getOcrWordId().getWordSequenceId());
 
 	    int firstWordSequence = wordSequenceNumbers.get().min().getAsInt();
 	    int lastWordSequence = wordSequenceNumbers.get().max().getAsInt();
 
-	    Function<Integer, RawOcrWord> findWordFromSequenceNumber = sequenceNumber -> ocrWords.get().filter(ocrWord -> ocrWord.getWordSequenceNumber() == sequenceNumber).findAny().get();
+	    Function<Integer, OcrWord> findWordFromSequenceNumber = sequenceNumber -> ocrWords.get().filter(ocrWord -> ocrWord.getOcrWordId().getWordSequenceId() == sequenceNumber).findAny().get();
 
-	    RawOcrWord firstWord = findWordFromSequenceNumber.apply(firstWordSequence);
-	    RawOcrWord lastWord = findWordFromSequenceNumber.apply(lastWordSequence);
+	    OcrWord firstWord = findWordFromSequenceNumber.apply(firstWordSequence);
+	    OcrWord lastWord = findWordFromSequenceNumber.apply(lastWordSequence);
 
 	    int leftTopX = firstWord.getX1();
-	    int leftTopY = linesAsMap.get(lineNumber).getRawOcrText().getY1();
+	    int leftTopY = linesAsMap.get(lineNumber).getY1();
 	    int rightBottomX = lastWord.getX2();
-	    int rightBottomY = linesAsMap.get(lineNumber).getRawOcrText().getY2();
+	    int rightBottomY = linesAsMap.get(lineNumber).getY2();
 
 	    int leftBottomX = leftTopX;
 	    int leftBottomY = extractedLineDetails.imageHeight - rightBottomY;
@@ -159,15 +168,15 @@ public class TesseractOcrWordAnalyser {
 
 	    String positionData = String.format(" %d %d %d %d 0", leftBottomX, leftBottomY, rightTopX, rightTopY);
 
-	    List<String> boxes = ocrWords.get().sorted((RawOcrWord o1, RawOcrWord o2) -> o1.getWordSequenceNumber() - o2.getWordSequenceNumber()).map(rawOcrText -> {
+	    List<String> boxes = ocrWords.get().sorted((OcrWord o1, OcrWord o2) -> o1.getOcrWordId().getWordSequenceId() - o2.getOcrWordId().getWordSequenceId()).map(rawOcrText -> {
 		String ocrText;
 		// lookup for corrected text
-		if (correctTextLookupBySequenceNumber.containsKey(rawOcrText.getWordSequenceNumber())) {
-		    ocrText = correctTextLookupBySequenceNumber.get(rawOcrText.getWordSequenceNumber());
+		if (correctTextLookupBySequenceNumber.containsKey(rawOcrText.getOcrWordId().getWordSequenceId())) {
+		    ocrText = correctTextLookupBySequenceNumber.get(rawOcrText.getOcrWordId().getWordSequenceId());
 		} else {
-		    ocrText = rawOcrText.getText();
+		    ocrText = rawOcrText.getRawText();
 		}
-		if (lastWordSequence == rawOcrText.getWordSequenceNumber()) {
+		if (lastWordSequence == rawOcrText.getOcrWordId().getWordSequenceId()) {
 		    return ocrText;
 		}
 		return ocrText + " ";
@@ -212,7 +221,7 @@ public class TesseractOcrWordAnalyser {
 		int height = box.h();
 
 		// line number starts from 1
-		RawOcrLine lineTextBox = new RawOcrLine(lineNumber + 1, new RawOcrWord(x1, y1, x1 + width, y1 + height, confidence, ocrLineText, -1));
+		RawOcrLine lineTextBox = new RawOcrLine(lineNumber + 1, x1, y1, x1 + width, y1 + height, confidence, ocrLineText);
 		LOGGER.debug("lineTextBox: {}", lineTextBox);
 		return lineTextBox;
 	    }).collect(Collectors.toList());
@@ -226,8 +235,12 @@ public class TesseractOcrWordAnalyser {
 
     }
 
-    public static Rectangle getWordArea(RawOcrWord rawOcrWord) {
-	return new Rectangle(rawOcrWord.getX1(), rawOcrWord.getY1(), rawOcrWord.getX2() - rawOcrWord.getX1(), rawOcrWord.getY2() - rawOcrWord.getY1());
+    public static Rectangle getWordArea(OcrWord ocrWord) {
+	return getWordArea(ocrWord.getX1(), ocrWord.getY1(), ocrWord.getX2(), ocrWord.getY2());
+    }
+
+    public static Rectangle getWordArea(int x1, int y1, int x2, int y2) {
+	return new Rectangle(x1, y1, x2 - x1, y2 - y1);
     }
 
     private static class ExtractedLineDetails {
@@ -238,6 +251,20 @@ public class TesseractOcrWordAnalyser {
 	    this.imageHeight = imageHeight;
 	    this.lines = lines;
 	}
+    }
+
+    @Value
+    private static class RawOcrLine {
+
+	// line number starts from 1
+	private final int lineNumber;
+	private final int x1;
+	private final int y1;
+	private final int x2;
+	private final int y2;
+	private final float meanConfidence;
+	private final String lineText;
+
     }
 
 }

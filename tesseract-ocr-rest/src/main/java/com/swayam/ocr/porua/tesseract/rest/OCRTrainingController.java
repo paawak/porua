@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.swayam.ocr.porua.tesseract.model.RawOcrWord;
+import com.swayam.ocr.porua.tesseract.dto.OcrWordDto;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.WordCache;
 
@@ -39,7 +39,7 @@ public class OCRTrainingController {
     }
 
     @PostMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<RawOcrWord> getDetectedText(@RequestPart("language") String languageAsString, @RequestPart("image") FilePart image) throws IOException, URISyntaxException {
+    public Flux<OcrWordDto> getDetectedText(@RequestPart("language") String languageAsString, @RequestPart("image") FilePart image) throws IOException, URISyntaxException {
 
 	// LOG.info("FileName: {}, language: {}", image.filename(),
 	// languageAsString);
