@@ -7,19 +7,16 @@ import org.springframework.stereotype.Repository;
 import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.RawImage;
-import com.swayam.ocr.porua.tesseract.repo.BookRepository;
 import com.swayam.ocr.porua.tesseract.repo.OcrWordRepository;
 import com.swayam.ocr.porua.tesseract.repo.RawImageRepository;
 
 @Repository
 public class HsqlBackedWordCache implements WordCache {
 
-    private final BookRepository bookRepository;
     private final RawImageRepository rawImageRepository;
     private final OcrWordRepository ocrWordRepository;
 
-    public HsqlBackedWordCache(BookRepository bookRepository, RawImageRepository rawImageRepository, OcrWordRepository ocrWordRepository) {
-	this.bookRepository = bookRepository;
+    public HsqlBackedWordCache(RawImageRepository rawImageRepository, OcrWordRepository ocrWordRepository) {
 	this.rawImageRepository = rawImageRepository;
 	this.ocrWordRepository = ocrWordRepository;
     }
@@ -31,14 +28,12 @@ public class HsqlBackedWordCache implements WordCache {
 
     @Override
     public int getWordCount(long bookId, long rawImageId) {
-	// TODO Auto-generated method stub
-	return 0;
+	return ocrWordRepository.countByOcrWordIdBookIdAndOcrWordIdRawImageId(bookId, rawImageId);
     }
 
     @Override
     public Collection<OcrWord> getWords(long bookId, long rawImageId) {
-	// TODO Auto-generated method stub
-	return null;
+	return ocrWordRepository.findByOcrWordIdBookIdAndOcrWordIdRawImageId(bookId, rawImageId);
     }
 
     @Override
