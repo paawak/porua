@@ -30,11 +30,6 @@ public class HsqlBackedWordCache implements WordCache {
     }
 
     @Override
-    public OcrWord addOcrWord(OcrWord ocrWord) {
-	return ocrWordRepository.save(ocrWord);
-    }
-
-    @Override
     public int getWordCount(long bookId, long rawImageId) {
 	// TODO Auto-generated method stub
 	return 0;
@@ -49,6 +44,11 @@ public class HsqlBackedWordCache implements WordCache {
     @Override
     public OcrWord getWord(OcrWordId ocrWordId) {
 	return ocrWordRepository.findById(ocrWordId).get();
+    }
+
+    @Override
+    public OcrWord addOcrWord(OcrWord ocrWord) {
+	return ocrWordRepository.save(ocrWord);
     }
 
     @Override

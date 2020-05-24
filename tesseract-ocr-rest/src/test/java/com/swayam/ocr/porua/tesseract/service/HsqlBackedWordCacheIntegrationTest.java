@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -36,6 +37,23 @@ class HsqlBackedWordCacheIntegrationTest {
     }
 
     @Test
+    void testAddOcrWord() {
+	// given
+	OcrWord rawOcrWord = getOcrWord(11, 22, 33, 44, 55.55f, "ABC123", 1);
+
+	List<OcrWord> expected = Arrays.asList(rawOcrWord);
+
+	// when
+	testClass.addOcrWord(rawOcrWord);
+
+	// then
+	List<OcrWord> results =
+		jdbcTemplate.query("SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC", ocrWordMapper());
+
+	assertEquals(expected, results);
+    }
+
+    @Test
     void testUpdateCorrectTextInOcrWord() {
 	// given
 	OcrWord rawOcrWord1 = getOcrWord(11, 22, 33, 44, 55.55f, "ABC123", 1);
@@ -55,15 +73,41 @@ class HsqlBackedWordCacheIntegrationTest {
 	testClass.updateCorrectTextInOcrWord(new OcrWordId(1, 1, 2), "I have changed");
 
 	// then
-	List<OcrWord> results = jdbcTemplate.query("SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC",
-		(ResultSet res, int rowNum) -> {
-		    OcrWord ocrWord =
-			    getOcrWord(res.getInt("x1"), res.getInt("y1"), res.getInt("x2"), res.getInt("y2"), res.getFloat("confidence"), res.getString("raw_text"), res.getInt("word_sequence_id"));
-		    ocrWord.setCorrectedText(res.getString("corrected_text"));
-		    return ocrWord;
-		});
+	List<OcrWord> results =
+		jdbcTemplate.query("SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC", ocrWordMapper());
 
 	assertEquals(expected, results);
+    }
+
+    @Test
+    void testRemoveWord() {
+	// given
+	OcrWord rawOcrWord1 = getOcrWord(11, 22, 33, 44, 55.55f, "ABC123", 1);
+	OcrWord rawOcrWord2 = getOcrWord(111, 222, 333, 444, 555.555f, "DEF456", 2);
+	OcrWord rawOcrWord3 = getOcrWord(1111, 2222, 3333, 4444, 5555.5555f, "GHI789", 3);
+
+	List<OcrWord> expected = Arrays.asList(rawOcrWord1, rawOcrWord3);
+
+	testClass.addOcrWord(rawOcrWord1);
+	testClass.addOcrWord(rawOcrWord2);
+	testClass.addOcrWord(rawOcrWord3);
+
+	// when
+	testClass.removeWord(new OcrWordId(1, 1, 2));
+
+	// then
+	List<OcrWord> results =
+		jdbcTemplate.query("SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC", ocrWordMapper());
+
+	assertEquals(expected, results);
+    }
+
+    private RowMapper<OcrWord> ocrWordMapper() {
+	return (ResultSet res, int rowNum) -> {
+	    OcrWord ocrWord = getOcrWord(res.getInt("x1"), res.getInt("y1"), res.getInt("x2"), res.getInt("y2"), res.getFloat("confidence"), res.getString("raw_text"), res.getInt("word_sequence_id"));
+	    ocrWord.setCorrectedText(res.getString("corrected_text"));
+	    return ocrWord;
+	};
     }
 
     private OcrWord getOcrWord(int x1, int y1, int x2, int y2, float confidence, String rawText, int wordSequenceId) {
