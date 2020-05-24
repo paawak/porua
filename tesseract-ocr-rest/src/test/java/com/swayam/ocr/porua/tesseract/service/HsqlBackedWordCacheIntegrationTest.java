@@ -24,6 +24,9 @@ import com.swayam.ocr.porua.tesseract.model.OcrWord;
 @SpringBootTest
 class HsqlBackedWordCacheIntegrationTest {
 
+    private static final String SELECT_FROM_OCR_WORD =
+	    "SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC";
+
     @Autowired
     private HsqlBackedWordCache testClass;
 
@@ -47,8 +50,7 @@ class HsqlBackedWordCacheIntegrationTest {
 	testClass.addOcrWord(rawOcrWord);
 
 	// then
-	List<OcrWord> results =
-		jdbcTemplate.query("SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC", ocrWordMapper());
+	List<OcrWord> results = jdbcTemplate.query(SELECT_FROM_OCR_WORD, ocrWordMapper());
 
 	assertEquals(expected, results);
     }
@@ -73,8 +75,7 @@ class HsqlBackedWordCacheIntegrationTest {
 	testClass.updateCorrectTextInOcrWord(new OcrWordId(1, 1, 2), "I have changed");
 
 	// then
-	List<OcrWord> results =
-		jdbcTemplate.query("SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC", ocrWordMapper());
+	List<OcrWord> results = jdbcTemplate.query(SELECT_FROM_OCR_WORD, ocrWordMapper());
 
 	assertEquals(expected, results);
     }
@@ -96,8 +97,7 @@ class HsqlBackedWordCacheIntegrationTest {
 	testClass.removeWord(new OcrWordId(1, 1, 2));
 
 	// then
-	List<OcrWord> results =
-		jdbcTemplate.query("SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC", ocrWordMapper());
+	List<OcrWord> results = jdbcTemplate.query(SELECT_FROM_OCR_WORD, ocrWordMapper());
 
 	assertEquals(expected, results);
     }
