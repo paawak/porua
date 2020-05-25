@@ -12,6 +12,8 @@ public interface OcrDataStoreService {
 
     Book addBook(Book book);
 
+    Book getBook(long bookId);
+
     Iterable<Book> getBooks();
 
     PageImage addPageImage(PageImage rawImage);
@@ -22,7 +24,7 @@ public interface OcrDataStoreService {
 
     int getWordCount(long bookId, long rawImageId);
 
-    Collection<OcrWord> getWords(long bookId, long rawImageId);
+    Collection<OcrWord> getWords(long bookId, long pageImageId);
 
     OcrWord addOcrWord(OcrWord rawOcrWord);
 

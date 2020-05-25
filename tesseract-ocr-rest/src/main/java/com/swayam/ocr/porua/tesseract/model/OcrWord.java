@@ -39,6 +39,6 @@ public class OcrWord {
     private float confidence;
 
     @Column(name = "line_number")
-    private int lineNumber;
+    private Integer lineNumber;
 
 }

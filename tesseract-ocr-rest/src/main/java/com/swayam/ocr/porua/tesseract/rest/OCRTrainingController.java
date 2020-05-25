@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Optional;
 
 import javax.imageio.ImageIO;
 
@@ -26,12 +25,12 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
-import com.swayam.ocr.porua.tesseract.model.Language;
+import com.swayam.ocr.porua.tesseract.model.Book;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.PageImage;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
-import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
 import com.swayam.ocr.porua.tesseract.service.OcrDataStoreService;
+import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -43,48 +42,58 @@ public class OCRTrainingController {
 
     private static final Logger LOG = LoggerFactory.getLogger(OCRTrainingController.class);
 
-    private final OcrDataStoreService wordCache;
+    private final OcrDataStoreService ocrDataStoreService;
     private final FileSystemUtil fileSystemUtil;
 
-    public OCRTrainingController(OcrDataStoreService wordCache, FileSystemUtil fileSystemUtil) {
-	this.wordCache = wordCache;
+    public OCRTrainingController(OcrDataStoreService ocrDataStoreService, FileSystemUtil fileSystemUtil) {
+	this.ocrDataStoreService = ocrDataStoreService;
 	this.fileSystemUtil = fileSystemUtil;
 
     }
 
+    @GetMapping(value = "/book", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<Book> getBooks() {
+	return Flux.fromIterable(ocrDataStoreService.getBooks());
+    }
+
+    @GetMapping(value = "/page", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<PageImage> getPages(@RequestParam("bookId") final long bookId) {
+	return Flux.fromIterable(ocrDataStoreService.getPages(bookId));
+    }
+
+    @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<OcrWord> getOcrWords(@RequestParam("bookId") final long bookId, @RequestParam("pageImageId") final long pageImageId) {
+	LOG.info("Retrieving OCR Words for Book Id {} and PageId {}", bookId, pageImageId);
+	return Flux.fromIterable(ocrDataStoreService.getWords(bookId, pageImageId));
+    }
+
     @PostMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<OcrWord> getDetectedText(@RequestPart("language") final String languageAsString, @RequestPart("bookId") final long bookId,
-	    @RequestPart(value = "rawImageId", required = false) final Optional<Long> rawImageId, @RequestPart("pageNumber") final int pageNumber, @RequestPart("image") final FilePart image)
+    public Flux<OcrWord> submitPageAndAnalyzeWords(@RequestPart("bookId") final long bookId, @RequestPart("pageNumber") final int pageNumber, @RequestPart("image") final FilePart image)
 	    throws IOException, URISyntaxException {
 
-	LOG.info("FileName: {}, language: {}", image.filename(), languageAsString);
+	LOG.info("Uploaded fileName: {}", image.filename());
 
-	Language language = Language.valueOf(languageAsString);
+	Book book = ocrDataStoreService.getBook(bookId);
 
 	String imageFileName = image.filename();
 	Path savedImagePath = fileSystemUtil.saveMultipartFileAsImage(image);
 
-	if (rawImageId.isEmpty()) {
-	    PageImage rawImage = new PageImage();
-	    rawImage.setName(imageFileName);
-	    rawImage.setPageNumber(pageNumber);
-	    long imageFileId = wordCache.addPageImage(rawImage).getId();
-	    return Flux.create((FluxSink<OcrWord> fluxSink) -> {
-		new TesseractOcrWordAnalyser(savedImagePath, language).extractWordsFromImage(fluxSink, (wordSequenceId) -> new OcrWordId(bookId, imageFileId, wordSequenceId));
-	    }).map(rawText -> wordCache.addOcrWord(rawText));
-	}
+	PageImage newPageImage = new PageImage();
+	newPageImage.setName(imageFileName);
+	newPageImage.setPageNumber(pageNumber);
+	long imageFileId = ocrDataStoreService.addPageImage(newPageImage).getId();
 
-	LOG.warn("Entries already present for {}: using existing entries", imageFileName);
-
-	return Flux.fromIterable(wordCache.getWords(bookId, rawImageId.get()));
+	return Flux.create((FluxSink<OcrWord> fluxSink) -> {
+	    new TesseractOcrWordAnalyser(savedImagePath, book.getLanguage()).extractWordsFromImage(fluxSink, (wordSequenceId) -> new OcrWordId(bookId, imageFileId, wordSequenceId));
+	}).map(rawText -> ocrDataStoreService.addOcrWord(rawText));
 
     }
 
     @GetMapping(value = "/word/image")
-    public Mono<ResponseEntity<byte[]>> getOcrWordImage(@RequestParam("bookId") final long bookId, @RequestParam("rawImageId") final long rawImageId,
+    public Mono<ResponseEntity<byte[]>> getOcrWordImage(@RequestParam("bookId") final long bookId, @RequestParam("pageImageId") final long rawImageId,
 	    @RequestParam("wordSequenceId") int wordSequenceId, @RequestParam("imagePath") Path imagePath) throws IOException {
 	LOG.trace("serving ocr word image for id: {}", wordSequenceId);
-	OcrWord ocrText = wordCache.getWord(new OcrWordId(bookId, rawImageId, wordSequenceId));
+	OcrWord ocrText = ocrDataStoreService.getWord(new OcrWordId(bookId, rawImageId, wordSequenceId));
 	BufferedImage fullImage = ImageIO.read(Files.newInputStream(imagePath));
 	Rectangle wordArea = TesseractOcrWordAnalyser.getWordArea(ocrText);
 	BufferedImage wordImage = fullImage.getSubimage(wordArea.x, wordArea.y, wordArea.width, wordArea.height);

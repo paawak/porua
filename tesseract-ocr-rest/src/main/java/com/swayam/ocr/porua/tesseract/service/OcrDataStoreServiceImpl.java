@@ -37,6 +37,11 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
     }
 
     @Override
+    public Book getBook(long bookId) {
+	return bookRepository.findById(bookId).get();
+    }
+
+    @Override
     public PageImage addPageImage(PageImage pageImage) {
 	return pageImageRepository.save(pageImage);
     }
@@ -52,13 +57,13 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
     }
 
     @Override
-    public int getWordCount(long bookId, long rawImageId) {
-	return ocrWordRepository.countByOcrWordIdBookIdAndOcrWordIdPageImageId(bookId, rawImageId);
+    public int getWordCount(long bookId, long pageImageId) {
+	return ocrWordRepository.countByOcrWordIdBookIdAndOcrWordIdPageImageId(bookId, pageImageId);
     }
 
     @Override
-    public Collection<OcrWord> getWords(long bookId, long rawImageId) {
-	return ocrWordRepository.findByOcrWordIdBookIdAndOcrWordIdPageImageId(bookId, rawImageId);
+    public Collection<OcrWord> getWords(long bookId, long pageImageId) {
+	return ocrWordRepository.findByOcrWordIdBookIdAndOcrWordIdPageImageId(bookId, pageImageId);
     }
 
     @Override
