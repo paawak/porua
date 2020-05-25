@@ -31,7 +31,7 @@ import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.RawImage;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
-import com.swayam.ocr.porua.tesseract.service.WordCache;
+import com.swayam.ocr.porua.tesseract.service.OcrDataStoreService;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -43,10 +43,10 @@ public class OCRTrainingController {
 
     private static final Logger LOG = LoggerFactory.getLogger(OCRTrainingController.class);
 
-    private final WordCache wordCache;
+    private final OcrDataStoreService wordCache;
     private final FileSystemUtil fileSystemUtil;
 
-    public OCRTrainingController(WordCache wordCache, FileSystemUtil fileSystemUtil) {
+    public OCRTrainingController(OcrDataStoreService wordCache, FileSystemUtil fileSystemUtil) {
 	this.wordCache = wordCache;
 	this.fileSystemUtil = fileSystemUtil;
 

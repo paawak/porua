@@ -11,12 +11,12 @@ import com.swayam.ocr.porua.tesseract.repo.OcrWordRepository;
 import com.swayam.ocr.porua.tesseract.repo.RawImageRepository;
 
 @Repository
-public class HsqlBackedWordCache implements WordCache {
+public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 
     private final RawImageRepository rawImageRepository;
     private final OcrWordRepository ocrWordRepository;
 
-    public HsqlBackedWordCache(RawImageRepository rawImageRepository, OcrWordRepository ocrWordRepository) {
+    public OcrDataStoreServiceImpl(RawImageRepository rawImageRepository, OcrWordRepository ocrWordRepository) {
 	this.rawImageRepository = rawImageRepository;
 	this.ocrWordRepository = ocrWordRepository;
     }

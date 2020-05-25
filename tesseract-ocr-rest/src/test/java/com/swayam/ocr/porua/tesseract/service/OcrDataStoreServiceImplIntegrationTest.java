@@ -23,13 +23,13 @@ import com.swayam.ocr.porua.tesseract.model.OcrWord;
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
 @SpringBootTest
-class HsqlBackedWordCacheIntegrationTest {
+class OcrDataStoreServiceImplIntegrationTest {
 
     private static final String SELECT_FROM_OCR_WORD =
 	    "SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC";
 
     @Autowired
-    private HsqlBackedWordCache testClass;
+    private OcrDataStoreServiceImpl testClass;
 
     @Autowired
     private JdbcOperations jdbcTemplate;

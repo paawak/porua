@@ -6,7 +6,7 @@ import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.RawImage;
 
-public interface WordCache {
+public interface OcrDataStoreService {
 
     RawImage storeImageFile(RawImage rawImage);
 
