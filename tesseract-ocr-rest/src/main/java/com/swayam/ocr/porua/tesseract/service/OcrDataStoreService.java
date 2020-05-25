@@ -1,6 +1,7 @@
 package com.swayam.ocr.porua.tesseract.service;
 
 import java.util.Collection;
+import java.util.List;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.Book;
@@ -14,6 +15,10 @@ public interface OcrDataStoreService {
     Iterable<Book> getBooks();
 
     PageImage addPageImage(PageImage rawImage);
+
+    int getPageCount(long bookId);
+
+    List<PageImage> getPages(long bookId);
 
     int getWordCount(long bookId, long rawImageId);
 

@@ -84,6 +84,60 @@ class OcrDataStoreServiceImplIntegrationTest {
     }
 
     @Test
+    void testGetPages() {
+	// given
+	Book book = new Book();
+	book.setId(1);
+	book.setName("TEST BOOK 1");
+	book.setLanguage(Language.ben);
+
+	PageImage pageImage1 = new PageImage();
+	pageImage1.setId(1);
+	pageImage1.setBook(book);
+	pageImage1.setName("TEST IMAGE 1.jpg");
+	pageImage1.setPageNumber(1);
+
+	PageImage pageImage2 = new PageImage();
+	pageImage2.setId(2);
+	pageImage2.setBook(book);
+	pageImage2.setName("TEST IMAGE 2.jpg");
+	pageImage2.setPageNumber(2);
+
+	// when
+	List<PageImage> results = testClass.getPages(1);
+
+	// then
+	assertEquals(Arrays.asList(pageImage1, pageImage2), results);
+    }
+
+    @Test
+    void testGetPageCount() {
+	// given
+	Book book = new Book();
+	book.setId(1);
+	book.setName("TEST BOOK 1");
+	book.setLanguage(Language.ben);
+
+	PageImage pageImage1 = new PageImage();
+	pageImage1.setBook(book);
+	pageImage1.setName("TEST IMAGE 1.jpg");
+	pageImage1.setPageNumber(10);
+	testClass.addPageImage(pageImage1);
+
+	PageImage pageImage2 = new PageImage();
+	pageImage2.setBook(book);
+	pageImage2.setName("TEST IMAGE 2.jpg");
+	pageImage2.setPageNumber(20);
+	testClass.addPageImage(pageImage2);
+
+	// when
+	int result = testClass.getPageCount(1);
+
+	// then
+	assertEquals(4, result);
+    }
+
+    @Test
     void testAddPageImage() {
 	// given
 	Book book = new Book();

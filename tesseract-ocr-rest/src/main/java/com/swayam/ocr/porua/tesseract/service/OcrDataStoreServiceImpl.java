@@ -1,8 +1,9 @@
 package com.swayam.ocr.porua.tesseract.service;
 
 import java.util.Collection;
+import java.util.List;
 
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.Book;
@@ -12,7 +13,7 @@ import com.swayam.ocr.porua.tesseract.repo.BookRepository;
 import com.swayam.ocr.porua.tesseract.repo.OcrWordRepository;
 import com.swayam.ocr.porua.tesseract.repo.PageImageRepository;
 
-@Repository
+@Service
 public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 
     private final BookRepository bookRepository;
@@ -38,6 +39,16 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
     @Override
     public PageImage addPageImage(PageImage pageImage) {
 	return pageImageRepository.save(pageImage);
+    }
+
+    @Override
+    public int getPageCount(long bookId) {
+	return pageImageRepository.countByBookId(bookId);
+    }
+
+    @Override
+    public List<PageImage> getPages(long bookId) {
+	return pageImageRepository.findByBookId(bookId);
     }
 
     @Override
