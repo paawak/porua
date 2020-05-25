@@ -5,25 +5,39 @@ import java.util.Collection;
 import org.springframework.stereotype.Repository;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
+import com.swayam.ocr.porua.tesseract.model.Book;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.PageImage;
+import com.swayam.ocr.porua.tesseract.repo.BookRepository;
 import com.swayam.ocr.porua.tesseract.repo.OcrWordRepository;
 import com.swayam.ocr.porua.tesseract.repo.PageImageRepository;
 
 @Repository
 public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 
+    private final BookRepository bookRepository;
     private final PageImageRepository pageImageRepository;
     private final OcrWordRepository ocrWordRepository;
 
-    public OcrDataStoreServiceImpl(PageImageRepository pageImageRepository, OcrWordRepository ocrWordRepository) {
+    public OcrDataStoreServiceImpl(BookRepository bookRepository, PageImageRepository pageImageRepository, OcrWordRepository ocrWordRepository) {
+	this.bookRepository = bookRepository;
 	this.pageImageRepository = pageImageRepository;
 	this.ocrWordRepository = ocrWordRepository;
     }
 
     @Override
-    public PageImage addImageFile(PageImage rawImage) {
-	return pageImageRepository.save(rawImage);
+    public Book addBook(Book book) {
+	return bookRepository.save(book);
+    }
+
+    @Override
+    public Iterable<Book> getBooks() {
+	return bookRepository.findAll();
+    }
+
+    @Override
+    public PageImage addPageImage(PageImage pageImage) {
+	return pageImageRepository.save(pageImage);
     }
 
     @Override

@@ -68,7 +68,7 @@ public class OCRTrainingController {
 	    PageImage rawImage = new PageImage();
 	    rawImage.setName(imageFileName);
 	    rawImage.setPageNumber(pageNumber);
-	    long imageFileId = wordCache.addImageFile(rawImage).getId();
+	    long imageFileId = wordCache.addPageImage(rawImage).getId();
 	    return Flux.create((FluxSink<OcrWord> fluxSink) -> {
 		new TesseractOcrWordAnalyser(savedImagePath, language).extractWordsFromImage(fluxSink, (wordSequenceId) -> new OcrWordId(bookId, imageFileId, wordSequenceId));
 	    }).map(rawText -> wordCache.addOcrWord(rawText));

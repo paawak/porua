@@ -18,7 +18,10 @@ import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
+import com.swayam.ocr.porua.tesseract.model.Book;
+import com.swayam.ocr.porua.tesseract.model.Language;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
+import com.swayam.ocr.porua.tesseract.model.PageImage;
 
 @DirtiesContext(classMode = ClassMode.BEFORE_EACH_TEST_METHOD)
 @ActiveProfiles("test")
@@ -40,6 +43,67 @@ class OcrDataStoreServiceImplIntegrationTest {
 	jdbcTemplate.update("INSERT INTO book (id, name, language) VALUES (2, 'TEST BOOK 2', 'eng')");
 	jdbcTemplate.update("INSERT INTO page_image (id, book_id, name, page_number) VALUES (1, 1, 'TEST IMAGE 1.jpg', 1)");
 	jdbcTemplate.update("INSERT INTO page_image (id, book_id, name, page_number) VALUES (2, 1, 'TEST IMAGE 2.jpg', 2)");
+    }
+
+    @Test
+    void testAddBook() {
+	// given
+	Book book = new Book();
+	book.setName("TEST BOOK 44");
+	book.setLanguage(Language.ben);
+
+	// when
+	Book result = testClass.addBook(book);
+
+	// then
+	assertEquals(3, result.getId());
+	assertEquals("TEST BOOK 44", result.getName());
+	assertEquals(Language.ben, result.getLanguage());
+    }
+
+    @Test
+    void testGetBooks() {
+	// given
+	Book book1 = new Book();
+	book1.setId(1);
+	book1.setName("TEST BOOK 1");
+	book1.setLanguage(Language.ben);
+
+	Book book2 = new Book();
+	book2.setId(2);
+	book2.setName("TEST BOOK 2");
+	book2.setLanguage(Language.eng);
+
+	List<Book> expected = Arrays.asList(book1, book2);
+
+	// when
+	Iterable<Book> results = testClass.getBooks();
+
+	// then
+	assertEquals(expected, results);
+    }
+
+    @Test
+    void testAddPageImage() {
+	// given
+	Book book = new Book();
+	book.setId(1);
+	book.setName("TEST BOOK 1");
+	book.setLanguage(Language.ben);
+
+	PageImage pageImage = new PageImage();
+	pageImage.setBook(book);
+	pageImage.setName("TEST IMAGE TIFF 1");
+	pageImage.setPageNumber(10);
+
+	// when
+	PageImage result = testClass.addPageImage(pageImage);
+
+	// then
+	assertEquals(3, result.getId());
+	assertEquals(book, result.getBook());
+	assertEquals("TEST IMAGE TIFF 1", result.getName());
+	assertEquals(10, result.getPageNumber());
     }
 
     @Test
