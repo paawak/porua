@@ -38,8 +38,8 @@ class HsqlBackedWordCacheIntegrationTest {
     void setupBookAndRawImage() {
 	jdbcTemplate.update("INSERT INTO book (id, name, language) VALUES (1, 'TEST BOOK 1', 'ben')");
 	jdbcTemplate.update("INSERT INTO book (id, name, language) VALUES (2, 'TEST BOOK 2', 'eng')");
-	jdbcTemplate.update("INSERT INTO raw_image (id, name, page_number) VALUES (1, 'TEST IMAGE 1.jpg', 1)");
-	jdbcTemplate.update("INSERT INTO raw_image (id, name, page_number) VALUES (2, 'TEST IMAGE 2.jpg', 2)");
+	jdbcTemplate.update("INSERT INTO raw_image (id, book_id, name, page_number) VALUES (1, 1, 'TEST IMAGE 1.jpg', 1)");
+	jdbcTemplate.update("INSERT INTO raw_image (id, book_id, name, page_number) VALUES (2, 1, 'TEST IMAGE 2.jpg', 2)");
     }
 
     @Test
