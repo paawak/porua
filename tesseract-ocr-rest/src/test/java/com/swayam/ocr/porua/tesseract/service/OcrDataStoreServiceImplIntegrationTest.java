@@ -26,7 +26,7 @@ import com.swayam.ocr.porua.tesseract.model.OcrWord;
 class OcrDataStoreServiceImplIntegrationTest {
 
     private static final String SELECT_FROM_OCR_WORD =
-	    "SELECT book_id, raw_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC";
+	    "SELECT book_id, page_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC";
 
     @Autowired
     private OcrDataStoreServiceImpl testClass;
@@ -38,8 +38,8 @@ class OcrDataStoreServiceImplIntegrationTest {
     void setupBookAndRawImage() {
 	jdbcTemplate.update("INSERT INTO book (id, name, language) VALUES (1, 'TEST BOOK 1', 'ben')");
 	jdbcTemplate.update("INSERT INTO book (id, name, language) VALUES (2, 'TEST BOOK 2', 'eng')");
-	jdbcTemplate.update("INSERT INTO raw_image (id, book_id, name, page_number) VALUES (1, 1, 'TEST IMAGE 1.jpg', 1)");
-	jdbcTemplate.update("INSERT INTO raw_image (id, book_id, name, page_number) VALUES (2, 1, 'TEST IMAGE 2.jpg', 2)");
+	jdbcTemplate.update("INSERT INTO page_image (id, book_id, name, page_number) VALUES (1, 1, 'TEST IMAGE 1.jpg', 1)");
+	jdbcTemplate.update("INSERT INTO page_image (id, book_id, name, page_number) VALUES (2, 1, 'TEST IMAGE 2.jpg', 2)");
     }
 
     @Test
@@ -164,7 +164,7 @@ class OcrDataStoreServiceImplIntegrationTest {
 	};
     }
 
-    private OcrWord getOcrWord(int bookId, int rawImageId, int x1, int y1, int x2, int y2, float confidence, String rawText, int wordSequenceId) {
+    private OcrWord getOcrWord(int bookId, int pageImageId, int x1, int y1, int x2, int y2, float confidence, String rawText, int wordSequenceId) {
 	OcrWord ocrWord = new OcrWord();
 	ocrWord.setX1(x1);
 	ocrWord.setY1(y1);
@@ -172,7 +172,7 @@ class OcrDataStoreServiceImplIntegrationTest {
 	ocrWord.setY2(y2);
 	ocrWord.setConfidence(confidence);
 	ocrWord.setRawText(rawText);
-	ocrWord.setOcrWordId(new OcrWordId(bookId, rawImageId, wordSequenceId));
+	ocrWord.setOcrWordId(new OcrWordId(bookId, pageImageId, wordSequenceId));
 	return ocrWord;
     }
 

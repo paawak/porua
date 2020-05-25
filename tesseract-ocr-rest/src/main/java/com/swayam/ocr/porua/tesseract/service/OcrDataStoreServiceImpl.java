@@ -6,34 +6,34 @@ import org.springframework.stereotype.Repository;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
-import com.swayam.ocr.porua.tesseract.model.RawImage;
+import com.swayam.ocr.porua.tesseract.model.PageImage;
 import com.swayam.ocr.porua.tesseract.repo.OcrWordRepository;
-import com.swayam.ocr.porua.tesseract.repo.RawImageRepository;
+import com.swayam.ocr.porua.tesseract.repo.PageImageRepository;
 
 @Repository
 public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 
-    private final RawImageRepository rawImageRepository;
+    private final PageImageRepository pageImageRepository;
     private final OcrWordRepository ocrWordRepository;
 
-    public OcrDataStoreServiceImpl(RawImageRepository rawImageRepository, OcrWordRepository ocrWordRepository) {
-	this.rawImageRepository = rawImageRepository;
+    public OcrDataStoreServiceImpl(PageImageRepository pageImageRepository, OcrWordRepository ocrWordRepository) {
+	this.pageImageRepository = pageImageRepository;
 	this.ocrWordRepository = ocrWordRepository;
     }
 
     @Override
-    public RawImage storeImageFile(RawImage rawImage) {
-	return rawImageRepository.save(rawImage);
+    public PageImage addImageFile(PageImage rawImage) {
+	return pageImageRepository.save(rawImage);
     }
 
     @Override
     public int getWordCount(long bookId, long rawImageId) {
-	return ocrWordRepository.countByOcrWordIdBookIdAndOcrWordIdRawImageId(bookId, rawImageId);
+	return ocrWordRepository.countByOcrWordIdBookIdAndOcrWordIdPageImageId(bookId, rawImageId);
     }
 
     @Override
     public Collection<OcrWord> getWords(long bookId, long rawImageId) {
-	return ocrWordRepository.findByOcrWordIdBookIdAndOcrWordIdRawImageId(bookId, rawImageId);
+	return ocrWordRepository.findByOcrWordIdBookIdAndOcrWordIdPageImageId(bookId, rawImageId);
     }
 
     @Override

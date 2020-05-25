@@ -20,8 +20,8 @@ public class OcrWordId implements Serializable {
     @Column(name = "book_id")
     private long bookId;
 
-    @Column(name = "raw_image_id")
-    private long rawImageId;
+    @Column(name = "page_image_id")
+    private long pageImageId;
 
     @Column(name = "word_sequence_id")
     private int wordSequenceId;

@@ -13,9 +13,9 @@ import javax.persistence.Table;
 import lombok.Data;
 
 @Entity
-@Table(name = "raw_image")
+@Table(name = "page_image")
 @Data
-public class RawImage {
+public class PageImage {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

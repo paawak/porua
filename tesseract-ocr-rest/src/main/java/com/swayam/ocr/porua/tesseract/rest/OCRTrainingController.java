@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.Language;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
-import com.swayam.ocr.porua.tesseract.model.RawImage;
+import com.swayam.ocr.porua.tesseract.model.PageImage;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
 import com.swayam.ocr.porua.tesseract.service.OcrDataStoreService;
@@ -65,10 +65,10 @@ public class OCRTrainingController {
 	Path savedImagePath = fileSystemUtil.saveMultipartFileAsImage(image);
 
 	if (rawImageId.isEmpty()) {
-	    RawImage rawImage = new RawImage();
+	    PageImage rawImage = new PageImage();
 	    rawImage.setName(imageFileName);
 	    rawImage.setPageNumber(pageNumber);
-	    long imageFileId = wordCache.storeImageFile(rawImage).getId();
+	    long imageFileId = wordCache.addImageFile(rawImage).getId();
 	    return Flux.create((FluxSink<OcrWord> fluxSink) -> {
 		new TesseractOcrWordAnalyser(savedImagePath, language).extractWordsFromImage(fluxSink, (wordSequenceId) -> new OcrWordId(bookId, imageFileId, wordSequenceId));
 	    }).map(rawText -> wordCache.addOcrWord(rawText));

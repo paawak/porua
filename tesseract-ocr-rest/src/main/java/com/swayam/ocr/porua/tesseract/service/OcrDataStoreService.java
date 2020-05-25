@@ -4,11 +4,11 @@ import java.util.Collection;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
-import com.swayam.ocr.porua.tesseract.model.RawImage;
+import com.swayam.ocr.porua.tesseract.model.PageImage;
 
 public interface OcrDataStoreService {
 
-    RawImage storeImageFile(RawImage rawImage);
+    PageImage addImageFile(PageImage rawImage);
 
     int getWordCount(long bookId, long rawImageId);
 
