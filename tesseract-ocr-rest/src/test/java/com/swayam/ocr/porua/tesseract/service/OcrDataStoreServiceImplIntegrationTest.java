@@ -120,13 +120,13 @@ class OcrDataStoreServiceImplIntegrationTest {
 
 	PageImage pageImage1 = new PageImage();
 	pageImage1.setBook(book);
-	pageImage1.setName("TEST IMAGE 1.jpg");
+	pageImage1.setName("TEST IMAGE 3.jpg");
 	pageImage1.setPageNumber(10);
 	testClass.addPageImage(pageImage1);
 
 	PageImage pageImage2 = new PageImage();
 	pageImage2.setBook(book);
-	pageImage2.setName("TEST IMAGE 2.jpg");
+	pageImage2.setName("TEST IMAGE 4.jpg");
 	pageImage2.setPageNumber(20);
 	testClass.addPageImage(pageImage2);
 
