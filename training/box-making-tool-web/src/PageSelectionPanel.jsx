@@ -29,7 +29,10 @@ class PageSelectionPanel extends React.Component {
     if (this.state.selectedPageId === NEW_PAGE_OPTION) {
       alert('New Page');
     } else {
-      alert('Existing Page');
+      fetch("http://localhost:8080/train/word?bookId=" + this.state.selectedBookId + "&pageImageId=" + this.state.selectedPageId)
+        .then(rawData => rawData.json())
+        .then(data => this.props.ocrWordsRecieved(data))
+        .catch(() => this.setState({ hasErrors: true }));
     }
   }
 

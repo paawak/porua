@@ -23,7 +23,15 @@ class App extends React.Component {
   render() {
     let panelToDisplay;
     if (this.state.displayMode === DisplayMode.PAGE_SELECTION) {
-      panelToDisplay = <PageSelectionPanel/>;
+      panelToDisplay = <PageSelectionPanel
+        ocrWordsRecieved={ocrWordListData => {
+            this.setState({
+              ocrWords: ocrWordListData,
+              displayMode: DisplayMode.OCR_CORRECTION_PAGE
+            });
+          }
+        }
+      />;
     } else if (this.state.displayMode === DisplayMode.IMAGE_UPLOADER) {
       panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><ImageUploader
       imageSubmittedForAnalysis={() => {
