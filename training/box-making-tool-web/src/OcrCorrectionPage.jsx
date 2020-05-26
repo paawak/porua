@@ -7,7 +7,7 @@ class OcrCorrectionPage extends React.Component {
     const ocrWords = this.props.ocrWords.map((ocrWord) =>
       <OcrWord key={ocrWord.ocrWordId.wordSequenceId} bookId={ocrWord.ocrWordId.bookId}
         pageImageId={ocrWord.ocrWordId.pageImageId} wordSequenceId={ocrWord.ocrWordId.wordSequenceId}
-        givenText={ocrWord.rawText}/>
+        givenText={ocrWord.correctedText == null ? ocrWord.rawText : ocrWord.correctedText}/>
     );
 
     return (
