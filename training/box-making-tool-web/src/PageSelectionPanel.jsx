@@ -10,7 +10,9 @@ class PageSelectionPanel extends React.Component {
       books: [],
       pages: [],
       selectedBookId: null,
-      selectedPageId: null
+      selectedPageId: null,
+      bookName: null,
+      pageName: null
     };
     this.handleButtonClick = this.handleButtonClick.bind(this);
   }
@@ -27,7 +29,7 @@ class PageSelectionPanel extends React.Component {
     }
 
     if (this.state.selectedPageId === NEW_PAGE_OPTION) {
-      this.props.showNewPagePanel();
+      this.props.showNewPagePanel(this.state.selectedBookId, this.state.bookName);
     } else {
       fetch("http://localhost:8080/train/word?bookId=" + this.state.selectedBookId + "&pageImageId=" + this.state.selectedPageId)
         .then(rawData => rawData.json())
@@ -53,6 +55,12 @@ class PageSelectionPanel extends React.Component {
       <option key={page.id} value={page.id}>{page.name}</option>
     );
 
+    const extractSelectedLabel = (e) => {
+      let index = e.nativeEvent.target.selectedIndex;
+      let label = e.nativeEvent.target[index].text;
+      return label;
+    };
+
     return (
       <form className="was-validated">
 
@@ -61,9 +69,12 @@ class PageSelectionPanel extends React.Component {
           <select id="book" className="custom-select" required
           onChange={e => {
               let bookId = e.target.value;
+              let bookName = extractSelectedLabel(e);
               this.setState({
                 selectedBookId: bookId,
+                bookName: bookName,
                 selectedPageId: null,
+                pageName: null,
                 pages: []
               });
 
@@ -87,7 +98,8 @@ class PageSelectionPanel extends React.Component {
           <select id="page" className="custom-select" required
             onChange={e => {
                 this.setState({
-                  selectedPageId: e.target.value
+                  selectedPageId: e.target.value,
+                  pageName: extractSelectedLabel(e)
                 });
               }
             }

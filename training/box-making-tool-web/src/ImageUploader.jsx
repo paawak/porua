@@ -44,21 +44,10 @@ class ImageUploader extends React.Component {
   render() {
     return (
       	<form onSubmit={this.handleSubmit}>
-          <p className="lead">Choose the language and upload an image to OCR</p>
-      		<fieldset className="form-group">
-      			<div className="row">
-      				<legend className="col-form-label col-sm-2 pt-0">Language Selection</legend>
-      				<div className="col-sm-10">
-      					<div className="form-group form-check">
-      						<input className="form-check-input" type="radio" name="language" id="languageBengali" value="ben" defaultChecked={true} onChange={this.handleLanguageChange} />
-                    <label	className="form-check-label" htmlFor="languageBengali">Bengali </label>
-      					</div>
-      					<div className="form-group form-check">
-      						<input className="form-check-input" type="radio" name="language" id="languageEnglish" value="eng" onChange={this.handleLanguageChange} />
-                  <label className="form-check-label" htmlFor="languageEnglish">English </label>
-      					</div>
-      				</div>
-      			</div>
+          <p className="lead">Upload a new image to OCR</p>
+      		<fieldset className="form-group" disabled>
+            <label htmlFor="bookName">Selected Book</label>
+            <input type="text" id="bookName" className="form-control" placeholder={this.props.bookName}/>
       		</fieldset>
       		<div className="input-group mb-3">
       			<div className="input-group-prepend">
