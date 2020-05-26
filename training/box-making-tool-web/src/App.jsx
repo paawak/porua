@@ -1,8 +1,10 @@
 import React from 'react';
 import OcrCorrectionPage from './OcrCorrectionPage'
 import ImageUploader from './ImageUploader'
+import PageSelectionPanel from './PageSelectionPanel'
 
 export const DisplayMode = {
+      PAGE_SELECTION: 'PAGE_SELECTION',
       IMAGE_UPLOADER: 'IMAGE_UPLOADER',
       IMAGE_PROCESSING_IN_PROGRESS: 'IMAGE_PROCESSING_IN_PROGRESS',
       OCR_CORRECTION_PAGE: 'OCR_CORRECTION_PAGE'
@@ -13,15 +15,16 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      displayMode: DisplayMode.IMAGE_UPLOADER,
+      displayMode: DisplayMode.PAGE_SELECTION,
       ocrWords: []
     };
   }
 
   render() {
     let panelToDisplay;
-
-    if (this.state.displayMode === DisplayMode.IMAGE_UPLOADER) {
+    if (this.state.displayMode === DisplayMode.PAGE_SELECTION) {
+      panelToDisplay = <PageSelectionPanel/>;
+    } else if (this.state.displayMode === DisplayMode.IMAGE_UPLOADER) {
       panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><ImageUploader
       imageSubmittedForAnalysis={() => {
           this.setState({
