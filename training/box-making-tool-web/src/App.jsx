@@ -22,12 +22,18 @@ class App extends React.Component {
 
   render() {
     let panelToDisplay;
+    const ocrWordsRecievedEvent = (ocrWordListData) => {
+        this.setState({
+          ocrWords: ocrWordListData,
+          displayMode: DisplayMode.OCR_CORRECTION_PAGE
+        });
+    };
     if (this.state.displayMode === DisplayMode.PAGE_SELECTION) {
       panelToDisplay = <PageSelectionPanel
-        ocrWordsRecieved={ocrWordListData => {
+        ocrWordsRecievedForExistingPage={ocrWordsRecievedEvent}
+        showNewPagePanel={() => {
             this.setState({
-              ocrWords: ocrWordListData,
-              displayMode: DisplayMode.OCR_CORRECTION_PAGE
+              displayMode: DisplayMode.IMAGE_UPLOADER
             });
           }
         }
@@ -40,13 +46,7 @@ class App extends React.Component {
           });
         }
       }
-      ocrWordsRecieved={ocrWordListData => {
-          this.setState({
-            ocrWords: ocrWordListData,
-            displayMode: DisplayMode.OCR_CORRECTION_PAGE
-          });
-        }
-      }/></div>;
+      ocrWordsRecievedForNewPage={ocrWordsRecievedEvent}/></div>;
     } else if (this.state.displayMode === DisplayMode.IMAGE_PROCESSING_IN_PROGRESS) {
       panelToDisplay =
       <button className="btn btn-primary btn-lg btn-block" type="button" disabled>

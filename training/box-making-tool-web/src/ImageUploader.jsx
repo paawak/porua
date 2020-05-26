@@ -32,7 +32,7 @@ class ImageUploader extends React.Component {
         body: data,
       }).then(response => response.json())
         .then(data => {
-          this.props.ocrWordsRecieved(data);
+          this.props.ocrWordsRecievedForNewPage(data);
         });
 
         this.props.imageSubmittedForAnalysis();
