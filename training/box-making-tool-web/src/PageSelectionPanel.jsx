@@ -9,8 +9,28 @@ class PageSelectionPanel extends React.Component {
     this.state = {
       books: [],
       pages: [],
-      selectedBookId: null
+      selectedBookId: null,
+      selectedPageId: null
     };
+    this.handleButtonClick = this.handleButtonClick.bind(this);
+  }
+
+  handleButtonClick() {
+    if ((this.state.selectedBookId == null) || (this.state.selectedBookId === '')) {
+      alert('Select a Book');
+      return;
+    }
+
+    if ((this.state.selectedPageId == null) || (this.state.selectedPageId === '')) {
+      alert('Select a Page');
+      return;
+    }
+
+    if (this.state.selectedPageId === NEW_PAGE_OPTION) {
+      alert('New Page');
+    } else {
+      alert('Existing Page');
+    }
   }
 
   componentDidMount() {
@@ -39,8 +59,9 @@ class PageSelectionPanel extends React.Component {
           onChange={e => {
               let bookId = e.target.value;
               this.setState({
-                pages: [],
-                selectedBookId: bookId
+                selectedBookId: bookId,
+                selectedPageId: null,
+                pages: []
               });
 
               if (bookId !== '') {
@@ -49,7 +70,6 @@ class PageSelectionPanel extends React.Component {
                   .then(pages => this.setState({ pages: pages }))
                   .catch(() => this.setState({ hasErrors: true }));
               }
-
             }
           }
           >
@@ -61,7 +81,14 @@ class PageSelectionPanel extends React.Component {
 
         <div className="mb-3">
           <label htmlFor="page">Page</label>
-          <select id="page" className="custom-select" required>
+          <select id="page" className="custom-select" required
+            onChange={e => {
+                this.setState({
+                  selectedPageId: e.target.value
+                });
+              }
+            }
+          >
             <option value="">Choose...</option>
             <option value={NEW_PAGE_OPTION}>Add New Page</option>
             {pageItems}
@@ -69,7 +96,7 @@ class PageSelectionPanel extends React.Component {
           <div className="invalid-feedback">* Select a Page</div>
         </div>
 
-        <button type="button" className="btn btn-success">Submit</button>
+        <button type="button" className="btn btn-success" onClick={this.handleButtonClick}>Submit</button>
 
       </form>
     );
