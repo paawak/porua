@@ -7,11 +7,13 @@ class OcrCorrectionPage extends React.Component {
 
     if (this.props.ocrWords.status !== 200) {
       return (
-        <div className="alert alert-danger alert-dismissible fade show" role="alert">
-          <strong>Oops!</strong> Could not upload image for analysis.
-          <button type="button" className="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
+        <div className="alert alert-danger" role="alert">
+          <h4 className="alert-heading">Error uploading image!</h4>
+          <p>
+            Could not upload image for analysis.
+          </p>
+          <hr/>
+          <p className="mb-0">{this.props.ocrWords.message}</p>
         </div>
       );
     }
