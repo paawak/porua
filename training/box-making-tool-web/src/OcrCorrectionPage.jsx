@@ -5,7 +5,7 @@ class OcrCorrectionPage extends React.Component {
 
   render() {
 
-    if (this.props.ocrWords.status !== 200) {
+    if ((this.props.ocrWords.status !== undefined) && (this.props.ocrWords.status !== 200)) {
       return (
         <div className="alert alert-danger" role="alert">
           <h4 className="alert-heading">Error uploading image!</h4>
