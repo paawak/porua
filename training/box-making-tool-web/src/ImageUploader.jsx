@@ -47,7 +47,7 @@ class ImageUploader extends React.Component {
           <p className="lead">Upload a new image to OCR</p>
       		<fieldset className="form-group" disabled>
             <label htmlFor="bookName">Selected Book</label>
-            <input type="text" id="bookName" className="form-control" placeholder={this.props.bookName}/>
+            <input type="text" id="bookName" className="form-control" placeholder={this.props.book.name}/>
       		</fieldset>
       		<div className="input-group mb-3">
       			<div className="input-group-prepend">

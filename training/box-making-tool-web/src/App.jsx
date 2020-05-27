@@ -17,8 +17,7 @@ class App extends React.Component {
     this.state = {
       displayMode: DisplayMode.PAGE_SELECTION,
       ocrWords: [],
-      newPageBookId: null,
-      newPageBookName: null
+      book: null
     };
   }
 
@@ -33,19 +32,17 @@ class App extends React.Component {
     if (this.state.displayMode === DisplayMode.PAGE_SELECTION) {
       panelToDisplay = <PageSelectionPanel
         ocrWordsRecievedForExistingPage={ocrWordsRecievedEvent}
-        showNewPagePanel={(bookId, bookName) => {
+        showNewPagePanel={(book) => {
             this.setState({
               displayMode: DisplayMode.IMAGE_UPLOADER,
-              newPageBookId: bookId,
-              newPageBookName: bookName
+              book: book
             });
           }
         }
       />;
     } else if (this.state.displayMode === DisplayMode.IMAGE_UPLOADER) {
-      panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><ImageUploader
-      bookId={this.state.newPageBookId}
-      bookName={this.state.newPageBookName}
+      panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight">
+      <ImageUploader book={this.state.book}
       imageSubmittedForAnalysis={() => {
           this.setState({
             displayMode: DisplayMode.IMAGE_PROCESSING_IN_PROGRESS
