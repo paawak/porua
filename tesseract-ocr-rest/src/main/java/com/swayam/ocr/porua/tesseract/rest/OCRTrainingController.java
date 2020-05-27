@@ -68,11 +68,12 @@ public class OCRTrainingController {
     }
 
     @PostMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<OcrWord> submitPageAndAnalyzeWords(@RequestPart("bookId") final long bookId, @RequestPart("pageNumber") final int pageNumber, @RequestPart("image") final FilePart image)
-	    throws IOException, URISyntaxException {
+    public Flux<OcrWord> submitPageAndAnalyzeWords(@RequestPart("bookId") final String bookIdString, @RequestPart("pageNumber") final String pageNumberString,
+	    @RequestPart("image") final FilePart image) throws IOException, URISyntaxException {
 
-	LOG.info("Uploaded fileName: {}", image.filename());
+	LOG.info("BookId: {}, PageNumber: {}, Uploaded fileName: {}", bookIdString, pageNumberString, image.filename());
 
+	long bookId = Long.valueOf(bookIdString);
 	Book book = ocrDataStoreService.getBook(bookId);
 
 	String imageFileName = image.filename();
@@ -80,7 +81,8 @@ public class OCRTrainingController {
 
 	PageImage newPageImage = new PageImage();
 	newPageImage.setName(imageFileName);
-	newPageImage.setPageNumber(pageNumber);
+	newPageImage.setPageNumber(Integer.valueOf(pageNumberString));
+	newPageImage.setBook(book);
 	long imageFileId = ocrDataStoreService.addPageImage(newPageImage).getId();
 
 	return Flux.create((FluxSink<OcrWord> fluxSink) -> {
