@@ -48,6 +48,8 @@ class ImageUploader extends React.Component {
       		<fieldset className="form-group" disabled>
             <label htmlFor="bookName">Selected Book</label>
             <input type="text" id="bookName" className="form-control" placeholder={this.props.book.name}/>
+            <label htmlFor="languageName">Selected Language</label>
+            <input type="text" id="languageName" className="form-control" placeholder={this.props.book.language}/>
       		</fieldset>
       		<div className="input-group mb-3">
       			<div className="input-group-prepend">
