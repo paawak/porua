@@ -5,26 +5,20 @@ class ImageUploader extends React.Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleLanguageChange = this.handleLanguageChange.bind(this);
     this.imageFileInput = React.createRef();
     this.state = {
       isImageFileSelected: false,
-      selectedLanguage: 'ben',
-      selectedImageFileName: 'Choose file...'
+      selectedImageFileName: 'Choose file...',
+      pageNumberEntered: null
     };
-  }
-
-  handleLanguageChange(event) {
-    this.setState({
-      selectedLanguage: event.target.value
-    });
   }
 
   handleSubmit(event) {
     event.preventDefault();
     if (this.state.isImageFileSelected) {
       const data = new FormData();
-      data.append('language', this.state.selectedLanguage);
+      data.append('bookId', this.props.book.id);
+      data.append('pageNumber', this.state.pageNumberEntered);
       data.append('image', this.imageFileInput.current.files[0]);
 
       fetch('http://localhost:8080/train/word', {
@@ -48,9 +42,17 @@ class ImageUploader extends React.Component {
       		<fieldset className="form-group" disabled>
             <label htmlFor="bookName">Selected Book</label>
             <input type="text" id="bookName" className="form-control" placeholder={this.props.book.name}/>
+      		</fieldset>
+          <fieldset className="form-group" disabled>
             <label htmlFor="languageName">Selected Language</label>
             <input type="text" id="languageName" className="form-control" placeholder={this.props.book.language}/>
       		</fieldset>
+          <div className="form-group">
+            <label htmlFor="pageNumber">Page Number</label>
+            <input type="number" className="form-control" id="pageNumber" onChange={
+              e => {this.setState({pageNumberEntered: e.target.value})}
+            }/>
+          </div>
       		<div className="input-group mb-3">
       			<div className="input-group-prepend">
       				<span className="input-group-text" id="imageAddon">Upload Image</span>
