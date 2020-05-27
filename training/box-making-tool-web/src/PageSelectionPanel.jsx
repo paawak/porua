@@ -28,7 +28,7 @@ class PageSelectionPanel extends React.Component {
 
     if (this.state.selectedPageId === NEW_PAGE_OPTION) {
       let bookId = this.state.selectedBookId;
-      let book = this.state.books.filter(book => book.id == bookId)[0];
+      let book = this.state.books.filter(book => book.id === parseInt(bookId, 10))[0];
       this.props.showNewPagePanel(book);
     } else {
       fetch("http://localhost:8080/train/word?bookId=" + this.state.selectedBookId + "&pageImageId=" + this.state.selectedPageId)
