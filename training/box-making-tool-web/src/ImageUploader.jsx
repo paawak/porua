@@ -46,7 +46,8 @@ class ImageUploader extends React.Component {
             errorMessage: jsonReponse.message
           });
         } else {
-          this.props.ocrWordsRecievedForNewPage(jsonReponse);          
+          let page = {name: this.state.selectedImageFileName, book: this.props.book};
+          this.props.ocrWordsRecievedForNewPage(jsonReponse, page);          
         }
       });
 
