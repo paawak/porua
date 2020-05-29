@@ -1,4 +1,6 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Fix for common problems
+### Error: ENOSPC: System limit for number of file watchers reached, watch 'box-making-tool-web/public'
+    export CHOKIDAR_USEPOLLING=1
 
 ## Available Scripts
 
