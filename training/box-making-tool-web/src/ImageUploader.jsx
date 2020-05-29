@@ -56,8 +56,8 @@ class ImageUploader extends React.Component {
         errorMessage: null
       });
 
-      } else {
-        alert("Please select an image to upload");
+    } else {
+      alert("Please select an image to upload");
     }
   }
 
