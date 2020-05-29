@@ -31,9 +31,11 @@ class PageSelectionPanel extends React.Component {
       let book = this.state.books.filter(book => book.id === parseInt(bookId, 10))[0];
       this.props.showNewPagePanel(book);
     } else {
-      fetch("http://localhost:8080/train/word?bookId=" + this.state.selectedBookId + "&pageImageId=" + this.state.selectedPageId)
+      let pageId = this.state.selectedPageId;
+      let page = this.state.pages.filter(page => page.id === parseInt(pageId, 10))[0];
+      fetch("http://localhost:8080/train/word?bookId=" + this.state.selectedBookId + "&pageImageId=" + pageId)
         .then(rawData => rawData.json())
-        .then(data => this.props.ocrWordsRecievedForExistingPage(data))
+        .then(data => this.props.ocrWordsRecievedForExistingPage(data, page))
         .catch(() => this.setState({ hasErrors: true }));
     }
   }

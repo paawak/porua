@@ -16,16 +16,18 @@ class App extends React.Component {
     this.state = {
       displayMode: DisplayMode.PAGE_SELECTION,
       ocrWords: [],
-      book: null
+      book: null,
+      page: null
     };
   }
 
   render() {
     let panelToDisplay;
-    const ocrWordsRecievedEvent = (ocrWordListData) => {
+    const ocrWordsRecievedEvent = (ocrWordListData, page) => {
         this.setState({
           ocrWords: ocrWordListData,
-          displayMode: DisplayMode.OCR_CORRECTION_PAGE
+          displayMode: DisplayMode.OCR_CORRECTION_PAGE,
+          page: page
         });
     };
     if (this.state.displayMode === DisplayMode.PAGE_SELECTION) {
@@ -44,7 +46,7 @@ class App extends React.Component {
         <ImageUploader book={this.state.book} ocrWordsRecievedForNewPage={ocrWordsRecievedEvent}/>
       </div>;
     } else if (this.state.displayMode === DisplayMode.OCR_CORRECTION_PAGE) {
-      panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><OcrCorrectionPage ocrWords={this.state.ocrWords}/></div>
+      panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight"><OcrCorrectionPage ocrWords={this.state.ocrWords} page={this.state.page}/></div>
     } else {
       panelToDisplay = <div/>;
     }
