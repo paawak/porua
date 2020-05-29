@@ -92,10 +92,12 @@ public class OCRTrainingController {
     }
 
     @GetMapping(value = "/word/image")
-    public Mono<ResponseEntity<byte[]>> getOcrWordImage(@RequestParam("bookId") final long bookId, @RequestParam("pageImageId") final long rawImageId,
-	    @RequestParam("wordSequenceId") int wordSequenceId, @RequestParam("imagePath") Path imagePath) throws IOException {
-	LOG.trace("serving ocr word image for id: {}", wordSequenceId);
-	OcrWord ocrText = ocrDataStoreService.getWord(new OcrWordId(bookId, rawImageId, wordSequenceId));
+    public Mono<ResponseEntity<byte[]>> getOcrWordImage(@RequestParam("bookId") final long bookId, @RequestParam("pageImageId") final long pageImageId,
+	    @RequestParam("wordSequenceId") int wordSequenceId) throws IOException {
+	String pageImageName = ocrDataStoreService.getPageImage(pageImageId).getName();
+	Path imagePath = fileSystemUtil.getImageSaveLocation(pageImageName);
+	LOG.trace("serving ocr word image for id: {} and page image name: {}", wordSequenceId, pageImageName);
+	OcrWord ocrText = ocrDataStoreService.getWord(new OcrWordId(bookId, pageImageId, wordSequenceId));
 	BufferedImage fullImage = ImageIO.read(Files.newInputStream(imagePath));
 	Rectangle wordArea = TesseractOcrWordAnalyser.getWordArea(ocrText);
 	BufferedImage wordImage = fullImage.getSubimage(wordArea.x, wordArea.y, wordArea.width, wordArea.height);

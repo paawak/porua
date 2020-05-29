@@ -47,6 +47,11 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
     }
 
     @Override
+    public PageImage getPageImage(long pageImageId) {
+	return pageImageRepository.findById(pageImageId).get();
+    }
+
+    @Override
     public int getPageCount(long bookId) {
 	return pageImageRepository.countByBookId(bookId);
     }
