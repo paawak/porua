@@ -5,9 +5,6 @@ class BanglaTextBox extends Component {
 
   componentDidMount(){
     this.$el = $(this.el);
-    $('input[type="text"]').click(function() {
-      console.log("aaaaa");      
-    }); 
     $('input[type="text"]').bangla({enable: true});
   }
   
@@ -15,7 +12,7 @@ class BanglaTextBox extends Component {
     return (
       <div>
         <h3>Choose date!</h3>
-        <input type='text'  ref={el => this.el = el}  />
+        <input type='text' id="banglaText1"  ref={el => this.el = el}  />
       </div>    
     )
   }
