@@ -2,7 +2,6 @@ import React from 'react';
 import OcrCorrectionPage from './OcrCorrectionPage'
 import ImageUploader from './ImageUploader'
 import PageSelectionPanel from './PageSelectionPanel'
-import BanglaTextBox from './BanglaTextBox'
 
 export const DisplayMode = {
       PAGE_SELECTION: 'PAGE_SELECTION',
@@ -57,8 +56,7 @@ class App extends React.Component {
         <div className="container-xl">
           <h1 className="display-4">OCR Training Workbench</h1>
           {panelToDisplay}
-          </div>
-          <BanglaTextBox/>
+          </div>          
       </div>
     );
   }
