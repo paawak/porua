@@ -1,30 +1,21 @@
-import React from 'react';
+import React, { Component } from "react";
+import { render } from "react-dom";
+import $ from "jquery";
 
-class BanglaTextBox extends React.Component {
-
-  constructor(props) {
-    super(props);
-    this.handleKeyEvent = this.handleKeyEvent.bind(this);
-    this.state = {};
+class BanglaTextBox extends Component {
+  componentDidMount() {
+    $('input[type="text"]').click(function() {
+      console.log("aaaaa");      
+    }); 
+    //$('input[type="text"]').bangla();//not working
   }
-
-  handleKeyEvent(keyEvent) {
-    if (keyEvent.metaKey) {
-      console.log("Metachar");
-      return;
-    }
-    console.log("char: " + keyEvent.keyCode );
-
-    //keyEvent.key = '\u0995';
-    
-  }
-
   render() {
     return (
-      <input type="text" onKeyUp={this.handleKeyEvent}/>
+      <input type="text" id="banglaText"/>
     );
   }
-
 }
+
+render(<BanglaTextBox />, document.getElementById("root"));
 
 export default BanglaTextBox;
