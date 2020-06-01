@@ -1,21 +1,26 @@
 import React, { Component } from "react";
-import { render } from "react-dom";
 import $ from "jquery";
 
+
 class BanglaTextBox extends Component {
-  componentDidMount() {
+
+  componentDidMount(){
+    this.$el = $(this.el);
+    //$('input[type="text"]').bangla(); 
     $('input[type="text"]').click(function() {
       console.log("aaaaa");      
     }); 
-    //$('input[type="text"]').bangla();//not working
   }
-  render() {
+  
+  render(){
     return (
-      <input type="text" id="banglaText"/>
-    );
+      <div>
+        <h3>Choose date!</h3>
+        <input type='text'  ref={el => this.el = el}  />
+      </div>    
+    )
   }
-}
 
-render(<BanglaTextBox />, document.getElementById("root"));
+}
 
 export default BanglaTextBox;
