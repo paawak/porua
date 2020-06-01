@@ -1,19 +1,17 @@
 import React, { Component } from "react";
+
 const $ = window.$;
 
 class BanglaTextBox extends Component {
 
   componentDidMount(){
     this.$el = $(this.el);
-    $('input[type="text"]').bangla({enable: true});
+    $('input[class="banglaText"]').bangla({enable: true});
   }
   
-  render(){
+  render() {
     return (
-      <div>
-        <h3>Choose date!</h3>
-        <input type='text' id="banglaText1"  ref={el => this.el = el}  />
-      </div>    
+      <input type='text' className="banglaText"  ref={el => this.el = el}  /> 
     )
   }
 
