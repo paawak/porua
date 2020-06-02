@@ -1,4 +1,5 @@
 import React from 'react';
+import BanglaTextBox from './BanglaTextBox'
 
 class OcrWord extends React.Component {
 
@@ -30,7 +31,7 @@ class OcrWord extends React.Component {
               <label htmlFor={correctedTextInputId}>Correction: </label>
             </div>
             <div className="col">
-              <input type="text" name={correctedTextInputId} id={correctedTextInputId}/>
+              <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId}/>
             </div>
           </div>
         </div>

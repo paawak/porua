@@ -1,4 +1,5 @@
 import React from 'react';
+import ImageProcessingInProgress from './ImageProcessingInProgress';
 
 export const DisplayMode = {
   IMAGE_UPLOADER: 'IMAGE_UPLOADER',
@@ -68,11 +69,7 @@ class ImageUploader extends React.Component {
     if (this.state.displayMode === DisplayMode.IMAGE_UPLOADER) {
       panelToDisplay = this.renderImageUploadForm();
     } else if (this.state.displayMode === DisplayMode.IMAGE_PROCESSING_IN_PROGRESS) {
-      panelToDisplay =
-      <button className="btn btn-primary btn-lg btn-block" type="button" disabled>
-        <span className="spinner-border spinner-border-sm float-left" role="status" aria-hidden="true"></span>
-        Please wait while we analyse the uploaded image...
-      </button>
+      panelToDisplay = <ImageProcessingInProgress/>;      
     } else {
       panelToDisplay = <div/>;
     }

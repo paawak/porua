@@ -2,6 +2,10 @@
 ### Error: ENOSPC: System limit for number of file watchers reached, watch 'box-making-tool-web/public'
     export CHOKIDAR_USEPOLLING=1
 
+## Bangla typing
+1. <https://github.com/dipu-bd/jquery.bangla>    
+1. <https://medium.com/@dipu.sudipta/jquery-bangla-an-input-tool-for-bangla-language-cc3bd781b2d8>
+
 ## Available Scripts
 
 In the project directory, you can run:

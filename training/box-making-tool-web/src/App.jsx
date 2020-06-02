@@ -56,7 +56,7 @@ class App extends React.Component {
         <div className="container-xl">
           <h1 className="display-4">OCR Training Workbench</h1>
           {panelToDisplay}
-          </div>
+          </div>          
       </div>
     );
   }
