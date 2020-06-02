@@ -22,5 +22,6 @@ CREATE MEMORY TABLE IF NOT EXISTS ocr_word (
     x2 INTEGER NOT NULL,
     y2 INTEGER NOT NULL, 
     confidence  DOUBLE NOT NULL,
-    line_number INTEGER
+    line_number INTEGER,
+    ignored BOOLEAN DEFAULT FALSE NOT NULL
 );

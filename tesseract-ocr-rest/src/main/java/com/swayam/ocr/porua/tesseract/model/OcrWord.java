@@ -41,4 +41,7 @@ public class OcrWord {
     @Column(name = "line_number")
     private Integer lineNumber;
 
+    @Column
+    private boolean ignored;
+
 }

@@ -228,6 +228,7 @@ class OcrDataStoreServiceImplIntegrationTest {
 	// given
 	OcrWord ocrWord1 = getOcrWord(1, 1, 11, 22, 33, 44, 55.55f, "ABC123", 1);
 	OcrWord ocrWord2 = getOcrWord(1, 1, 111, 222, 333, 444, 555.555f, "DEF456", 2);
+	ocrWord2.setIgnored(true);
 	OcrWord ocrWord3 = getOcrWord(1, 1, 1111, 2222, 3333, 4444, 5555.5555f, "GHI789", 3);
 	OcrWord ocrWord4 = getOcrWord(1, 2, 11, 22, 33, 44, 55.55f, "ABC123", 1);
 	OcrWord ocrWord5 = getOcrWord(1, 2, 111, 222, 333, 444, 555.555f, "DEF456", 2);
@@ -238,7 +239,7 @@ class OcrDataStoreServiceImplIntegrationTest {
 
 	List<OcrWord> toBeInserted = Arrays.asList(ocrWord1, ocrWord2, ocrWord3, ocrWord4, ocrWord5, ocrWord6, ocrWord7, ocrWord8, ocrWord9);
 
-	List<OcrWord> expected = Arrays.asList(ocrWord1, ocrWord2, ocrWord3);
+	List<OcrWord> expected = Arrays.asList(ocrWord1, ocrWord3);
 
 	toBeInserted.forEach(ocrWord -> testClass.addOcrWord(ocrWord));
 
@@ -254,6 +255,7 @@ class OcrDataStoreServiceImplIntegrationTest {
 	// given
 	OcrWord ocrWord1 = getOcrWord(1, 1, 11, 22, 33, 44, 55.55f, "ABC123", 1);
 	OcrWord ocrWord2 = getOcrWord(1, 1, 111, 222, 333, 444, 555.555f, "DEF456", 2);
+	ocrWord2.setIgnored(true);
 	OcrWord ocrWord3 = getOcrWord(1, 1, 1111, 2222, 3333, 4444, 5555.5555f, "GHI789", 3);
 	OcrWord ocrWord4 = getOcrWord(1, 2, 11, 22, 33, 44, 55.55f, "ABC123", 1);
 	OcrWord ocrWord5 = getOcrWord(1, 2, 111, 222, 333, 444, 555.555f, "DEF456", 2);
@@ -270,7 +272,7 @@ class OcrDataStoreServiceImplIntegrationTest {
 	int result = testClass.getWordCount(1, 1);
 
 	// then
-	assertEquals(3, result);
+	assertEquals(2, result);
     }
 
     private RowMapper<OcrWord> ocrWordMapper() {
