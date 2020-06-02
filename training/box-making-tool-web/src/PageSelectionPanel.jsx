@@ -1,6 +1,12 @@
 import React from 'react';
+import ImageProcessingInProgress from './ImageProcessingInProgress';
 
 export const NEW_PAGE_OPTION = "NEW_PAGE_OPTION";
+
+export const DisplayMode = {
+  PAGE_SELECTION_FORM: 'PAGE_SELECTION_FORM',
+  IMAGE_PROCESSING_IN_PROGRESS: 'IMAGE_PROCESSING_IN_PROGRESS'
+};
 
 class PageSelectionPanel extends React.Component {
 
@@ -10,7 +16,8 @@ class PageSelectionPanel extends React.Component {
       books: [],
       pages: [],
       selectedBookId: null,
-      selectedPageId: null
+      selectedPageId: null,
+      displayMode: DisplayMode.PAGE_SELECTION_FORM
     };
     this.handleButtonClick = this.handleButtonClick.bind(this);
   }
@@ -31,6 +38,9 @@ class PageSelectionPanel extends React.Component {
       let book = this.state.books.filter(book => book.id === parseInt(bookId, 10))[0];
       this.props.showNewPagePanel(book);
     } else {
+      this.setState({
+        displayMode: DisplayMode.IMAGE_PROCESSING_IN_PROGRESS
+      });
       let pageId = this.state.selectedPageId;
       let page = this.state.pages.filter(page => page.id === parseInt(pageId, 10))[0];
       fetch("http://localhost:8080/train/word?bookId=" + this.state.selectedBookId + "&pageImageId=" + pageId)
@@ -47,7 +57,19 @@ class PageSelectionPanel extends React.Component {
       .catch(() => this.setState({ hasErrors: true }));
   }
 
-  render() {
+  render() {    
+    let panel;
+    if (this.state.displayMode === DisplayMode.PAGE_SELECTION_FORM) {
+      panel = this.displayPageSelectionForm();
+    } else if (this.state.displayMode === DisplayMode.IMAGE_PROCESSING_IN_PROGRESS) {
+      panel = <ImageProcessingInProgress/>;
+    } else {
+      panel = <div/>;
+    }
+    return (panel);
+  }
+
+  displayPageSelectionForm() {
 
     const bookItems = this.state.books.map((book) =>
       <option key={book.id} value={book.id}>{book.name}</option>
@@ -57,58 +79,51 @@ class PageSelectionPanel extends React.Component {
       <option key={page.id} value={page.id}>{page.name}</option>
     );
 
-    return (
-      <form className="was-validated">
-
-        <div className="mb-3">
-          <label htmlFor="book">Book</label>
-          <select id="book" className="custom-select" required
-          onChange={e => {
-            let bookId = e.target.value;
+    return <form className="was-validated">
+      <div className="mb-3">
+        <label htmlFor="book">Book</label>
+        <select id="book" className="custom-select" required onChange={e => {
+          let bookId = e.target.value;
+          this.setState({
+            selectedBookId: bookId,
+            selectedPageId: null,
+            pages: []
+          });
+          if (bookId !== '') {
             this.setState({
               selectedBookId: bookId,
               selectedPageId: null,
-              pages: []
-            });
-
-            if (bookId !== '') {
-              fetch("http://localhost:8080/train/page?bookId=" + bookId)
-                .then(rawData => rawData.json())
-                .then(pages => this.setState({ pages: pages }))
-                .catch(() => this.setState({ hasErrors: true }));
-            }
-            }
+              pages: []            });
+            fetch("http://localhost:8080/train/page?bookId=" + bookId)
+              .then(rawData => rawData.json())
+              .then(pages => this.setState({ pages: pages }))
+              .catch(() => this.setState({ hasErrors: true }));            
           }
-          >
-            <option value="">Choose...</option>
-            {bookItems}
-          </select>
-          <div className="invalid-feedback">* Select a Book</div>
-        </div>
+        } }>
+          <option value="">Choose...</option>
+          {bookItems}
+        </select>
+        <div className="invalid-feedback">* Select a Book</div>
+      </div>
 
-        <div className="mb-3">
-          <label htmlFor="page">Page</label>
-          <select id="page" className="custom-select" required
-            onChange={e => {
-                this.setState({
-                  selectedPageId: e.target.value
-                });
-              }
-            }
-          >
-            <option value="">Choose...</option>
-            <option value={NEW_PAGE_OPTION}>Add New Page</option>
-            {pageItems}
-          </select>
-          <div className="invalid-feedback">* Select a Page</div>
-        </div>
+      <div className="mb-3">
+        <label htmlFor="page">Page</label>
+        <select id="page" className="custom-select" required onChange={e => {
+          this.setState({
+            selectedPageId: e.target.value
+          });
+        } }>
+          <option value="">Choose...</option>
+          <option value={NEW_PAGE_OPTION}>Add New Page</option>
+          {pageItems}
+        </select>
+        <div className="invalid-feedback">* Select a Page</div>
+      </div>
 
-        <button type="button" className="btn btn-success" onClick={this.handleButtonClick}>Submit</button>
+      <button type="button" className="btn btn-success" onClick={this.handleButtonClick}>Submit</button>
 
-      </form>
-    );
+    </form>;
   }
-
 }
 
 export default PageSelectionPanel;
