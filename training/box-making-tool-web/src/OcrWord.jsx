@@ -15,10 +15,18 @@ class OcrWord extends React.Component {
     const correctedTextInputId = idGenerator("correctedText");
     const closeButtonId = idGenerator("closeButton");
 
+    const borderColorClassMap = {
+      0: 'success',
+      1: 'danger',
+      2: 'warning'
+    };
+
+    const borderColorClass = "border-" + borderColorClassMap[parseInt(this.props.wordSequenceId, 10) % 3];
+
     return (
       <div className="col">                  
           <div className="container">                                               
-              <div className="row row-cols-1 overflow-auto border border-primary">              
+              <div className={"row row-cols-1 overflow-auto border " + borderColorClass}>              
                 <div className="col">
                   <button type="button" id={closeButtonId} className="close" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
