@@ -6,6 +6,25 @@ class OcrWord extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
+    this.handleCloseButton = this.handleCloseButton.bind(this);
+  }
+
+  handleCloseButton(event) {
+    fetch("http://localhost:8080/train/word/ignore", {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        bookId: this.props.bookId, 
+        pageImageId: this.props.pageImageId,
+        wordSequenceId: this.props.wordSequenceId
+      })
+    })
+    .then(rawData => rawData.json())
+    .then(data => console.log("Ignored word: " + data))
+    .catch(() => this.setState({ hasErrors: true }));
   }
 
   render() {
@@ -28,7 +47,7 @@ class OcrWord extends React.Component {
           <div className="container">                                               
               <div className={"row row-cols-1 overflow-auto border " + borderColorClass}>              
                 <div className="col">
-                  <button type="button" id={closeButtonId} className="close" aria-label="Close">
+                  <button type="button" id={closeButtonId} className="close" aria-label="Close" onClick={this.handleCloseButton}>
                     <span aria-hidden="true">&times;</span>
                   </button> 
                 </div>                       
