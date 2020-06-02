@@ -13,12 +13,17 @@ class OcrWord extends React.Component {
     const idGenerator = (prefix) => prefix + "_" + this.props.wordSequenceId;
     const givenTextInputId = idGenerator("givenText");
     const correctedTextInputId = idGenerator("correctedText");
+    const closeButtonId = idGenerator("closeButton");
 
     return (
       <div className="col">                  
-          <div className="container">                                    
-              <div className="row row-cols-1 overflow-auto">
-              <span className="border border-primary">              
+          <div className="container">                                               
+              <div className="row row-cols-1 overflow-auto border border-primary">              
+                <div className="col">
+                  <button type="button" id={closeButtonId} className="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button> 
+                </div>                       
                 <div className="col">
                   <img id={idGenerator("ocrImage")} alt="..." src={"http://localhost:8080/train/word/image?bookId=" + this.props.bookId + "&pageImageId=" + this.props.pageImageId + "&wordSequenceId=" + this.props.wordSequenceId}/>
                 </div>
@@ -34,7 +39,6 @@ class OcrWord extends React.Component {
                 <div className="col">
                   <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId}/>
                 </div>
-                </span>
               </div>            
           </div>        
       </div>
