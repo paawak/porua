@@ -13,7 +13,7 @@ class OcrCorrectionPage extends React.Component {
     return (
       <div className="container">
         <h2>Ocr Correction Page</h2>                             
-        <div id="carouselExampleControls" className="carousel slide" data-ride="carousel">
+        <div id="bookDetailsCarouselControls" className="carousel slide" data-ride="carousel">
           <div className="carousel-inner">
             <div className="carousel-item active">
               {this.getNameValueAsDiv("Book", this.props.page.book.name)}
@@ -25,11 +25,11 @@ class OcrCorrectionPage extends React.Component {
               {this.getNameValueAsDiv("Page", this.props.page.name)}
             </div>
           </div>
-          <a className="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+          <a className="carousel-control-prev" href="#bookDetailsCarouselControls" role="button" data-slide="prev">
             <span className="carousel-control-prev-icon" aria-hidden="true"></span>
             <span className="sr-only">Previous</span>
           </a>
-          <a className="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+          <a className="carousel-control-next" href="#bookDetailsCarouselControls" role="button" data-slide="next">
             <span className="carousel-control-next-icon" aria-hidden="true"></span>
             <span className="sr-only">Next</span>
           </a>
