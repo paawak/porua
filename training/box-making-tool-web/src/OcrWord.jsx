@@ -6,30 +6,32 @@ class OcrWord extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      disabled: false
+      markForDelete: false
     };
     this.handleCloseButton = this.handleCloseButton.bind(this);
   }
 
   handleCloseButton(event) {
     this.setState({
-      disabled: true
+      markForDelete: !this.state.markForDelete
     });
-    /*fetch("http://localhost:8080/train/word/ignore", {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        bookId: this.props.bookId, 
-        pageImageId: this.props.pageImageId,
-        wordSequenceId: this.props.wordSequenceId
+    if (false) {
+      fetch("http://localhost:8080/train/word/ignore", {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          bookId: this.props.bookId, 
+          pageImageId: this.props.pageImageId,
+          wordSequenceId: this.props.wordSequenceId
+        })
       })
-    })
-    .then(rawData => rawData.json())
-    .then(data => console.log("Ignored word: " + data))
-    .catch(() => this.setState({ hasErrors: true }));*/
+      .then(rawData => rawData.json())
+      .then(data => console.log("Ignored word: " + data))
+      .catch(() => this.setState({ hasErrors: true }));
+    }
   }
 
   render() {
@@ -45,19 +47,19 @@ class OcrWord extends React.Component {
       return "rgb(" + red + ", " + green + ", 0)";
     };        
 
-    let bgColor = "";
+    let highlightColor = "";
 
-    if (this.state.disabled) {
-      bgColor = "bg-danger";
+    if (this.state.markForDelete) {
+      highlightColor = "bg-danger";
     }
     
     return (
       <div className="col">                  
           <div className="container p-2">                                               
-              <div className={`row row-cols-1 overflow-auto border border-warning  ${bgColor}`}>              
+              <div className={`row row-cols-1 overflow-auto border border-warning  ${highlightColor}`}>              
                 <div className="col">
                   <button type="button" id={closeButtonId} className="close text-danger btn-outline-warning" aria-label="Close" 
-                    onClick={this.handleCloseButton} disabled={this.state.disabled}>
+                    onClick={this.handleCloseButton}>
                     <span aria-hidden="true">&times;</span>
                   </button> 
                 </div>                       
@@ -74,7 +76,7 @@ class OcrWord extends React.Component {
                   </h6>
                 </div>
                 <div className="col p-3 form-group">
-                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} placeholder="Correct Text" disabled={this.state.disabled}/>
+                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} placeholder="Correct Text" disabled={this.state.markForDelete}/>
                 </div>
               </div>            
           </div>        
