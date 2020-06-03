@@ -5,12 +5,17 @@ class OcrWord extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      disabled: false
+    };
     this.handleCloseButton = this.handleCloseButton.bind(this);
   }
 
   handleCloseButton(event) {
-    fetch("http://localhost:8080/train/word/ignore", {
+    this.setState({
+      disabled: true
+    });
+    /*fetch("http://localhost:8080/train/word/ignore", {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -24,7 +29,7 @@ class OcrWord extends React.Component {
     })
     .then(rawData => rawData.json())
     .then(data => console.log("Ignored word: " + data))
-    .catch(() => this.setState({ hasErrors: true }));
+    .catch(() => this.setState({ hasErrors: true }));*/
   }
 
   render() {
@@ -39,13 +44,20 @@ class OcrWord extends React.Component {
       let red = ff - green;
       return "rgb(" + red + ", " + green + ", 0)";
     };        
+
+    let bgColor = "";
+
+    if (this.state.disabled) {
+      bgColor = "bg-danger";
+    }
     
     return (
       <div className="col">                  
           <div className="container p-2">                                               
-              <div className="row row-cols-1 overflow-auto border border-warning">              
+              <div className={`row row-cols-1 overflow-auto border border-warning  ${bgColor}`}>              
                 <div className="col">
-                  <button type="button" id={closeButtonId} className="close text-danger" aria-label="Close" onClick={this.handleCloseButton}>
+                  <button type="button" id={closeButtonId} className="close text-danger btn-outline-warning" aria-label="Close" 
+                    onClick={this.handleCloseButton} disabled={this.state.disabled}>
                     <span aria-hidden="true">&times;</span>
                   </button> 
                 </div>                       
@@ -56,11 +68,13 @@ class OcrWord extends React.Component {
                   <p className="lead">OCR Text</p>
                   <hr className="my-4"/>
                   <h1 className="display-4">{this.props.givenText}</h1>
-                  <hr className="my-4"/>
-                  <small style={{backgroundColor: bgColorGenerator()}}>* With {parseInt(this.props.confidence)}% confidence</small>
+                  <hr className="my-4"/>                  
+                  <h6>
+                    * <small style={{backgroundColor: bgColorGenerator()}}>Confidence: {parseInt(this.props.confidence)}%</small>
+                  </h6>
                 </div>
                 <div className="col p-3 form-group">
-                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} placeholder="Correct Text"/>
+                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} placeholder="Correct Text" disabled={this.state.disabled}/>
                 </div>
               </div>            
           </div>        

@@ -15,7 +15,7 @@ class BanglaTextBox extends Component {
   
   render() {
     return (
-      <input type='text' className="banglaText" name={this.props.name} id={this.props.id} placeholder={this.props.placeholder}/> 
+      <input type='text' className="banglaText" name={this.props.name} id={this.props.id} placeholder={this.props.placeholder} disabled={this.props.disabled}/> 
     )
   }
 
