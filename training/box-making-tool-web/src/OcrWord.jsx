@@ -14,8 +14,7 @@ class OcrWord extends React.Component {
 
   handleCloseButton(event) {
     this.setState({
-      markForDelete: !this.state.markForDelete,
-      correctedText: null
+      markForDelete: !this.state.markForDelete
     });
     if (false) {
       fetch("http://localhost:8080/train/word/ignore", {
