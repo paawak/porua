@@ -30,7 +30,6 @@ class OcrWord extends React.Component {
   render() {
 
     const idGenerator = (prefix) => prefix + "_" + this.props.wordSequenceId;
-    const givenTextInputId = idGenerator("givenText");
     const correctedTextInputId = idGenerator("correctedText");
     const closeButtonId = idGenerator("closeButton");
 
@@ -54,11 +53,10 @@ class OcrWord extends React.Component {
                 <div className="col">
                   <img id={idGenerator("ocrImage")} alt="..." src={"http://localhost:8080/train/word/image?bookId=" + this.props.bookId + "&pageImageId=" + this.props.pageImageId + "&wordSequenceId=" + this.props.wordSequenceId}/>
                 </div>
-                <div className="col">
-                  <label htmlFor={givenTextInputId}>OCR:</label>
-                </div>
-                <div className="col">
-                  <input type="text" name={givenTextInputId} id={givenTextInputId} value={this.props.givenText} disabled={true}/>
+                <div className="col alert alert-dark jumbotron jumbotron-fluid" role="alert">
+                  <p className="lead">OCR Text</p>
+                  <hr className="my-4"/>
+                  <h1 className="display-4">{this.props.givenText}</h1>
                 </div>
                 <div className="col">
                   <label htmlFor={correctedTextInputId}>Correction: </label>
