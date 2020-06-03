@@ -5,7 +5,9 @@ class OcrCorrectionPage extends React.Component {
 
   render() {
     const ocrWords = this.props.ocrWords.map((ocrWord) =>
-      <OcrWord key={ocrWord.ocrWordId.wordSequenceId} bookId={ocrWord.ocrWordId.bookId}
+      <OcrWord key={ocrWord.ocrWordId.wordSequenceId} 
+        bookId={ocrWord.ocrWordId.bookId}
+        confidence={ocrWord.confidence}
         pageImageId={ocrWord.ocrWordId.pageImageId} wordSequenceId={ocrWord.ocrWordId.wordSequenceId}
         givenText={ocrWord.correctedText == null ? ocrWord.rawText : ocrWord.correctedText}/>
     );
@@ -42,7 +44,7 @@ class OcrCorrectionPage extends React.Component {
   }
 
   getNameValueAsDiv(name, value) {
-    return <div className="jumbotron jumbotron-fluid">
+    return <div className="d-block w-100 jumbotron jumbotron-fluid">
             <div className="container">
               <h1 className="display-4">{name}: {value}</h1>
             </div>
