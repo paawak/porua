@@ -6,14 +6,16 @@ class OcrWord extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      markForDelete: false
+      markForDelete: false,
+      correctedText: null
     };
     this.handleCloseButton = this.handleCloseButton.bind(this);
   }
 
   handleCloseButton(event) {
     this.setState({
-      markForDelete: !this.state.markForDelete
+      markForDelete: !this.state.markForDelete,
+      correctedText: null
     });
     if (false) {
       fetch("http://localhost:8080/train/word/ignore", {
@@ -42,7 +44,7 @@ class OcrWord extends React.Component {
 
     const bgColorGenerator = () => {
       const ff = 0xff;
-      let green = parseFloat(this.props.confidence) * ff / 100;    
+      let green = parseInt(this.props.confidence) * ff / 100;    
       let red = ff - green;
       return "rgb(" + red + ", " + green + ", 0)";
     };        
@@ -51,6 +53,8 @@ class OcrWord extends React.Component {
 
     if (this.state.markForDelete) {
       highlightColor = "bg-danger";
+    } else if (this.state.correctedText) {
+      highlightColor = "bg-warning";
     }
     
     return (
@@ -76,7 +80,14 @@ class OcrWord extends React.Component {
                   </h6>
                 </div>
                 <div className="col p-3 form-group">
-                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} placeholder="Correct Text" disabled={this.state.markForDelete}/>
+                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} placeholder="Correct Text" 
+                    disabled={this.state.markForDelete}
+                    onBlur={evt => {                                              
+                      this.setState({
+                        correctedText: evt.target.value
+                      });
+                    } 
+                    }/>
                 </div>
               </div>            
           </div>        
