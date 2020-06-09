@@ -10,12 +10,17 @@ class BanglaTextBox extends Component {
   }
 
   componentDidMount(){
-    $('input[class="banglaText"]').bangla({enable: true});
+    const jqueryIdSelector = "#" + this.props.id;
+    $(jqueryIdSelector).bangla({enable: true});
   }
   
   render() {
     return (
-      <input type='text' className="banglaText" name={this.props.name} id={this.props.id} /> 
+      <input type='text' className="banglaText" name={this.props.name} id={this.props.id} 
+        placeholder={this.props.placeholder} 
+        disabled={this.props.disabled}
+        onBlur={this.props.onBlur}        
+        /> 
     )
   }
 

@@ -36,4 +36,6 @@ public interface OcrDataStoreService {
 
     void removeWord(OcrWordId ocrWordId);
 
+    OcrWord markWordAsIgnored(OcrWordId ocrWordId);
+
 }
