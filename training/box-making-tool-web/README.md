@@ -15,10 +15,9 @@ This demo will show you how you can upload a new image containing Bangla to the 
 ## Correct an existing image
 This demo will show you how you can retrieve an image that you had uploaded in the past and correct it.
 
-![](assets/tesseract-box-making-tool-correcting-existing-image-file.m4v)
-
   <video controls="true" allowfullscreen="true" poster="assets/assets/tesseract-box-making-tool-correcting-existing-image-file.png">
     <source src="assets/tesseract-box-making-tool-correcting-existing-image-file.m4v" type="video/mp4">
+    Your browser does not support the video tag.
   </video>
 
 # Developer Stuff
