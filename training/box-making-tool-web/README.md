@@ -1,74 +1,34 @@
-## Fix for common problems
-### Error: ENOSPC: System limit for number of file watchers reached, watch 'box-making-tool-web/public'
-    export CHOKIDAR_USEPOLLING=1
+# Introduction
+This is a tool for creating box files for Tesseract OCR from Bangla images. You would be able to edit images which show incorrect text and feed it to the backend system for correction. The box file is generated with corrected text. This is still work in progress.
+
+# Demo
+
+## Upload a new image
+This demo will show you how you can upload a new image containing Bangla to the backend system, and how it detects words using OCR and then sends it to the frontend so that you can manually correct the words, or remove mis-detected words.
+
+[![Tesseract box making tool upload new image file demo](assets/tesseract-box-making-tool-uploading-new-image-file.png)](https://www.youtube.com/embed/7Cm_kfVbbcM)
+
+## Correct an existing image
+This demo will show you how you can retrieve an image that you had uploaded in the past and correct it.
+
+[![Tesseract box making tool correcting existing image file demo](assets/tesseract-box-making-tool-correcting-existing-image-file.png)](https://www.youtube.com/embed/Wj0ILdo_Eqs)
+
+# Developer Stuff
+
+## Running the project
+
+This project is written in React. You can run it by:
+
+    npm start
+
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ## Bangla typing
 1. <https://github.com/dipu-bd/jquery.bangla>    
 1. <https://medium.com/@dipu.sudipta/jquery-bangla-an-input-tool-for-bangla-language-cc3bd781b2d8>
 
-## Available Scripts
+## Fix for common problems
+### Error: ENOSPC: System limit for number of file watchers reached, watch 'box-making-tool-web/public'
+This happens when you have the Visual Studio Open. Solution:
 
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+    export CHOKIDAR_USEPOLLING=1
