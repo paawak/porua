@@ -15,21 +15,43 @@ class OcrCorrectionPage extends React.Component {
     );
 
     return (
-      <div className="container">
+      <div className="container">     
         <nav className="navbar sticky-top navbar-expand-lg navbar-light bg-light">
           <div className="navbar-brand">Ocr Correction Page</div>
-          <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
             <span className="navbar-toggler-icon"></span>
           </button>
-          <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div className="navbar-nav">
-              <div className="nav-item nav-link">Language: {this.props.page.book.language}</div>
-              <div className="nav-item nav-link">Book: {this.props.page.book.name}</div>              
-              <div className="nav-item nav-link active">Page: {this.props.page.name} <span className="sr-only">(current)</span></div>
-            </div>
+          <div className="collapse navbar-collapse" id="navbarMain">
+            <ul className="navbar-nav">
+              <li className="nav-item dropdown">
+                <div className="nav-link dropdown-toggle" id="navbarLanguageMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Language
+                </div>
+                <div className="dropdown-menu" aria-labelledby="navbarLanguageMenuLink">
+                  <div className="dropdown-item">{this.props.page.book.language}</div>
+                </div>
+              </li>
+              <li className="nav-item dropdown">
+                <div className="nav-link dropdown-toggle" id="navbarBookMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Book
+                </div>
+                <div className="dropdown-menu" aria-labelledby="navbarBookMenuLink">
+                  <div className="dropdown-item">{this.props.page.book.name}</div>
+                </div>
+              </li>
+              <li className="nav-item dropdown active">
+                <div className="nav-link dropdown-toggle" id="navbarPageMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Page <span className="sr-only">(current)</span>
+                </div>
+                <div className="dropdown-menu" aria-labelledby="navbarPageMenuLink">
+                  <div className="dropdown-item">{this.props.page.name}</div>
+                </div>
+              </li>
+            </ul>
           </div>
           <button className="btn btn-outline-success my-2 my-sm-0" type="button">Submit For Correction</button>
-        </nav>             
+        </nav>
+
         <div className="row row-cols-4">
           {ocrWords}
         </div>
