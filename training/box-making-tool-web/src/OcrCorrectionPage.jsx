@@ -9,6 +9,31 @@ class OcrCorrectionPage extends React.Component {
       markedForDeletion: new Map(),
       markedForCorrection: new Map()
     };
+    this.handleSubmitForCorrection = this.handleSubmitForCorrection.bind(this);
+  }
+
+  handleSubmitForCorrection() {
+    this.state.markedForDeletion.forEach(
+      (value, wordSequenceId) => {
+        console.log(wordSequenceId + "::" + value);
+        //FIXME: work in progress
+        fetch("http://localhost:8080/train/word/ignore", {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            bookId: this.props.page.book.bookId, 
+            pageImageId: this.props.page.pageImageId,
+            wordSequenceId: wordSequenceId
+          })
+        })
+        .then(rawData => rawData.json())
+        .then(data => console.log("Ignored word: " + data.wordSequenceId))
+        .catch(() => this.setState({ hasErrors: true }));
+      }
+    );
   }
 
   render() {
@@ -72,7 +97,7 @@ class OcrCorrectionPage extends React.Component {
               </li>
             </ul>
           </div>
-          <button className="btn btn-outline-success my-2 my-sm-0" type="button">Submit For Correction</button>
+          <button className="btn btn-outline-success my-2 my-sm-0" type="button" onClick={this.handleSubmitForCorrection}>Submit For Correction</button>
         </nav>
 
         <div className="row row-cols-4">

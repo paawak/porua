@@ -17,23 +17,6 @@ class OcrWord extends React.Component {
       markForDelete: !this.state.markForDelete
     });
     this.props.toggleMarkedForDeletion();
-    if (false) {
-      fetch("http://localhost:8080/train/word/ignore", {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          bookId: this.props.bookId, 
-          pageImageId: this.props.pageImageId,
-          wordSequenceId: this.props.wordSequenceId
-        })
-      })
-      .then(rawData => rawData.json())
-      .then(data => console.log("Ignored word: " + data))
-      .catch(() => this.setState({ hasErrors: true }));
-    }
   }
 
   render() {
