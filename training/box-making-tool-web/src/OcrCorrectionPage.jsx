@@ -3,6 +3,14 @@ import OcrWord from './OcrWord'
 
 class OcrCorrectionPage extends React.Component {
 
+  constructor(props) {
+    super(props);
+    this.state = {
+      markedForDeletion: new Map(),
+      markedForCorrection: new Map()
+    };
+  }
+
   render() {
     const ocrWords = this.props.ocrWords.map((ocrWord) =>
       <OcrWord key={ocrWord.ocrWordId.wordSequenceId} 
@@ -12,14 +20,18 @@ class OcrCorrectionPage extends React.Component {
         wordSequenceId={ocrWord.ocrWordId.wordSequenceId}
         givenText={ocrWord.rawText}
         correctedText={ocrWord.correctedText}
-        toggleMarkedForDeletion={
+        toggleMarkedForDeletion = {
           () => {
-           console.log("************ delete: " + ocrWord.ocrWordId.wordSequenceId); 
+           if (this.state.markedForDeletion.has(ocrWord.ocrWordId.wordSequenceId)) {
+            this.state.markedForDeletion.delete(ocrWord.ocrWordId.wordSequenceId);
+           } else {
+            this.state.markedForDeletion.set(ocrWord.ocrWordId.wordSequenceId, true);
+           }
           }
         }
-        markForCorrection={
+        markForCorrection = {
           (correctedText) => {
-           console.log("************ correct: " + ocrWord.ocrWordId.wordSequenceId + " : " + correctedText); 
+           this.state.markedForCorrection.set(ocrWord.ocrWordId.wordSequenceId, correctedText);
           }
         }
         />
