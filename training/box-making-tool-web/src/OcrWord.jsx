@@ -7,7 +7,7 @@ class OcrWord extends React.Component {
     super(props);
     this.state = {
       markForDelete: false,
-      correctedText: null
+      correctedText: this.props.correctedText
     };
     this.handleCloseButton = this.handleCloseButton.bind(this);
   }
@@ -79,7 +79,8 @@ class OcrWord extends React.Component {
                   </h6>
                 </div>
                 <div className="col p-3 form-group">
-                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} placeholder="Correct Text" 
+                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} 
+                    placeholder={this.state.correctedText == null ? "Correct Text" : this.state.correctedText}
                     disabled={this.state.markForDelete}
                     onBlur={evt => {                                              
                       this.setState({

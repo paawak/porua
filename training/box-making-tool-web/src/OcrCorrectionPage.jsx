@@ -9,7 +9,9 @@ class OcrCorrectionPage extends React.Component {
         bookId={ocrWord.ocrWordId.bookId}
         confidence={ocrWord.confidence}
         pageImageId={ocrWord.ocrWordId.pageImageId} wordSequenceId={ocrWord.ocrWordId.wordSequenceId}
-        givenText={ocrWord.correctedText == null ? ocrWord.rawText : ocrWord.correctedText}/>
+        givenText={ocrWord.rawText}
+        correctedText={ocrWord.correctedText}
+        />
     );
 
     return (
