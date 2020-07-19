@@ -8,9 +8,20 @@ class OcrCorrectionPage extends React.Component {
       <OcrWord key={ocrWord.ocrWordId.wordSequenceId} 
         bookId={ocrWord.ocrWordId.bookId}
         confidence={ocrWord.confidence}
-        pageImageId={ocrWord.ocrWordId.pageImageId} wordSequenceId={ocrWord.ocrWordId.wordSequenceId}
+        pageImageId={ocrWord.ocrWordId.pageImageId} 
+        wordSequenceId={ocrWord.ocrWordId.wordSequenceId}
         givenText={ocrWord.rawText}
         correctedText={ocrWord.correctedText}
+        toggleMarkedForDeletion={
+          () => {
+           console.log("************ delete: " + ocrWord.ocrWordId.wordSequenceId); 
+          }
+        }
+        markForCorrection={
+          (correctedText) => {
+           console.log("************ correct: " + ocrWord.ocrWordId.wordSequenceId + " : " + correctedText); 
+          }
+        }
         />
     );
 

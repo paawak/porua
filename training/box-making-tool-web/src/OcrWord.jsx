@@ -16,6 +16,7 @@ class OcrWord extends React.Component {
     this.setState({
       markForDelete: !this.state.markForDelete
     });
+    this.props.toggleMarkedForDeletion();
     if (false) {
       fetch("http://localhost:8080/train/word/ignore", {
         method: 'POST',
@@ -82,9 +83,11 @@ class OcrWord extends React.Component {
                   <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} 
                     placeholder={this.state.correctedText == null ? "Correct Text" : this.state.correctedText}
                     disabled={this.state.markForDelete}
-                    onBlur={evt => {                                              
+                    onBlur={evt => {     
+                      const textValue = evt.target.value;  
+                      this.props.markForCorrection(textValue);                                     
                       this.setState({
-                        correctedText: evt.target.value
+                        correctedText: textValue
                       });
                     } 
                     }/>
