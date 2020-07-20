@@ -15,8 +15,6 @@ class OcrCorrectionPage extends React.Component {
   handleSubmitForCorrection() {
     this.state.markedForDeletion.forEach(
       (value, wordSequenceId) => {
-        console.log(wordSequenceId + "::" + value);
-        //FIXME: work in progress
         fetch("http://localhost:8080/train/word/ignore", {
           method: 'POST',
           headers: {
@@ -24,8 +22,8 @@ class OcrCorrectionPage extends React.Component {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            bookId: this.props.page.book.bookId, 
-            pageImageId: this.props.page.pageImageId,
+            bookId: this.props.page.book.id, 
+            pageImageId: this.props.page.id,
             wordSequenceId: wordSequenceId
           })
         })
