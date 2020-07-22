@@ -19,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,6 +30,7 @@ import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.Book;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.PageImage;
+import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrectionDto;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.OcrDataStoreService;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
@@ -90,6 +92,11 @@ public class OCRTrainingController {
 	    new TesseractOcrWordAnalyser(savedImagePath, book.getLanguage()).extractWordsFromImage(fluxSink, (wordSequenceId) -> new OcrWordId(bookId, imageFileId, wordSequenceId));
 	}).map(rawText -> ocrDataStoreService.addOcrWord(rawText));
 
+    }
+
+    @PutMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<OcrCorrectionDto> applyCorrectionToOcrWords(@RequestBody final Flux<OcrCorrectionDto> ocrWordsForCorrection) {
+	return ocrWordsForCorrection.map(ocrWordForCorrection -> ocrDataStoreService.updateCorrectTextInOcrWord(ocrWordForCorrection.getOcrWordId(), ocrWordForCorrection.getCorrectedText()));
     }
 
     @PostMapping(value = "/word/ignore", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
