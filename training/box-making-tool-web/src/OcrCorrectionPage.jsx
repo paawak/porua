@@ -7,7 +7,11 @@ class OcrCorrectionPage extends React.Component {
     super(props);
     this.state = {
       markedForDeletion: new Map(),
-      markedForCorrection: new Map()
+      markedForCorrection: new Map(),
+      ignoredSuccess: false,
+      ignoredFailed: false,
+      correctionSuccess: false,
+      correctionFailed: false      
     };
     this.handleSubmitForCorrection = this.handleSubmitForCorrection.bind(this);
   }
@@ -31,9 +35,13 @@ class OcrCorrectionPage extends React.Component {
       },
       body: JSON.stringify(ignoredWords)
     })
-      .then(rawData => rawData.json())
-      .then(data => console.log("Ignored words: " + data))
-      .catch(() => this.setState({ hasErrors: true }));    
+      .then(response => {
+        if (response.ok) {
+          this.setState({ ignoredSuccess: true });
+        } else {
+          this.setState({ ignoredFailed: true });
+        }
+      });    
 
     const correctedWords = Array.from(this.state.markedForCorrection).map(entryAsArray => {
       return {
@@ -52,10 +60,14 @@ class OcrCorrectionPage extends React.Component {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(correctedWords)
-    })
-      .then(rawData => rawData.json())
-      .then(data => console.log("Corrected words: " + data))
-      .catch(() => this.setState({ hasErrors: true }));
+    })      
+    .then(response => {
+      if (response.ok) {
+        this.setState({ correctionSuccess: true });
+      } else {
+        this.setState({ correctionFailed: true });
+      }
+    });
 
   }
 
@@ -86,6 +98,28 @@ class OcrCorrectionPage extends React.Component {
         }
         />
     );
+
+    const displayError = (text) => {
+      return (
+      <div className="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error in {text} operation!</strong> Please try again.
+          <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      )
+    };
+
+    const displaySuccess = (text) => {
+      return (
+      <div className="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> {text} operation was succesful!
+          <button type="button" className="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      )
+    };
 
     return (
       <div className="container">     
@@ -124,6 +158,22 @@ class OcrCorrectionPage extends React.Component {
           </div>
           <button className="btn btn-outline-success my-2 my-sm-0" type="button" onClick={this.handleSubmitForCorrection}>Submit For Correction</button>
         </nav>
+        
+        { this.state.ignoredFailed &&
+          displayError("ignore")
+        }
+        
+        { this.state.correctionFailed &&
+          displayError("word correction")
+        }
+
+        { this.state.ignoredSuccess &&
+          displaySuccess("Ignore")
+        }
+
+        { this.state.correctionSuccess &&
+          displaySuccess("Word correction")
+        }
 
         <div className="row row-cols-4">
           {ocrWords}
