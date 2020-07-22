@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
@@ -30,6 +31,7 @@ import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.Book;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.PageImage;
+import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrection;
 import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrectionDto;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.OcrDataStoreService;
@@ -95,8 +97,12 @@ public class OCRTrainingController {
     }
 
     @PutMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<OcrCorrectionDto> applyCorrectionToOcrWords(@RequestBody final Flux<OcrCorrectionDto> ocrWordsForCorrection) {
-	return ocrWordsForCorrection.map(ocrWordForCorrection -> ocrDataStoreService.updateCorrectTextInOcrWord(ocrWordForCorrection.getOcrWordId(), ocrWordForCorrection.getCorrectedText()));
+    public Flux<OcrCorrection> applyCorrectionToOcrWords(@RequestBody final List<OcrCorrectionDto> ocrWordsForCorrection) {
+	System.out.println("***" + ocrWordsForCorrection);
+	return Flux.fromIterable(ocrWordsForCorrection).map(ocrWordForCorrection -> {
+	    System.out.println("************ " + ocrWordForCorrection);
+	    return ocrDataStoreService.updateCorrectTextInOcrWord(ocrWordForCorrection.getOcrWordId(), ocrWordForCorrection.getCorrectedText());
+	});
     }
 
     @PostMapping(value = "/word/ignore", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

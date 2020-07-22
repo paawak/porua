@@ -2,14 +2,13 @@ package com.swayam.ocr.porua.tesseract.rest.dto;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
 
-public interface OcrCorrectionDto {
+import lombok.Data;
 
-    OcrWordId getOcrWordId();
+@Data
+public class OcrCorrectionDto implements OcrCorrection {
 
-    void setOcrWordId(OcrWordId ocrWordId);
+    private OcrWordId ocrWordId;
 
-    String getCorrectedText();
-
-    void setCorrectedText(String correctedText);
+    private String correctedText;
 
 }

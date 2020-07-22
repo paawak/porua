@@ -50,10 +50,9 @@ class OcrCorrectionPage extends React.Component {
     fetch("http://localhost:8080/train/word", {
       method: 'PUT',
       headers: {
-        'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: correctedWords
+      body: JSON.stringify(correctedWords)
     })
       .then(rawData => rawData.json())
       .then(data => console.log("Corrected words: " + data))
