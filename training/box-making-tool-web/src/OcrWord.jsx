@@ -7,7 +7,7 @@ class OcrWord extends React.Component {
     super(props);
     this.state = {
       markForDelete: false,
-      correctedText: null
+      correctedText: this.props.correctedText
     };
     this.handleCloseButton = this.handleCloseButton.bind(this);
   }
@@ -16,23 +16,7 @@ class OcrWord extends React.Component {
     this.setState({
       markForDelete: !this.state.markForDelete
     });
-    if (false) {
-      fetch("http://localhost:8080/train/word/ignore", {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          bookId: this.props.bookId, 
-          pageImageId: this.props.pageImageId,
-          wordSequenceId: this.props.wordSequenceId
-        })
-      })
-      .then(rawData => rawData.json())
-      .then(data => console.log("Ignored word: " + data))
-      .catch(() => this.setState({ hasErrors: true }));
-    }
+    this.props.toggleMarkedForDeletion();
   }
 
   render() {
@@ -79,11 +63,14 @@ class OcrWord extends React.Component {
                   </h6>
                 </div>
                 <div className="col p-3 form-group">
-                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} placeholder="Correct Text" 
+                  <BanglaTextBox name={correctedTextInputId} id={correctedTextInputId} 
+                    placeholder={this.state.correctedText == null ? "Correct Text" : this.state.correctedText}
                     disabled={this.state.markForDelete}
-                    onBlur={evt => {                                              
+                    onBlur={evt => {     
+                      const textValue = evt.target.value;  
+                      this.props.markForCorrection(textValue);                                     
                       this.setState({
-                        correctedText: evt.target.value
+                        correctedText: textValue
                       });
                     } 
                     }/>

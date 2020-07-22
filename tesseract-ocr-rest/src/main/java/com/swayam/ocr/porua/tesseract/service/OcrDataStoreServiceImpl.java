@@ -90,10 +90,10 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
     }
 
     @Override
-    public void updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText) {
+    public OcrWord updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText) {
 	OcrWord ocrWord = getWord(ocrWordId);
 	ocrWord.setCorrectedText(correctedText);
-	ocrWordRepository.save(ocrWord);
+	return ocrWordRepository.save(ocrWord);
     }
 
     @Override
