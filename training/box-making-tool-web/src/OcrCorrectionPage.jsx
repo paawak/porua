@@ -16,35 +16,34 @@ class OcrCorrectionPage extends React.Component {
     const bookId = this.props.page.book.id;
     const pageImageId = this.props.page.id;
 
-    this.state.markedForDeletion.forEach(
-      (value, wordSequenceId) => {
-        fetch("http://localhost:8080/train/word/ignore", {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            bookId: bookId, 
-            pageImageId: pageImageId,
-            wordSequenceId: wordSequenceId
-          })
-        })
-        .then(rawData => rawData.json())
-        .then(data => console.log("Ignored word: " + data.wordSequenceId))
-        .catch(() => this.setState({ hasErrors: true }));
+    const ignoredWords = Array.from(this.state.markedForDeletion.keys()).map(wordSequenceId => {
+      return {
+        "bookId": bookId,
+        "pageImageId": pageImageId,
+        "wordSequenceId": wordSequenceId
       }
-    );
+    });
 
-    const correctedWords = Array.from(this.state.markedForCorrection).map(entryAsArray =>  {
-      const correctedWord = {};
-      correctedWord["correctedText"] = entryAsArray[1];
-      const ocrWordId = {};
-      ocrWordId["bookId"] = bookId;
-      ocrWordId["pageImageId"] = pageImageId;
-      ocrWordId["wordSequenceId"] = entryAsArray[0];
-      correctedWord["ocrWordId"] = ocrWordId;
-      return correctedWord;
+    fetch("http://localhost:8080/train/word/ignore", {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(ignoredWords)
+    })
+      .then(rawData => rawData.json())
+      .then(data => console.log("Ignored words: " + data))
+      .catch(() => this.setState({ hasErrors: true }));    
+
+    const correctedWords = Array.from(this.state.markedForCorrection).map(entryAsArray => {
+      return {
+        "correctedText": entryAsArray[1],
+        "ocrWordId": {
+          "bookId": bookId,
+          "pageImageId": pageImageId,
+          "wordSequenceId": entryAsArray[0]
+        }
+      };
     });
 
     fetch("http://localhost:8080/train/word", {

@@ -102,10 +102,9 @@ public class OCRTrainingController {
 		.map(ocrWordForCorrection -> ocrDataStoreService.updateCorrectTextInOcrWord(ocrWordForCorrection.getOcrWordId(), ocrWordForCorrection.getCorrectedText()));
     }
 
-    @PostMapping(value = "/word/ignore", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<OcrWord> markOcrWordAsIgnored(@RequestBody final OcrWordId ocrWordId) {
-	LOG.info("Marking {} as ignored", ocrWordId);
-	return Mono.just(ocrDataStoreService.markWordAsIgnored(ocrWordId));
+    @PutMapping(value = "/word/ignore", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Flux<OcrWord> markOcrWordAsIgnored(@RequestBody final List<OcrWordId> wordsToIgnore) {
+	return Flux.fromIterable(wordsToIgnore).map(ocrDataStoreService::markWordAsIgnored);
     }
 
     @GetMapping(value = "/word/image")
