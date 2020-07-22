@@ -13,6 +13,9 @@ class OcrCorrectionPage extends React.Component {
   }
 
   handleSubmitForCorrection() {
+    const bookId = this.props.page.book.id;
+    const pageImageId = this.props.page.id;
+
     this.state.markedForDeletion.forEach(
       (value, wordSequenceId) => {
         fetch("http://localhost:8080/train/word/ignore", {
@@ -22,8 +25,8 @@ class OcrCorrectionPage extends React.Component {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            bookId: this.props.page.book.id, 
-            pageImageId: this.props.page.id,
+            bookId: bookId, 
+            pageImageId: pageImageId,
             wordSequenceId: wordSequenceId
           })
         })
@@ -32,6 +35,30 @@ class OcrCorrectionPage extends React.Component {
         .catch(() => this.setState({ hasErrors: true }));
       }
     );
+
+    const correctedWords = Array.from(this.state.markedForCorrection).map(entryAsArray =>  {
+      const correctedWord = {};
+      correctedWord["correctedText"] = entryAsArray[1];
+      const ocrWordId = {};
+      ocrWordId["bookId"] = bookId;
+      ocrWordId["pageImageId"] = pageImageId;
+      ocrWordId["wordSequenceId"] = entryAsArray[0];
+      correctedWord["ocrWordId"] = ocrWordId;
+      return correctedWord;
+    });
+
+    fetch("http://localhost:8080/train/word", {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: correctedWords
+    })
+      .then(rawData => rawData.json())
+      .then(data => console.log("Corrected words: " + data))
+      .catch(() => this.setState({ hasErrors: true }));
+
   }
 
   render() {
@@ -54,7 +81,9 @@ class OcrCorrectionPage extends React.Component {
         }
         markForCorrection = {
           (correctedText) => {
-           this.state.markedForCorrection.set(ocrWord.ocrWordId.wordSequenceId, correctedText);
+            if (correctedText) {
+              this.state.markedForCorrection.set(ocrWord.ocrWordId.wordSequenceId, correctedText);
+            }
           }
         }
         />
