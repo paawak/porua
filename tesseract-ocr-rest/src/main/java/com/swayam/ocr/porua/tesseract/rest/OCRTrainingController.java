@@ -98,11 +98,8 @@ public class OCRTrainingController {
 
     @PutMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<OcrCorrection> applyCorrectionToOcrWords(@RequestBody final List<OcrCorrectionDto> ocrWordsForCorrection) {
-	System.out.println("***" + ocrWordsForCorrection);
-	return Flux.fromIterable(ocrWordsForCorrection).map(ocrWordForCorrection -> {
-	    System.out.println("************ " + ocrWordForCorrection);
-	    return ocrDataStoreService.updateCorrectTextInOcrWord(ocrWordForCorrection.getOcrWordId(), ocrWordForCorrection.getCorrectedText());
-	});
+	return Flux.fromIterable(ocrWordsForCorrection)
+		.map(ocrWordForCorrection -> ocrDataStoreService.updateCorrectTextInOcrWord(ocrWordForCorrection.getOcrWordId(), ocrWordForCorrection.getCorrectedText()));
     }
 
     @PostMapping(value = "/word/ignore", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
