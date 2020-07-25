@@ -7,6 +7,7 @@ import static org.bytedeco.leptonica.global.lept.pixRead;
 
 import java.awt.Rectangle;
 import java.nio.IntBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -55,7 +56,7 @@ public class TesseractOcrWordAnalyser {
     public void extractWordsFromImage(FluxSink<OcrWord> ocrWordSink, Function<Integer, OcrWordId> ocrWordIdGenerator) {
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
 
-	LOGGER.info("Analyzing image file for words...");
+	LOGGER.info("Analyzing image file for words with language {} and TESSDATA {}", language.name(), tessDataDirectory);
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
 	    int returnCode = api.Init(tessDataDirectory, language.name());
@@ -78,7 +79,7 @@ public class TesseractOcrWordAnalyser {
 		Supplier<IntPointer> intPointerSupplier = () -> new IntPointer(new int[1]);
 		do {
 		    BytePointer ocrResult = ri.GetUTF8Text(level);
-		    String ocrText = ocrResult.getString().trim();
+		    String ocrText = ocrResult.getString(Charset.forName("utf-8")).trim();
 
 		    float confidence = ri.Confidence(level);
 		    IntPointer x1 = intPointerSupplier.get();
