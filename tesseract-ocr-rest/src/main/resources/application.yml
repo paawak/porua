@@ -15,7 +15,7 @@ spring:
       max-file-size: 5MB
       max-request-size: 20MB
   flyway:
-    locations: classpath:/sql/ddl,classpath:/sql/dml
+    locations: classpath:/sql/ddl
   datasource:
     url: jdbc:hsqldb:file:./target/hsql-db/ocrdb;shutdown=true
     username: SA

@@ -13,6 +13,7 @@ import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,11 +50,12 @@ public class OCRTrainingController {
 
     private final OcrDataStoreService ocrDataStoreService;
     private final FileSystemUtil fileSystemUtil;
+    private final String tessDataDirectory;
 
-    public OCRTrainingController(OcrDataStoreService ocrDataStoreService, FileSystemUtil fileSystemUtil) {
+    public OCRTrainingController(OcrDataStoreService ocrDataStoreService, FileSystemUtil fileSystemUtil, @Value("${app.config.ocr.tesseract.tessdata-location}") String tessDataDirectory) {
 	this.ocrDataStoreService = ocrDataStoreService;
 	this.fileSystemUtil = fileSystemUtil;
-
+	this.tessDataDirectory = tessDataDirectory;
     }
 
     @GetMapping(value = "/book", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -91,7 +93,7 @@ public class OCRTrainingController {
 	long imageFileId = ocrDataStoreService.addPageImage(newPageImage).getId();
 
 	return Flux.create((FluxSink<OcrWord> fluxSink) -> {
-	    new TesseractOcrWordAnalyser(savedImagePath, book.getLanguage()).extractWordsFromImage(fluxSink, (wordSequenceId) -> new OcrWordId(bookId, imageFileId, wordSequenceId));
+	    new TesseractOcrWordAnalyser(savedImagePath, book.getLanguage(), tessDataDirectory).extractWordsFromImage(fluxSink, (wordSequenceId) -> new OcrWordId(bookId, imageFileId, wordSequenceId));
 	}).map(rawText -> ocrDataStoreService.addOcrWord(rawText));
 
     }

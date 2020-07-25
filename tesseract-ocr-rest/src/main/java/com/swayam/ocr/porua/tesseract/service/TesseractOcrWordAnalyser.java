@@ -42,14 +42,14 @@ public class TesseractOcrWordAnalyser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TesseractOcrWordAnalyser.class);
 
-    private static final String TESSDATA_DIRECTORY = "/kaaj/installs/tesseract/tessdata_best-4.0.0";
-
     private final Path imagePath;
     private final Language language;
+    private final String tessDataDirectory;
 
-    public TesseractOcrWordAnalyser(Path imagePath, Language language) {
+    public TesseractOcrWordAnalyser(Path imagePath, Language language, final String tessDataDirectory) {
 	this.imagePath = imagePath;
 	this.language = language;
+	this.tessDataDirectory = tessDataDirectory;
     }
 
     public void extractWordsFromImage(FluxSink<OcrWord> ocrWordSink, Function<Integer, OcrWordId> ocrWordIdGenerator) {
@@ -58,7 +58,7 @@ public class TesseractOcrWordAnalyser {
 	LOGGER.info("Analyzing image file for words...");
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.name());
+	    int returnCode = api.Init(tessDataDirectory, language.name());
 	    if (returnCode != 0) {
 		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }
@@ -193,7 +193,7 @@ public class TesseractOcrWordAnalyser {
 	int imageHeight;
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.name());
+	    int returnCode = api.Init(tessDataDirectory, language.name());
 	    if (returnCode != 0) {
 		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }

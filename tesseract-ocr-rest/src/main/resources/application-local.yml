@@ -1,7 +1,10 @@
 app:
   config:
     server:
-      image-write-directory: /kaaj/source/porua/tesseract-ocr-rest/target/temp-images
+      image-write-directory: ./target/image-temp
     ocr:
       tesseract:
-        tessdata-location: /kaaj/source/porua/tesseract-configs/tessdata
+        tessdata-location: /kaaj/installs/tesseract/tessdata_best-4.0.0
+spring:
+  flyway:
+    locations: classpath:/sql/ddl,classpath:/sql/dml
