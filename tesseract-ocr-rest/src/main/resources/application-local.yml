@@ -5,6 +5,3 @@ app:
     ocr:
       tesseract:
         tessdata-location: /kaaj/installs/tesseract/tessdata_best-4.0.0
-spring:
-  flyway:
-    locations: classpath:/sql/ddl,classpath:/sql/dml

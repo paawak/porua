@@ -1,4 +1,3 @@
-INSERT INTO book (id, name, language) VALUES (1, 'Rajshekhar Basu Mahabharat', 'ben');
 INSERT INTO page_image (id, book_id, name, page_number) VALUES (1, 1, 'bangla-mahabharat-1-page_2.jpg', 1);
 INSERT INTO ocr_word (book_id, page_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence) VALUES (1, 1, 1, ':', NULL, 448, 184, 450, 186, 23.968079);
 INSERT INTO ocr_word (book_id, page_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence) VALUES (1, 1, 2, '.', NULL, 480, 137, 516, 233, 23.968079);
