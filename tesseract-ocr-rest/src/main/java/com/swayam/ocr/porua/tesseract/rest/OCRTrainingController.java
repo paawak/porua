@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,14 +64,14 @@ public class OCRTrainingController {
 	return Flux.fromIterable(ocrDataStoreService.getBooks());
     }
 
+    @GetMapping(value = "/book/{bookId}/page-count", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<Integer> getPagesInBook(@PathVariable(name = "bookId") final long bookId) {
+	return Mono.just(ocrDataStoreService.getPageCount(bookId));
+    }
+
     @GetMapping(value = "/page", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<PageImage> getPages(@RequestParam("bookId") final long bookId) {
 	return Flux.fromIterable(ocrDataStoreService.getPages(bookId));
-    }
-
-    @GetMapping(value = "/page/count", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Integer> getPageCount(@RequestParam("bookId") final long bookId) {
-	return Mono.just(ocrDataStoreService.getPageCount(bookId));
     }
 
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
