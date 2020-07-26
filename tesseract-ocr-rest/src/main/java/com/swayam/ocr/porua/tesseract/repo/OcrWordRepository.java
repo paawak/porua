@@ -11,6 +11,6 @@ public interface OcrWordRepository extends CrudRepository<OcrWord, OcrWordId> {
 
     int countByIgnoredFalseAndOcrWordIdBookIdAndOcrWordIdPageImageId(long bookId, long pageImageId);
 
-    List<OcrWord> findByIgnoredFalseAndOcrWordIdBookIdAndOcrWordIdPageImageId(long bookId, long pageImageId);
+    List<OcrWord> findByIgnoredFalseAndOcrWordIdBookIdAndOcrWordIdPageImageIdOrderByOcrWordIdWordSequenceId(long bookId, long pageImageId);
 
 }
