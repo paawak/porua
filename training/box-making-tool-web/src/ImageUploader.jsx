@@ -15,7 +15,7 @@ class ImageUploader extends React.Component {
     this.state = {
       isImageFileSelected: false,
       selectedImageFileName: 'Choose file...',
-      pageNumberEntered: null,
+      pageNumber: null,
       displayMode: DisplayMode.IMAGE_UPLOADER,
       errorOccuredDuringImageUpload: false,
       errorMessage: null
@@ -27,7 +27,7 @@ class ImageUploader extends React.Component {
     if (this.state.isImageFileSelected) {
       const data = new FormData();
       data.append('bookId', this.props.book.id);
-      data.append('pageNumber', this.state.pageNumberEntered);
+      data.append('pageNumber', this.state.pageNumber);
       data.append('image', this.imageFileInput.current.files[0]);      
 
       fetch('http://localhost:8080/train/word', {
@@ -63,6 +63,17 @@ class ImageUploader extends React.Component {
     }
   }
 
+  componentDidMount() {
+    fetch("http://localhost:8080/book/" + this.props.book.id + "/page-count")
+      .then(response => {
+        if (response.status === 200) {
+          this.setState({
+            pageNumber: parseInt(response.text, 10) + 1
+          });
+        }  
+      });
+  }
+
   render() {
     let panelToDisplay;
 
@@ -91,7 +102,7 @@ class ImageUploader extends React.Component {
       </fieldset>
       <div className="form-group">
         <label htmlFor="pageNumber">Page Number</label>
-        <input type="number" className="form-control" id="pageNumber" onChange={e => { this.setState({ pageNumberEntered: e.target.value }); } } />
+        <input type="number" className="form-control" id="pageNumber" readOnly={true} value={this.state.pageNumber} />
       </div>
       <div className="input-group mb-3">
         <div className="input-group-prepend">
