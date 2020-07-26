@@ -17,86 +17,101 @@ class OcrCorrectionPage extends React.Component {
   }
 
   handleSubmitForCorrection() {
-    const bookId = this.props.page.book.id;
-    const pageImageId = this.props.page.id;
 
-    const ignoredWords = Array.from(this.state.markedForDeletion.keys()).map(wordSequenceId => {
+    const ignoredWords = Array.from(this.state.markedForDeletion).map(entryAsArray => {
+      let wordSequenceId = entryAsArray[0];
+      let ignoredOcrWord = entryAsArray[1];
       return {
-        "bookId": bookId,
-        "pageImageId": pageImageId,
+        "bookId": ignoredOcrWord.bookId,
+        "pageImageId": ignoredOcrWord.pageImageId,
         "wordSequenceId": wordSequenceId
       }
     });
 
-    fetch("http://localhost:8080/train/word/ignore", {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(ignoredWords)
-    })
-      .then(response => {
-        if (response.ok) {
-          this.setState({ ignoredSuccess: true });
-        } else {
-          this.setState({ ignoredFailed: true });
-        }
-      });    
+    if (ignoredWords) {
+      fetch("http://localhost:8080/train/word/ignore", {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(ignoredWords)
+      })
+        .then(response => {
+          if (response.ok) {
+            this.setState({ ignoredSuccess: true });
+          } else {
+            this.setState({ ignoredFailed: true });
+          }
+        });
+    }
 
     const correctedWords = Array.from(this.state.markedForCorrection).map(entryAsArray => {
+      let wordSequenceId = entryAsArray[0];
+      let correctedOcrWord = entryAsArray[1];
       return {
-        "correctedText": entryAsArray[1],
+        "correctedText": correctedOcrWord.correctedText,
         "ocrWordId": {
-          "bookId": bookId,
-          "pageImageId": pageImageId,
-          "wordSequenceId": entryAsArray[0]
+          "bookId": correctedOcrWord.bookId,
+          "pageImageId": correctedOcrWord.pageImageId,
+          "wordSequenceId": wordSequenceId
         }
       };
     });
 
-    fetch("http://localhost:8080/train/word", {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(correctedWords)
-    })      
-    .then(response => {
-      if (response.ok) {
-        this.setState({ correctionSuccess: true });
-      } else {
-        this.setState({ correctionFailed: true });
-      }
-    });
+    if (correctedWords) {
+      fetch("http://localhost:8080/train/word", {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(correctedWords)
+      })
+        .then(response => {
+          if (response.ok) {
+            this.setState({ correctionSuccess: true });
+          } else {
+            this.setState({ correctionFailed: true });
+          }
+        });
+    }
 
   }
 
   render() {
     const ocrWords = this.props.ocrWords.map((ocrWord) =>
-      <OcrWord key={ocrWord.ocrWordId.wordSequenceId} 
+      <OcrWord key={ocrWord.ocrWordId.wordSequenceId}
         bookId={ocrWord.ocrWordId.bookId}
         confidence={ocrWord.confidence}
-        pageImageId={ocrWord.ocrWordId.pageImageId} 
+        pageImageId={ocrWord.ocrWordId.pageImageId}
         wordSequenceId={ocrWord.ocrWordId.wordSequenceId}
         givenText={ocrWord.rawText}
         correctedText={ocrWord.correctedText}
-        toggleMarkedForDeletion = {
+        toggleMarkedForDeletion={
           () => {
-           if (this.state.markedForDeletion.has(ocrWord.ocrWordId.wordSequenceId)) {
-            this.state.markedForDeletion.delete(ocrWord.ocrWordId.wordSequenceId);
-           } else {
-            this.state.markedForDeletion.set(ocrWord.ocrWordId.wordSequenceId, true);
-           }
-          }
-        }
-        markForCorrection = {
-          (correctedText) => {
-            if (correctedText) {
-              this.state.markedForCorrection.set(ocrWord.ocrWordId.wordSequenceId, correctedText);
+            if (this.state.markedForDeletion.has(ocrWord.ocrWordId.wordSequenceId)) {
+              this.state.markedForDeletion.delete(ocrWord.ocrWordId.wordSequenceId);
+            } else {
+              this.state.markedForDeletion.set(ocrWord.ocrWordId.wordSequenceId, {
+                "bookId": ocrWord.ocrWordId.bookId,
+                "pageImageId": ocrWord.ocrWordId.pageImageId,
+                "wordSequenceId": ocrWord.ocrWordId.wordSequenceId
+              });
             }
           }
         }
-        />
+        markForCorrection={
+          (correctedText) => {
+            if (correctedText) {
+              this.state.markedForCorrection.set(ocrWord.ocrWordId.wordSequenceId, {
+                "bookId": ocrWord.ocrWordId.bookId,
+                "pageImageId": ocrWord.ocrWordId.pageImageId,
+                "wordSequenceId": ocrWord.ocrWordId.wordSequenceId,
+                "correctedText": correctedText
+              });
+            }
+          }
+        }
+      />
     );
 
     const displayError = (text) => {
