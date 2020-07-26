@@ -29,7 +29,7 @@ class OcrCorrectionPage extends React.Component {
     });
 
     if (ignoredWords.length > 0) {
-      fetch("http://localhost:8080/train/word/ignore", {
+      fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/word/ignore`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -60,7 +60,7 @@ class OcrCorrectionPage extends React.Component {
     });
 
     if (correctedWords.length > 0) {
-      fetch("http://localhost:8080/train/word", {
+      fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/word`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'

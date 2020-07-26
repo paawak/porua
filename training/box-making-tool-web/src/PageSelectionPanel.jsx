@@ -43,7 +43,7 @@ class PageSelectionPanel extends React.Component {
       });
       let pageId = this.state.selectedPageId;
       let page = this.state.pages.filter(page => page.id === parseInt(pageId, 10))[0];
-      fetch("http://localhost:8080/train/word?bookId=" + this.state.selectedBookId + "&pageImageId=" + pageId)
+      fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/word?bookId=${this.state.selectedBookId}&pageImageId=${pageId}`)
         .then(rawData => rawData.json())
         .then(data => this.props.ocrWordsRecievedForExistingPage(data, page))
         .catch(() => this.setState({ hasErrors: true }));
@@ -51,9 +51,7 @@ class PageSelectionPanel extends React.Component {
   }
 
   componentDidMount() {
-    let hostName = process.env.REACT_APP_REST_API_BASE_NAME;
-    console.log(hostName);
-    fetch("http://localhost:8080/train/book")
+    fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/book`)
       .then(rawData => rawData.json())
       .then(books => this.setState({ books: books }))
       .catch(() => this.setState({ hasErrors: true }));
@@ -96,7 +94,7 @@ class PageSelectionPanel extends React.Component {
               selectedBookId: bookId,
               selectedPageId: null,
               pages: []            });
-            fetch("http://localhost:8080/train/page?bookId=" + bookId)
+            fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/page?bookId=${bookId}`)
               .then(rawData => rawData.json())
               .then(pages => this.setState({ pages: pages }))
               .catch(() => this.setState({ hasErrors: true }));            
