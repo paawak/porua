@@ -30,7 +30,7 @@ class ImageUploader extends React.Component {
       data.append('pageNumber', this.state.pageNumber);
       data.append('image', this.imageFileInput.current.files[0]);      
 
-      fetch('http://localhost:8080/train/word', {
+      fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/word`, {
         method: 'POST',
         body: data
       }).then(response => {
@@ -64,7 +64,7 @@ class ImageUploader extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:8080/train/book/" + this.props.book.id + "/page-count")
+    fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/book/${this.props.book.id}/page-count`)
       .then(response => response.text()).then(textResponse => {
         this.setState({
           pageNumber: parseInt(textResponse, 10) + 1

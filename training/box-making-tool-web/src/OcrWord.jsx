@@ -51,7 +51,7 @@ class OcrWord extends React.Component {
                   </button> 
                 </div>                       
                 <div className="col pb-3">
-                  <img id={idGenerator("ocrImage")} alt="..." src={"http://localhost:8080/train/word/image?bookId=" + this.props.bookId + "&pageImageId=" + this.props.pageImageId + "&wordSequenceId=" + this.props.wordSequenceId}/>
+                  <img id={idGenerator("ocrImage")} alt="..." src={`${process.env.REACT_APP_REST_API_BASE_NAME}/train/word/image?bookId=${this.props.bookId}&pageImageId=${this.props.pageImageId}&wordSequenceId=${this.props.wordSequenceId}`}/>
                 </div>
                 <div className="col alert alert-dark jumbotron jumbotron-fluid" role="alert">
                   <p className="lead">OCR Text</p>
