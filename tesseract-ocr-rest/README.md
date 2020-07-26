@@ -16,7 +16,16 @@ mvn clean install
 
 # How to run
 
-docker run -it -p 8080:8080 -e spring.profiles.active=default,container paawak/tesseract-ocr-rest:latest
+## Running in Local
+
+    java -Dspring.profiles.active=local -jar target/tesseract-ocr-rest.jar
+
+## Running in Docker
+
+    docker run -it -p 8080:8080    \
+    -v /kaaj/installs/tesseract/tessdata_best-4.0.0:/tesseract/tessdata    \
+    -e spring.profiles.active=container     \
+    paawak/tesseract-ocr-rest:latest
 
 # Accessing the API
 

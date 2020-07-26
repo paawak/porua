@@ -7,6 +7,7 @@ import static org.bytedeco.leptonica.global.lept.pixRead;
 
 import java.awt.Rectangle;
 import java.nio.IntBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,23 +43,23 @@ public class TesseractOcrWordAnalyser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TesseractOcrWordAnalyser.class);
 
-    private static final String TESSDATA_DIRECTORY = "/kaaj/installs/tesseract/tessdata_best-4.0.0";
-
     private final Path imagePath;
     private final Language language;
+    private final String tessDataDirectory;
 
-    public TesseractOcrWordAnalyser(Path imagePath, Language language) {
+    public TesseractOcrWordAnalyser(Path imagePath, Language language, final String tessDataDirectory) {
 	this.imagePath = imagePath;
 	this.language = language;
+	this.tessDataDirectory = tessDataDirectory;
     }
 
     public void extractWordsFromImage(FluxSink<OcrWord> ocrWordSink, Function<Integer, OcrWordId> ocrWordIdGenerator) {
 	LOGGER.info("Image file to analyse with Tesseract OCR: {}", imagePath);
 
-	LOGGER.info("Analyzing image file for words...");
+	LOGGER.info("Analyzing image file for words with language {} and TESSDATA {}", language.name(), tessDataDirectory);
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.name());
+	    int returnCode = api.Init(tessDataDirectory, language.name());
 	    if (returnCode != 0) {
 		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }
@@ -78,7 +79,7 @@ public class TesseractOcrWordAnalyser {
 		Supplier<IntPointer> intPointerSupplier = () -> new IntPointer(new int[1]);
 		do {
 		    BytePointer ocrResult = ri.GetUTF8Text(level);
-		    String ocrText = ocrResult.getString().trim();
+		    String ocrText = ocrResult.getString(Charset.forName("utf-8")).trim();
 
 		    float confidence = ri.Confidence(level);
 		    IntPointer x1 = intPointerSupplier.get();
@@ -193,7 +194,7 @@ public class TesseractOcrWordAnalyser {
 	int imageHeight;
 
 	try (TessBaseAPI api = new TessBaseAPI();) {
-	    int returnCode = api.Init(TESSDATA_DIRECTORY, language.name());
+	    int returnCode = api.Init(tessDataDirectory, language.name());
 	    if (returnCode != 0) {
 		throw new RuntimeException("could not initialize tesseract, error code: " + returnCode);
 	    }
