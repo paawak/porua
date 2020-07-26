@@ -68,6 +68,11 @@ public class OCRTrainingController {
 	return Flux.fromIterable(ocrDataStoreService.getPages(bookId));
     }
 
+    @GetMapping(value = "/page/count", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<Integer> getPageCount(@RequestParam("bookId") final long bookId) {
+	return Mono.just(ocrDataStoreService.getPageCount(bookId));
+    }
+
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<OcrWord> getOcrWords(@RequestParam("bookId") final long bookId, @RequestParam("pageImageId") final long pageImageId) {
 	LOG.info("Retrieving OCR Words for Book Id {} and PageId {}", bookId, pageImageId);
