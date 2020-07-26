@@ -28,7 +28,7 @@ class OcrCorrectionPage extends React.Component {
       }
     });
 
-    if (ignoredWords) {
+    if (ignoredWords.length > 0) {
       fetch("http://localhost:8080/train/word/ignore", {
         method: 'PUT',
         headers: {
@@ -39,6 +39,7 @@ class OcrCorrectionPage extends React.Component {
         .then(response => {
           if (response.ok) {
             this.setState({ ignoredSuccess: true });
+            this.state.markedForDeletion.clear();
           } else {
             this.setState({ ignoredFailed: true });
           }
@@ -58,7 +59,7 @@ class OcrCorrectionPage extends React.Component {
       };
     });
 
-    if (correctedWords) {
+    if (correctedWords.length > 0) {
       fetch("http://localhost:8080/train/word", {
         method: 'PUT',
         headers: {
@@ -69,6 +70,7 @@ class OcrCorrectionPage extends React.Component {
         .then(response => {
           if (response.ok) {
             this.setState({ correctionSuccess: true });
+            this.state.markedForCorrection.clear();
           } else {
             this.setState({ correctionFailed: true });
           }
