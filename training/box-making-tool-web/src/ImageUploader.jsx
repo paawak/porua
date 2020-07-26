@@ -15,7 +15,7 @@ class ImageUploader extends React.Component {
     this.state = {
       isImageFileSelected: false,
       selectedImageFileName: 'Choose file...',
-      pageNumber: null,
+      pageNumber: -1,
       displayMode: DisplayMode.IMAGE_UPLOADER,
       errorOccuredDuringImageUpload: false,
       errorMessage: null
@@ -64,13 +64,11 @@ class ImageUploader extends React.Component {
   }
 
   componentDidMount() {
-    fetch("http://localhost:8080/book/" + this.props.book.id + "/page-count")
-      .then(response => {
-        if (response.status === 200) {
-          this.setState({
-            pageNumber: parseInt(response.text, 10) + 1
-          });
-        }  
+    fetch("http://localhost:8080/train/book/" + this.props.book.id + "/page-count")
+      .then(response => response.text()).then(textResponse => {
+        this.setState({
+          pageNumber: parseInt(textResponse, 10) + 1
+        });
       });
   }
 
