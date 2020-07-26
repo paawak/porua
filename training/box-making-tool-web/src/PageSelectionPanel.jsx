@@ -51,6 +51,8 @@ class PageSelectionPanel extends React.Component {
   }
 
   componentDidMount() {
+    let hostName = process.env.REACT_APP_REST_API_BASE_NAME;
+    console.log(hostName);
     fetch("http://localhost:8080/train/book")
       .then(rawData => rawData.json())
       .then(books => this.setState({ books: books }))
