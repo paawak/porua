@@ -14,8 +14,6 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 20MB
-  flyway:
-    locations: classpath:/sql/ddl,classpath:/sql/dml
   datasource:
     url: jdbc:hsqldb:file:./target/hsql-db/ocrdb;shutdown=true
     username: SA
@@ -26,6 +24,9 @@ spring:
     show-sql: true
     hibernate:
       ddl-auto: none
+  liquibase:
+    enabled: true
+    change-log: classpath:/sql/liquibase/master-change-log.xml
 
 springdoc:
   swagger-ui.path: /swagger-ui.html

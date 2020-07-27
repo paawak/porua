@@ -68,6 +68,20 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<plugin>
+				<groupId>org.liquibase</groupId>
+				<artifactId>liquibase-maven-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<url>jdbc:hsqldb:file:./target/hsql-db/ocrdb;shutdown=true</url>
+					<username>SA</username>
+					<password></password>
+					<driver>org.hsqldb.jdbc.JDBCDriver</driver>
+					<outputChangeLogFile>liquibase-outputChangeLog.xml</outputChangeLogFile>
+				</configuration>
+			</plugin> 			
+			
 		</plugins>
 	</build>
 
@@ -92,10 +106,10 @@
             <artifactId>tesseract-platform</artifactId>
             <version>4.1.1-1.5.3</version>
 		</dependency>
-		
+
 		<dependency>
-			<groupId>org.flywaydb</groupId>
-			<artifactId>flyway-core</artifactId>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
 		</dependency>
 		
 		<dependency>
