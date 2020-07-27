@@ -70,6 +70,12 @@ Exporting the corrected words to a CSV file:
     
     * *DSV_TARGET_FILE=correctedtexts.csv
     \xq select id, corrected_text from ocr_word where corrected_text IS NOT NULL
+    
+# DB Migration Utils with Liquibase
+
+## Generating liquibase changelog from existing DB
+
+    mvn liquibase:generateChangeLog    
 		
 # Sources
 		
