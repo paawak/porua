@@ -18,7 +18,6 @@
 			</column>
 		</createTable>
 
-
 		<createTable tableName="OCR_WORD">
 			<column name="BOOK_ID" type="INT">
 				<constraints nullable="false" />
@@ -55,7 +54,6 @@
 			</column>
 		</createTable>
 
-
 		<createTable tableName="PAGE_IMAGE">
 			<column autoIncrement="true" name="ID" type="INT">
 				<constraints primaryKey="true"
@@ -72,70 +70,26 @@
 			</column>
 		</createTable>
 
-
-		<createTable tableName="flyway_schema_history">
-			<column name="installed_rank" type="INT">
-				<constraints primaryKey="true"
-					primaryKeyName="flyway_schema_history_pk" />
-			</column>
-			<column name="version" type="VARCHAR(50)" />
-			<column name="description" type="VARCHAR(200)">
-				<constraints nullable="false" />
-			</column>
-			<column name="type" type="VARCHAR(20)">
-				<constraints nullable="false" />
-			</column>
-			<column name="script" type="VARCHAR(1000)">
-				<constraints nullable="false" />
-			</column>
-			<column name="checksum" type="INT" />
-			<column name="installed_by" type="VARCHAR(100)">
-				<constraints nullable="false" />
-			</column>
-			<column defaultValueComputed="CURRENT_TIMESTAMP"
-				name="installed_on" type="TIMESTAMP">
-				<constraints nullable="false" />
-			</column>
-			<column name="execution_time" type="INT">
-				<constraints nullable="false" />
-			</column>
-			<column name="success" type="BOOLEAN">
-				<constraints nullable="false" />
-			</column>
-		</createTable>
-
-
 		<addUniqueConstraint columnNames="NAME"
 			constraintName="SYS_CT_10112" tableName="BOOK" />
 
-
 		<addUniqueConstraint columnNames="NAME"
 			constraintName="SYS_CT_10124" tableName="PAGE_IMAGE" />
-
 
 		<createIndex indexName="SYS_IDX_SYS_FK_10123_10130"
 			tableName="PAGE_IMAGE">
 			<column name="BOOK_ID" />
 		</createIndex>
 
-
 		<createIndex indexName="SYS_IDX_SYS_FK_10143_10156"
 			tableName="OCR_WORD">
 			<column name="BOOK_ID" />
 		</createIndex>
 
-
 		<createIndex indexName="SYS_IDX_SYS_FK_10144_10158"
 			tableName="OCR_WORD">
 			<column name="PAGE_IMAGE_ID" />
 		</createIndex>
-
-
-		<createIndex indexName="flyway_schema_history_s_idx"
-			tableName="flyway_schema_history">
-			<column name="success" />
-		</createIndex>
-
 
 		<addForeignKeyConstraint
 			baseColumnNames="BOOK_ID" baseTableName="PAGE_IMAGE"
@@ -143,13 +97,11 @@
 			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
 			referencedColumnNames="ID" referencedTableName="BOOK" validate="true" />
 
-
 		<addForeignKeyConstraint
 			baseColumnNames="BOOK_ID" baseTableName="OCR_WORD"
 			constraintName="SYS_FK_10143" deferrable="false"
 			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
 			referencedColumnNames="ID" referencedTableName="BOOK" validate="true" />
-
 
 		<addForeignKeyConstraint
 			baseColumnNames="PAGE_IMAGE_ID" baseTableName="OCR_WORD"
