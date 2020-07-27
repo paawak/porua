@@ -23,7 +23,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
-		<swagger.version>3.0.0-SNAPSHOT</swagger.version>
 	</properties>
 
 	<build>
@@ -80,24 +79,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>		
+        </dependency>
 
 		<dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger2</artifactId>
-		    <version>${swagger.version}</version>
-		</dependency>		
-		<dependency>
-		    <groupId>io.springfox</groupId>
-		    <artifactId>springfox-swagger-ui</artifactId>
-		    <version>${swagger.version}</version>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-webflux-ui</artifactId>
+			<version>1.4.3</version>
 		</dependency>
-		<dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-spring-webflux</artifactId>
-            <version>${swagger.version}</version>
-        </dependency>
-        
+
 		<dependency>
 			<groupId>org.bytedeco</groupId>
             <artifactId>tesseract-platform</artifactId>
@@ -126,12 +115,4 @@
 		</dependency>
 	</dependencies>
 	
-	 <repositories>
-        <repository>
-            <id>spring-libs-milestone</id>
-            <name>Spring Milestone Maven Repository</name>
-            <url>http://oss.jfrog.org/artifactory/oss-snapshot-local/</url>
-        </repository>
-    </repositories>
-
 </project>
