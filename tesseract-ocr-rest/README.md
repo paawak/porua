@@ -43,6 +43,11 @@ The REST API is at /rest/ocr. It takes in the below form data:
 	
 # Training
 
+## Uploading a PDF eBook
+This functionality lets you upload a PDF. It extracts all images into pages, sends it to OCR.
+
+    http://localhost:8080/ 
+
 ## Getting a list of words and their bounds:
 
     curl -X GET "http://localhost:8080/train/word?imagePath=/kaaj/source/porua/training/box-making-tool/src/test/resources/images/bangla-mahabharat-1-page_2.jpg&language=ben"	
