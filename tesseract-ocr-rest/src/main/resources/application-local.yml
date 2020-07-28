@@ -1,7 +1,7 @@
 app:
   config:
     server:
-      image-write-directory: ./target
+      image-write-directory: /kaaj/source/porua/tesseract-ocr-rest/target
     ocr:
       tesseract:
         tessdata-location: /kaaj/installs/tesseract/tessdata_best-4.0.0
