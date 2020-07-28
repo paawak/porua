@@ -104,6 +104,22 @@ public class OCRTrainingController {
 
     }
 
+    @PostMapping(value = "/pdf", produces = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<String> uploadEBookInPdfFormat(@RequestPart("bookId") final String bookIdAsString, @RequestPart("image") FilePart eBookAsPdf) throws IOException {
+
+	String eBookName = eBookAsPdf.filename();
+	MediaType mediaType = eBookAsPdf.headers().getContentType();
+
+	LOG.info("bookId: {}", bookIdAsString);
+	LOG.info("FileName: {}, ContentType: {}, Size: {}", eBookName, mediaType, eBookAsPdf.headers().getContentLength());
+
+	if (!MediaType.APPLICATION_PDF.equals(mediaType)) {
+	    return ResponseEntity.badRequest().body("Only PDF docs supported. Unsupported content-type: " + mediaType);
+	}
+
+	return ResponseEntity.ok(Integer.toString(-1));
+    }
+
     @PutMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<OcrCorrection> applyCorrectionToOcrWords(@RequestBody final List<OcrCorrectionDto> ocrWordsForCorrection) {
 	return Flux.fromIterable(ocrWordsForCorrection)

@@ -2,12 +2,11 @@
 <div>
 	<h2>Tesseract OCR Frontend</h2>
 	<div>
-		<form enctype="multipart/form-data" action="rest/ocr" method="POST" >
+		<form enctype="multipart/form-data" action="http://localhost:8080/train/pdf" method="POST" >
 			<div>
-				<div>Language:</div>
+				<div>Book Id:</div>
 				<div>
-					<input type="radio" name="language" id="language" value="ben" checked="checked"> Bangla<br>   
-					<input type="radio" name="language" id="language" value="eng"> English<br>
+					<input type="text" name="bookId" /> 
 				</div>
 			</div>
 			<div>
