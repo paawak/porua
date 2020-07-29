@@ -24,6 +24,7 @@ mvn clean install
 
     docker run -it -p 8080:8080    \
     -v /kaaj/installs/tesseract/tessdata_best-4.0.0:/tesseract/tessdata    \
+    -v /kaaj/source/porua/tesseract-ocr-rest/images:/tesseract-temp-images   \
     -e spring.profiles.active=container     \
     paawak/tesseract-ocr-rest:latest
 
