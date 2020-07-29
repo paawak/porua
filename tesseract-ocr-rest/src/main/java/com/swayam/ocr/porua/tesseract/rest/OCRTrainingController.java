@@ -13,7 +13,6 @@ import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,11 +35,11 @@ import com.swayam.ocr.porua.tesseract.model.PageImage;
 import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrection;
 import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrectionDto;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
+import com.swayam.ocr.porua.tesseract.service.ImageProcessor;
 import com.swayam.ocr.porua.tesseract.service.OcrDataStoreService;
 import com.swayam.ocr.porua.tesseract.service.TesseractOcrWordAnalyser;
 
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -50,13 +49,13 @@ public class OCRTrainingController {
     private static final Logger LOG = LoggerFactory.getLogger(OCRTrainingController.class);
 
     private final OcrDataStoreService ocrDataStoreService;
+    private final ImageProcessor imageProcessor;
     private final FileSystemUtil fileSystemUtil;
-    private final String tessDataDirectory;
 
-    public OCRTrainingController(OcrDataStoreService ocrDataStoreService, FileSystemUtil fileSystemUtil, @Value("${app.config.ocr.tesseract.tessdata-location}") String tessDataDirectory) {
+    public OCRTrainingController(OcrDataStoreService ocrDataStoreService, ImageProcessor imageProcessor, FileSystemUtil fileSystemUtil) {
 	this.ocrDataStoreService = ocrDataStoreService;
+	this.imageProcessor = imageProcessor;
 	this.fileSystemUtil = fileSystemUtil;
-	this.tessDataDirectory = tessDataDirectory;
     }
 
     @GetMapping(value = "/book", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,21 +85,10 @@ public class OCRTrainingController {
 
 	LOG.info("BookId: {}, PageNumber: {}, Uploaded fileName: {}", bookIdString, pageNumberString, image.filename());
 
-	long bookId = Long.valueOf(bookIdString);
-	Book book = ocrDataStoreService.getBook(bookId);
-
 	String imageFileName = image.filename();
 	Path savedImagePath = fileSystemUtil.saveMultipartFileAsImage(image);
 
-	PageImage newPageImage = new PageImage();
-	newPageImage.setName(imageFileName);
-	newPageImage.setPageNumber(Integer.valueOf(pageNumberString));
-	newPageImage.setBook(book);
-	long imageFileId = ocrDataStoreService.addPageImage(newPageImage).getId();
-
-	return Flux.create((FluxSink<OcrWord> fluxSink) -> {
-	    new TesseractOcrWordAnalyser(savedImagePath, book.getLanguage(), tessDataDirectory).extractWordsFromImage(fluxSink, (wordSequenceId) -> new OcrWordId(bookId, imageFileId, wordSequenceId));
-	}).map(rawText -> ocrDataStoreService.addOcrWord(rawText));
+	return imageProcessor.submitPageForAnalysis(Long.valueOf(bookIdString), Integer.parseInt(pageNumberString), imageFileName, savedImagePath);
 
     }
 
@@ -116,6 +104,10 @@ public class OCRTrainingController {
 	if (!MediaType.APPLICATION_PDF.equals(mediaType)) {
 	    return ResponseEntity.badRequest().body("Only PDF docs supported. Unsupported content-type: " + mediaType);
 	}
+
+	Path savedEBookPath = fileSystemUtil.saveMultipartFileAsImage(eBookAsPdf);
+
+	imageProcessor.processEBookInPdf(Long.valueOf(bookIdAsString), eBookName, savedEBookPath);
 
 	return ResponseEntity.ok(Integer.toString(-1));
     }

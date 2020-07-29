@@ -58,7 +58,6 @@ public class QuickPdfImageExtractionExample {
 			throw new RuntimeException(e);
 		    }
 		});
-	;
     }
 
     private static void simpleRunOfTheMillExtraction(PDDocument document) throws IOException {
