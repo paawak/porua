@@ -128,12 +128,16 @@ public class OCRTrainingController {
 	    @RequestParam("wordSequenceId") int wordSequenceId) throws IOException {
 	String pageImageName = ocrDataStoreService.getPageImage(pageImageId).getName();
 	Path imagePath = fileSystemUtil.getImageSaveLocation(pageImageName);
-	LOG.trace("serving ocr word image for id: {} and page image name: {}", wordSequenceId, pageImageName);
+
 	OcrWord ocrText = ocrDataStoreService.getWord(new OcrWordId(bookId, pageImageId, wordSequenceId));
 	BufferedImage fullImage = ImageIO.read(Files.newInputStream(imagePath));
 	Rectangle wordArea = TesseractOcrWordAnalyser.getWordArea(ocrText);
 	BufferedImage wordImage = fullImage.getSubimage(wordArea.x, wordArea.y, wordArea.width, wordArea.height);
-	String extension = imagePath.toFile().getName().split("\\.")[1];
+	String[] tokens = imagePath.toFile().getName().split("\\.");
+	String extension = tokens[tokens.length - 1];
+
+	LOG.trace("serving ocr word image for id: {} and page image name: {}, location: {}, extension: {}", wordSequenceId, pageImageName, imagePath, extension);
+
 	ByteArrayOutputStream bos = new ByteArrayOutputStream();
 	ImageIO.write(wordImage, extension, bos);
 	bos.flush();
