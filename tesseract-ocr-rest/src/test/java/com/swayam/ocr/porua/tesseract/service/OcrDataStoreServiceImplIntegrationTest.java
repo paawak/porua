@@ -114,7 +114,7 @@ class OcrDataStoreServiceImplIntegrationTest {
     }
 
     @Test
-    void testGetPages_igonred_completed() {
+    void testGetPages_ignored_completed() {
 	// given
 	Book book = new Book();
 	book.setId(1);
