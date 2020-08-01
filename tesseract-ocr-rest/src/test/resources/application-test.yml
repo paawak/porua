@@ -17,10 +17,14 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 20MB
-  flyway:
-    locations: classpath:/sql/ddl
   datasource:
     url: jdbc:hsqldb:mem:ocr-test-db;shutdown=true
     username: SA
     password: ''
     driver-class-name: org.hsqldb.jdbc.JDBCDriver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.HSQLDialect
+  liquibase:
+    change-log: classpath:/sql/liquibase/V1__ocr_word_initial_schema.xml
