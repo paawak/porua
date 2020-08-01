@@ -26,5 +26,3 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.HSQLDialect
-  liquibase:
-    change-log: classpath:/sql/liquibase/V1__ocr_word_initial_schema.xml
