@@ -31,4 +31,10 @@ public class PageImage {
     @Column(name = "page_number")
     private int pageNumber;
 
+    @Column
+    private boolean ignored;
+
+    @Column(name = "correction_completed")
+    private boolean correctionCompleted;
+
 }

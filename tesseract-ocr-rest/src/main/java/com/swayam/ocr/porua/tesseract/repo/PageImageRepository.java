@@ -10,6 +10,6 @@ public interface PageImageRepository extends CrudRepository<PageImage, Long> {
 
     int countByBookId(long bookId);
 
-    List<PageImage> findByBookId(long bookId);
+    List<PageImage> findByBookIdAndIgnoredIsFalseAndCorrectionCompletedIsFalse(long bookId);
 
 }
