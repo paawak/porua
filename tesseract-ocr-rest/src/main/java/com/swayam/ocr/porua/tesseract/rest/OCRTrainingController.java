@@ -72,6 +72,16 @@ public class OCRTrainingController {
 	return Flux.fromIterable(ocrDataStoreService.getPages(bookId));
     }
 
+    @PutMapping(value = "/page/ignore", produces = MediaType.TEXT_PLAIN_VALUE)
+    public Mono<Integer> markPageAsIgnored(@RequestParam("pageImageId") final long pageImageId) {
+	return Mono.just(ocrDataStoreService.markPageAsIgnored(pageImageId));
+    }
+
+    @PutMapping(value = "/page/complete", produces = MediaType.TEXT_PLAIN_VALUE)
+    public Mono<Integer> markPageAsCorrectionCompleted(@RequestParam("pageImageId") final long pageImageId) {
+	return Mono.just(ocrDataStoreService.markPageAsCorrectionCompleted(pageImageId));
+    }
+
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<OcrWord> getOcrWords(@RequestParam("bookId") final long bookId, @RequestParam("pageImageId") final long pageImageId) {
 	LOG.info("Retrieving OCR Words for Book Id {} and PageId {}", bookId, pageImageId);
