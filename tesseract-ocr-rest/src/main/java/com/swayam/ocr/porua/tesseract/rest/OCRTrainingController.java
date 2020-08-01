@@ -106,9 +106,9 @@ public class OCRTrainingController {
 
 	Path savedEBookPath = fileSystemUtil.saveMultipartFileAsImage(eBookAsPdf);
 
-	imageProcessor.processEBookInPdf(Long.valueOf(bookIdAsString), eBookName, savedEBookPath);
+	int extractedPageCount = imageProcessor.processEBookInPdf(Long.valueOf(bookIdAsString), eBookName, savedEBookPath);
 
-	return ResponseEntity.ok(Integer.toString(-1));
+	return ResponseEntity.ok(Integer.toString(extractedPageCount));
     }
 
     @PutMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
