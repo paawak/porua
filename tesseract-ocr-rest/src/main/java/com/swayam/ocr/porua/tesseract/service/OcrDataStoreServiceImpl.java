@@ -3,6 +3,8 @@ package com.swayam.ocr.porua.tesseract.service;
 import java.util.Collection;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
@@ -99,6 +101,18 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
     @Override
     public void removeWord(OcrWordId ocrWordId) {
 	ocrWordRepository.deleteById(ocrWordId);
+    }
+
+    @Transactional
+    @Override
+    public int markPageAsIgnored(long pageImageId) {
+	return pageImageRepository.markPageAsIgnored(pageImageId);
+    }
+
+    @Transactional
+    @Override
+    public int markPageAsCorrectionCompleted(long pageImageId) {
+	return pageImageRepository.markPageAsCorrectionCompleted(pageImageId);
     }
 
 }

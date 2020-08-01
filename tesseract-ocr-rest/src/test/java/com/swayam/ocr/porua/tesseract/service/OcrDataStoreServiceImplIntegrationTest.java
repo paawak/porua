@@ -1,6 +1,8 @@
 package com.swayam.ocr.porua.tesseract.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.ResultSet;
 import java.util.Arrays;
@@ -209,6 +211,72 @@ class OcrDataStoreServiceImplIntegrationTest {
 	assertEquals(book, result.getBook());
 	assertEquals("TEST IMAGE TIFF 1", result.getName());
 	assertEquals(10, result.getPageNumber());
+    }
+
+    @Test
+    void testMarkPageAsIgnored() {
+	// given
+	Book book = new Book();
+	book.setId(1);
+	book.setName("TEST BOOK 1");
+	book.setLanguage(Language.ben);
+
+	PageImage pageImage1 = new PageImage();
+	pageImage1.setId(1);
+	pageImage1.setBook(book);
+	pageImage1.setName("TEST IMAGE 1.jpg");
+	pageImage1.setPageNumber(1);
+
+	PageImage pageImage2 = new PageImage();
+	pageImage2.setId(2);
+	pageImage2.setBook(book);
+	pageImage2.setName("TEST IMAGE 2.jpg");
+	pageImage2.setPageNumber(2);
+
+	// when
+	int result = testClass.markPageAsIgnored(1);
+
+	// then
+	assertEquals(1, result);
+	Boolean ignored = jdbcTemplate.queryForObject("select ignored from page_image where id = ?", Boolean.class, 1);
+	assertTrue(ignored);
+	Boolean completed = jdbcTemplate.queryForObject("select correction_completed from page_image where id = ?", Boolean.class, 1);
+	assertFalse(completed);
+	List<PageImage> pages = testClass.getPages(1);
+	assertEquals(Arrays.asList(pageImage2), pages);
+    }
+
+    @Test
+    void testMarkPageAsCorrectionCompleted() {
+	// given
+	Book book = new Book();
+	book.setId(1);
+	book.setName("TEST BOOK 1");
+	book.setLanguage(Language.ben);
+
+	PageImage pageImage1 = new PageImage();
+	pageImage1.setId(1);
+	pageImage1.setBook(book);
+	pageImage1.setName("TEST IMAGE 1.jpg");
+	pageImage1.setPageNumber(1);
+
+	PageImage pageImage2 = new PageImage();
+	pageImage2.setId(2);
+	pageImage2.setBook(book);
+	pageImage2.setName("TEST IMAGE 2.jpg");
+	pageImage2.setPageNumber(2);
+
+	// when
+	int result = testClass.markPageAsCorrectionCompleted(2);
+
+	// then
+	assertEquals(1, result);
+	Boolean ignored = jdbcTemplate.queryForObject("select ignored from page_image where id = ?", Boolean.class, 2);
+	assertFalse(ignored);
+	Boolean completed = jdbcTemplate.queryForObject("select correction_completed from page_image where id = ?", Boolean.class, 2);
+	assertTrue(completed);
+	List<PageImage> pages = testClass.getPages(1);
+	assertEquals(Arrays.asList(pageImage1), pages);
     }
 
     @Test

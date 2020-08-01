@@ -38,4 +38,8 @@ public interface OcrDataStoreService {
 
     OcrWord markWordAsIgnored(OcrWordId ocrWordId);
 
+    int markPageAsIgnored(long pageImageId);
+
+    int markPageAsCorrectionCompleted(long pageImageId);
+
 }

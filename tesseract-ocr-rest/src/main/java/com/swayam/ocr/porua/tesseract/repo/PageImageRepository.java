@@ -2,7 +2,10 @@ package com.swayam.ocr.porua.tesseract.repo;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 
 import com.swayam.ocr.porua.tesseract.model.PageImage;
 
@@ -11,5 +14,13 @@ public interface PageImageRepository extends CrudRepository<PageImage, Long> {
     int countByBookId(long bookId);
 
     List<PageImage> findByBookIdAndIgnoredIsFalseAndCorrectionCompletedIsFalse(long bookId);
+
+    @Modifying
+    @Query("update PageImage set ignored = TRUE where id = :id")
+    int markPageAsIgnored(@Param("id") long id);
+
+    @Modifying
+    @Query("update PageImage set correctionCompleted = TRUE where id = :id")
+    int markPageAsCorrectionCompleted(@Param("id") long id);
 
 }
