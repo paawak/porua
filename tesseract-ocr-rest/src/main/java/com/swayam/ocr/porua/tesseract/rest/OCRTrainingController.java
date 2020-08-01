@@ -63,7 +63,7 @@ public class OCRTrainingController {
     }
 
     @GetMapping(value = "/book/{bookId}/page-count", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Integer> getPagesInBook(@PathVariable(name = "bookId") final long bookId) {
+    public Mono<Integer> getPagesInBook(@PathVariable("bookId") final long bookId) {
 	return Mono.just(ocrDataStoreService.getPageCount(bookId));
     }
 
@@ -72,14 +72,16 @@ public class OCRTrainingController {
 	return Flux.fromIterable(ocrDataStoreService.getPages(bookId));
     }
 
-    @PutMapping(value = "/page/ignore", produces = MediaType.TEXT_PLAIN_VALUE)
-    public int markPageAsIgnored(@RequestParam("pageImageId") final long pageImageId) {
-	return ocrDataStoreService.markPageAsIgnored(pageImageId);
+    @PutMapping(value = "/page/ignore/{pageImageId}")
+    public ResponseEntity<Integer> markPageAsIgnored(@PathVariable("pageImageId") final long pageImageId) {
+	int rowsAffected = ocrDataStoreService.markPageAsIgnored(pageImageId);
+	return ResponseEntity.ok(rowsAffected);
     }
 
-    @PutMapping(value = "/page/complete", produces = MediaType.TEXT_PLAIN_VALUE)
-    public int markPageAsCorrectionCompleted(@RequestParam("pageImageId") final long pageImageId) {
-	return ocrDataStoreService.markPageAsCorrectionCompleted(pageImageId);
+    @PutMapping(value = "/page/complete/{pageImageId}")
+    public ResponseEntity<Integer> markPageAsCorrectionCompleted(@PathVariable("pageImageId") final long pageImageId) {
+	int rowsAffected = ocrDataStoreService.markPageAsCorrectionCompleted(pageImageId);
+	return ResponseEntity.ok(rowsAffected);
     }
 
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
