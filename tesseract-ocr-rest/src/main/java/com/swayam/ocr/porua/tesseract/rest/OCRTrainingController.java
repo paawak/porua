@@ -73,13 +73,13 @@ public class OCRTrainingController {
     }
 
     @PutMapping(value = "/page/ignore", produces = MediaType.TEXT_PLAIN_VALUE)
-    public Mono<Integer> markPageAsIgnored(@RequestParam("pageImageId") final long pageImageId) {
-	return Mono.just(ocrDataStoreService.markPageAsIgnored(pageImageId));
+    public int markPageAsIgnored(@RequestParam("pageImageId") final long pageImageId) {
+	return ocrDataStoreService.markPageAsIgnored(pageImageId);
     }
 
     @PutMapping(value = "/page/complete", produces = MediaType.TEXT_PLAIN_VALUE)
-    public Mono<Integer> markPageAsCorrectionCompleted(@RequestParam("pageImageId") final long pageImageId) {
-	return Mono.just(ocrDataStoreService.markPageAsCorrectionCompleted(pageImageId));
+    public int markPageAsCorrectionCompleted(@RequestParam("pageImageId") final long pageImageId) {
+	return ocrDataStoreService.markPageAsCorrectionCompleted(pageImageId);
     }
 
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
