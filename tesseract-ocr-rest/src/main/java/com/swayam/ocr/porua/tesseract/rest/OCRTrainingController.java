@@ -32,7 +32,6 @@ import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.Book;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.PageImage;
-import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrection;
 import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrectionDto;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.ImageProcessor;
@@ -113,12 +112,12 @@ public class OCRTrainingController {
     }
 
     @PutMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<OcrCorrection> applyCorrectionToOcrWords(@RequestBody final List<OcrCorrectionDto> ocrWordsForCorrection) {
+    public Flux<Integer> applyCorrectionToOcrWords(@RequestBody final List<OcrCorrectionDto> ocrWordsForCorrection) {
 	return Flux.fromIterable(ocrWordsForCorrection)
 		.map(ocrWordForCorrection -> ocrDataStoreService.updateCorrectTextInOcrWord(ocrWordForCorrection.getOcrWordId(), ocrWordForCorrection.getCorrectedText()));
     }
 
-    @PutMapping(value = "/word/ignore", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.TEXT_PLAIN_VALUE)
+    @PutMapping(value = "/word/ignore", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<Integer> markOcrWordAsIgnored(@RequestBody final List<OcrWordId> wordsToIgnore) {
 	return Flux.fromIterable(wordsToIgnore).map(ocrDataStoreService::markWordAsIgnored);
     }

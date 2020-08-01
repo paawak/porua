@@ -30,7 +30,7 @@ public interface OcrDataStoreService {
 
     OcrWord addOcrWord(OcrWord rawOcrWord);
 
-    OcrWord updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText);
+    int updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText);
 
     OcrWord getWord(OcrWordId ocrWordId);
 

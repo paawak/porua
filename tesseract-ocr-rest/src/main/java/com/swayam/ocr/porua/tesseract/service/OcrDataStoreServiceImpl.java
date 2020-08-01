@@ -81,7 +81,7 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
     @Transactional
     @Override
     public int markWordAsIgnored(OcrWordId ocrWordId) {
-	return ocrWordRepository.markWordAsIgnored(ocrWordId);
+	return ocrWordRepository.markAsIgnored(ocrWordId);
     }
 
     @Override
@@ -89,11 +89,10 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 	return ocrWordRepository.save(ocrWord);
     }
 
+    @Transactional
     @Override
-    public OcrWord updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText) {
-	OcrWord ocrWord = getWord(ocrWordId);
-	ocrWord.setCorrectedText(correctedText);
-	return ocrWordRepository.save(ocrWord);
+    public int updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText) {
+	return ocrWordRepository.updateCorrectedText(ocrWordId, correctedText);
     }
 
     @Override

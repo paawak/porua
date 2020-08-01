@@ -18,6 +18,10 @@ public interface OcrWordRepository extends CrudRepository<OcrWord, OcrWordId> {
 
     @Modifying
     @Query("update OcrWord set ignored = TRUE where ocrWordId = :ocrWordId")
-    int markWordAsIgnored(@Param("ocrWordId") OcrWordId ocrWordId);
+    int markAsIgnored(@Param("ocrWordId") OcrWordId ocrWordId);
+
+    @Modifying
+    @Query("update OcrWord set correctedText = :correctedText where ocrWordId = :ocrWordId")
+    int updateCorrectedText(@Param("ocrWordId") OcrWordId ocrWordId, @Param("correctedText") String correctedText);
 
 }
