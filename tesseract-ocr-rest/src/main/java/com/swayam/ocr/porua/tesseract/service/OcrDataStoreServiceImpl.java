@@ -60,7 +60,7 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 
     @Override
     public List<PageImage> getPages(long bookId) {
-	return pageImageRepository.findByBookIdAndIgnoredIsFalseAndCorrectionCompletedIsFalse(bookId);
+	return pageImageRepository.findByBookIdAndIgnoredIsFalseAndCorrectionCompletedIsFalseOrderById(bookId);
     }
 
     @Override

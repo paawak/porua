@@ -13,7 +13,7 @@ public interface PageImageRepository extends CrudRepository<PageImage, Long> {
 
     int countByBookId(long bookId);
 
-    List<PageImage> findByBookIdAndIgnoredIsFalseAndCorrectionCompletedIsFalse(long bookId);
+    List<PageImage> findByBookIdAndIgnoredIsFalseAndCorrectionCompletedIsFalseOrderById(long bookId);
 
     @Modifying
     @Query("update PageImage set ignored = TRUE where id = :id")
