@@ -78,12 +78,10 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 	return ocrWordRepository.findById(ocrWordId).get();
     }
 
+    @Transactional
     @Override
-    public OcrWord markWordAsIgnored(OcrWordId ocrWordId) {
-	OcrWord ocrWord = getWord(ocrWordId);
-	ocrWord.setIgnored(true);
-	ocrWordRepository.save(ocrWord);
-	return ocrWord;
+    public int markWordAsIgnored(OcrWordId ocrWordId) {
+	return ocrWordRepository.markWordAsIgnored(ocrWordId);
     }
 
     @Override

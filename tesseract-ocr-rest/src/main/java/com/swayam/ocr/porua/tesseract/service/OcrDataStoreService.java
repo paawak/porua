@@ -36,7 +36,7 @@ public interface OcrDataStoreService {
 
     void removeWord(OcrWordId ocrWordId);
 
-    OcrWord markWordAsIgnored(OcrWordId ocrWordId);
+    int markWordAsIgnored(OcrWordId ocrWordId);
 
     int markPageAsIgnored(long pageImageId);
 
