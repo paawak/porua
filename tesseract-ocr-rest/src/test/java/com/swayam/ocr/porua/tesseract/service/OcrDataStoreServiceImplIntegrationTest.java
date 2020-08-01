@@ -1,6 +1,8 @@
 package com.swayam.ocr.porua.tesseract.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.ResultSet;
 import java.util.Arrays;
@@ -29,7 +31,7 @@ import com.swayam.ocr.porua.tesseract.model.PageImage;
 class OcrDataStoreServiceImplIntegrationTest {
 
     private static final String SELECT_FROM_OCR_WORD =
-	    "SELECT book_id, page_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence FROM ocr_word ORDER BY word_sequence_id ASC";
+	    "SELECT book_id, page_image_id, word_sequence_id, raw_text, corrected_text, x1, y1, x2, y2, confidence, ignored FROM ocr_word ORDER BY word_sequence_id ASC";
 
     @Autowired
     private OcrDataStoreServiceImpl testClass;
@@ -39,6 +41,7 @@ class OcrDataStoreServiceImplIntegrationTest {
 
     @BeforeEach
     void setupBookAndRawImage() {
+	jdbcTemplate.execute("TRUNCATE TABLE book");
 	jdbcTemplate.update("INSERT INTO book (id, name, language) VALUES (1, 'TEST BOOK 1', 'ben')");
 	jdbcTemplate.update("INSERT INTO book (id, name, language) VALUES (2, 'TEST BOOK 2', 'eng')");
 	jdbcTemplate.update("INSERT INTO page_image (id, book_id, name, page_number) VALUES (1, 1, 'TEST IMAGE 1.jpg', 1)");
@@ -111,6 +114,56 @@ class OcrDataStoreServiceImplIntegrationTest {
     }
 
     @Test
+    void testGetPages_ignored_completed() {
+	// given
+	Book book = new Book();
+	book.setId(1);
+	book.setName("TEST BOOK 1");
+	book.setLanguage(Language.ben);
+
+	PageImage pageImage1 = new PageImage();
+	pageImage1.setId(1);
+	pageImage1.setBook(book);
+	pageImage1.setName("TEST IMAGE 1.jpg");
+	pageImage1.setPageNumber(1);
+
+	PageImage pageImage2 = new PageImage();
+	pageImage2.setId(2);
+	pageImage2.setBook(book);
+	pageImage2.setName("TEST IMAGE 2.jpg");
+	pageImage2.setPageNumber(2);
+
+	PageImage pageImage3 = new PageImage();
+	pageImage3.setId(3);
+	pageImage3.setBook(book);
+	pageImage3.setName("TEST IMAGE 3.jpg");
+	pageImage3.setPageNumber(3);
+	pageImage3.setCorrectionCompleted(true);
+	testClass.addPageImage(pageImage3);
+
+	PageImage pageImage4 = new PageImage();
+	pageImage4.setId(4);
+	pageImage4.setBook(book);
+	pageImage4.setName("TEST IMAGE 4.jpg");
+	pageImage4.setPageNumber(4);
+	testClass.addPageImage(pageImage4);
+
+	PageImage pageImage5 = new PageImage();
+	pageImage5.setId(5);
+	pageImage5.setBook(book);
+	pageImage5.setName("TEST IMAGE 5.jpg");
+	pageImage5.setPageNumber(5);
+	pageImage5.setIgnored(true);
+	testClass.addPageImage(pageImage5);
+
+	// when
+	List<PageImage> results = testClass.getPages(1);
+
+	// then
+	assertEquals(Arrays.asList(pageImage1, pageImage2, pageImage4), results);
+    }
+
+    @Test
     void testGetPageCount() {
 	// given
 	Book book = new Book();
@@ -158,6 +211,72 @@ class OcrDataStoreServiceImplIntegrationTest {
 	assertEquals(book, result.getBook());
 	assertEquals("TEST IMAGE TIFF 1", result.getName());
 	assertEquals(10, result.getPageNumber());
+    }
+
+    @Test
+    void testMarkPageAsIgnored() {
+	// given
+	Book book = new Book();
+	book.setId(1);
+	book.setName("TEST BOOK 1");
+	book.setLanguage(Language.ben);
+
+	PageImage pageImage1 = new PageImage();
+	pageImage1.setId(1);
+	pageImage1.setBook(book);
+	pageImage1.setName("TEST IMAGE 1.jpg");
+	pageImage1.setPageNumber(1);
+
+	PageImage pageImage2 = new PageImage();
+	pageImage2.setId(2);
+	pageImage2.setBook(book);
+	pageImage2.setName("TEST IMAGE 2.jpg");
+	pageImage2.setPageNumber(2);
+
+	// when
+	int result = testClass.markPageAsIgnored(1);
+
+	// then
+	assertEquals(1, result);
+	Boolean ignored = jdbcTemplate.queryForObject("select ignored from page_image where id = ?", Boolean.class, 1);
+	assertTrue(ignored);
+	Boolean completed = jdbcTemplate.queryForObject("select correction_completed from page_image where id = ?", Boolean.class, 1);
+	assertFalse(completed);
+	List<PageImage> pages = testClass.getPages(1);
+	assertEquals(Arrays.asList(pageImage2), pages);
+    }
+
+    @Test
+    void testMarkPageAsCorrectionCompleted() {
+	// given
+	Book book = new Book();
+	book.setId(1);
+	book.setName("TEST BOOK 1");
+	book.setLanguage(Language.ben);
+
+	PageImage pageImage1 = new PageImage();
+	pageImage1.setId(1);
+	pageImage1.setBook(book);
+	pageImage1.setName("TEST IMAGE 1.jpg");
+	pageImage1.setPageNumber(1);
+
+	PageImage pageImage2 = new PageImage();
+	pageImage2.setId(2);
+	pageImage2.setBook(book);
+	pageImage2.setName("TEST IMAGE 2.jpg");
+	pageImage2.setPageNumber(2);
+
+	// when
+	int result = testClass.markPageAsCorrectionCompleted(2);
+
+	// then
+	assertEquals(1, result);
+	Boolean ignored = jdbcTemplate.queryForObject("select ignored from page_image where id = ?", Boolean.class, 2);
+	assertFalse(ignored);
+	Boolean completed = jdbcTemplate.queryForObject("select correction_completed from page_image where id = ?", Boolean.class, 2);
+	assertTrue(completed);
+	List<PageImage> pages = testClass.getPages(1);
+	assertEquals(Arrays.asList(pageImage1), pages);
     }
 
     @Test
@@ -224,6 +343,27 @@ class OcrDataStoreServiceImplIntegrationTest {
     }
 
     @Test
+    void testMarkWordAsIgnored() {
+	// given
+	OcrWord ocrWord1 = getOcrWord(1, 1, 11, 22, 33, 44, 55.55f, "ABC123", 1);
+	OcrWord ocrWord2 = getOcrWord(1, 1, 111, 222, 333, 444, 555.555f, "DEF456", 2);
+	OcrWord ocrWord3 = getOcrWord(1, 1, 1111, 2222, 3333, 4444, 5555.5555f, "GHI789", 3);
+
+	testClass.addOcrWord(ocrWord1);
+	testClass.addOcrWord(ocrWord2);
+	testClass.addOcrWord(ocrWord3);
+
+	// when
+	int result = testClass.markWordAsIgnored(new OcrWordId(1, 1, 2));
+
+	// then
+	assertEquals(1, result);
+	List<OcrWord> words = jdbcTemplate.query(SELECT_FROM_OCR_WORD, ocrWordMapper());
+	ocrWord2.setIgnored(true);
+	assertEquals(Arrays.asList(ocrWord1, ocrWord2, ocrWord3), words);
+    }
+
+    @Test
     void testGetWords() {
 	// given
 	OcrWord ocrWord1 = getOcrWord(1, 1, 11, 22, 33, 44, 55.55f, "ABC123", 1);
@@ -280,6 +420,7 @@ class OcrDataStoreServiceImplIntegrationTest {
 	    OcrWord ocrWord =
 		    getOcrWord(1, 1, res.getInt("x1"), res.getInt("y1"), res.getInt("x2"), res.getInt("y2"), res.getFloat("confidence"), res.getString("raw_text"), res.getInt("word_sequence_id"));
 	    ocrWord.setCorrectedText(res.getString("corrected_text"));
+	    ocrWord.setIgnored(res.getBoolean("ignored"));
 	    return ocrWord;
 	};
     }

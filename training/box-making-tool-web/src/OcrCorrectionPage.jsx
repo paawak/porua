@@ -8,12 +8,46 @@ class OcrCorrectionPage extends React.Component {
     this.state = {
       markedForDeletion: new Map(),
       markedForCorrection: new Map(),
-      ignoredSuccess: false,
-      ignoredFailed: false,
+      wordDeletedSuccess: false,
+      wordDeletedFailed: false,
       correctionSuccess: false,
-      correctionFailed: false      
+      correctionFailed: false,
+      pageIgnoredSuccess: false,
+      pageIgnoredFailed: false,
+      pageCompletedSuccess: false,
+      pageCompletedFailed: false
     };
     this.handleSubmitForCorrection = this.handleSubmitForCorrection.bind(this);
+    this.markPageIgnored = this.markPageIgnored.bind(this);
+    this.markPageCompleted = this.markPageCompleted.bind(this);
+  }
+
+  markPageIgnored() {
+    const pageImageId = this.props.ocrWords[0].ocrWordId.pageImageId;
+    fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/page/ignore/${pageImageId}`, {
+      method: 'PUT'
+    })
+      .then(response => {
+        if (response.ok) {
+          this.setState({ pageIgnoredSuccess: true });
+        } else {
+          this.setState({ pageIgnoredFailed: true });
+        }
+      });
+  }
+
+  markPageCompleted() {
+    const pageImageId = this.props.ocrWords[0].ocrWordId.pageImageId;
+    fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/page/complete/${pageImageId}`, {
+      method: 'PUT'
+    })
+      .then(response => {
+        if (response.ok) {
+          this.setState({ pageCompletedSuccess: true });
+        } else {
+          this.setState({ pageCompletedFailed: true });
+        }
+      });
   }
 
   handleSubmitForCorrection() {
@@ -38,10 +72,10 @@ class OcrCorrectionPage extends React.Component {
       })
         .then(response => {
           if (response.ok) {
-            this.setState({ ignoredSuccess: true });
+            this.setState({ wordDeletedSuccess: true });
             this.state.markedForDeletion.clear();
           } else {
-            this.setState({ ignoredFailed: true });
+            this.setState({ wordDeletedFailed: true });
           }
         });
     }
@@ -173,10 +207,12 @@ class OcrCorrectionPage extends React.Component {
               </li>
             </ul>
           </div>
-          <button className="btn btn-outline-success my-2 my-sm-0" type="button" onClick={this.handleSubmitForCorrection}>Submit For Correction</button>
+          <button id="ignorePageButton" className="btn btn-danger my-2 my-sm-0" type="button" onClick={this.markPageIgnored}>Ignore Page</button>
+          <button id="submitForCorrectionButton" className="btn btn-primary my-2 my-sm-0" type="button" onClick={this.handleSubmitForCorrection}>Submit For Correction</button>
+          <button id="correctionCompletedButton" className="btn btn-success my-2 my-sm-0" type="button" onClick={this.markPageCompleted}>Correction Completed</button>
         </nav>
         
-        { this.state.ignoredFailed &&
+        { this.state.wordDeletedFailed &&
           displayError("ignore")
         }
         
@@ -184,12 +220,28 @@ class OcrCorrectionPage extends React.Component {
           displayError("word correction")
         }
 
-        { this.state.ignoredSuccess &&
+        { this.state.pageIgnoredFailed &&
+          displayError("ignoring page")
+        }
+
+        { this.state.pageCompletedFailed &&
+          displayError("completing page")
+        }        
+
+        { this.state.wordDeletedSuccess &&
           displaySuccess("Ignore")
         }
 
         { this.state.correctionSuccess &&
           displaySuccess("Word correction")
+        }
+
+        { this.state.pageIgnoredSuccess &&
+          displaySuccess("ignoring page")
+        }
+
+        { this.state.pageCompletedSuccess &&
+          displaySuccess("completing page")
         }
 
         <div className="row row-cols-4">

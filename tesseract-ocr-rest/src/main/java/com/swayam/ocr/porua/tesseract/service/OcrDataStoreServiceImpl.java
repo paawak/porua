@@ -3,6 +3,8 @@ package com.swayam.ocr.porua.tesseract.service;
 import java.util.Collection;
 import java.util.List;
 
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
 import com.swayam.ocr.porua.tesseract.OcrWordId;
@@ -58,7 +60,7 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 
     @Override
     public List<PageImage> getPages(long bookId) {
-	return pageImageRepository.findByBookId(bookId);
+	return pageImageRepository.findByBookIdAndIgnoredIsFalseAndCorrectionCompletedIsFalseOrderById(bookId);
     }
 
     @Override
@@ -76,12 +78,10 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 	return ocrWordRepository.findById(ocrWordId).get();
     }
 
+    @Transactional
     @Override
-    public OcrWord markWordAsIgnored(OcrWordId ocrWordId) {
-	OcrWord ocrWord = getWord(ocrWordId);
-	ocrWord.setIgnored(true);
-	ocrWordRepository.save(ocrWord);
-	return ocrWord;
+    public int markWordAsIgnored(OcrWordId ocrWordId) {
+	return ocrWordRepository.markAsIgnored(ocrWordId);
     }
 
     @Override
@@ -89,16 +89,27 @@ public class OcrDataStoreServiceImpl implements OcrDataStoreService {
 	return ocrWordRepository.save(ocrWord);
     }
 
+    @Transactional
     @Override
-    public OcrWord updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText) {
-	OcrWord ocrWord = getWord(ocrWordId);
-	ocrWord.setCorrectedText(correctedText);
-	return ocrWordRepository.save(ocrWord);
+    public int updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText) {
+	return ocrWordRepository.updateCorrectedText(ocrWordId, correctedText);
     }
 
     @Override
     public void removeWord(OcrWordId ocrWordId) {
 	ocrWordRepository.deleteById(ocrWordId);
+    }
+
+    @Transactional
+    @Override
+    public int markPageAsIgnored(long pageImageId) {
+	return pageImageRepository.markPageAsIgnored(pageImageId);
+    }
+
+    @Transactional
+    @Override
+    public int markPageAsCorrectionCompleted(long pageImageId) {
+	return pageImageRepository.markPageAsCorrectionCompleted(pageImageId);
     }
 
 }

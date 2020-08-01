@@ -30,12 +30,16 @@ public interface OcrDataStoreService {
 
     OcrWord addOcrWord(OcrWord rawOcrWord);
 
-    OcrWord updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText);
+    int updateCorrectTextInOcrWord(OcrWordId ocrWordId, String correctedText);
 
     OcrWord getWord(OcrWordId ocrWordId);
 
     void removeWord(OcrWordId ocrWordId);
 
-    OcrWord markWordAsIgnored(OcrWordId ocrWordId);
+    int markWordAsIgnored(OcrWordId ocrWordId);
+
+    int markPageAsIgnored(long pageImageId);
+
+    int markPageAsCorrectionCompleted(long pageImageId);
 
 }

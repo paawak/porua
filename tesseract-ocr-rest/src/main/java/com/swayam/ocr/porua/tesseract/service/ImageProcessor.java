@@ -42,7 +42,7 @@ public class ImageProcessor {
 	this.tessDataDirectory = tessDataDirectory;
     }
 
-    public void processEBookInPdf(long bookId, final String fileName, final Path eBookPdfDownloadPath) {
+    public int processEBookInPdf(long bookId, final String fileName, final Path eBookPdfDownloadPath) {
 
 	PDDocument document;
 	try {
@@ -76,6 +76,8 @@ public class ImageProcessor {
 		    Path imageLocation = eBookPdfDownloadPath.getParent().resolve(pageImageName);
 		    taskExecutor.execute(() -> submitPdfPageForAnalysis(book, pageImage, pageNumber, pageImageName, imageLocation));
 		});
+
+	return pageCount.intValue();
 
     }
 

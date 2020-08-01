@@ -32,7 +32,6 @@ import com.swayam.ocr.porua.tesseract.OcrWordId;
 import com.swayam.ocr.porua.tesseract.model.Book;
 import com.swayam.ocr.porua.tesseract.model.OcrWord;
 import com.swayam.ocr.porua.tesseract.model.PageImage;
-import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrection;
 import com.swayam.ocr.porua.tesseract.rest.dto.OcrCorrectionDto;
 import com.swayam.ocr.porua.tesseract.service.FileSystemUtil;
 import com.swayam.ocr.porua.tesseract.service.ImageProcessor;
@@ -64,13 +63,25 @@ public class OCRTrainingController {
     }
 
     @GetMapping(value = "/book/{bookId}/page-count", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<Integer> getPagesInBook(@PathVariable(name = "bookId") final long bookId) {
+    public Mono<Integer> getPagesInBook(@PathVariable("bookId") final long bookId) {
 	return Mono.just(ocrDataStoreService.getPageCount(bookId));
     }
 
     @GetMapping(value = "/page", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<PageImage> getPages(@RequestParam("bookId") final long bookId) {
 	return Flux.fromIterable(ocrDataStoreService.getPages(bookId));
+    }
+
+    @PutMapping(value = "/page/ignore/{pageImageId}")
+    public ResponseEntity<Integer> markPageAsIgnored(@PathVariable("pageImageId") final long pageImageId) {
+	int rowsAffected = ocrDataStoreService.markPageAsIgnored(pageImageId);
+	return ResponseEntity.ok(rowsAffected);
+    }
+
+    @PutMapping(value = "/page/complete/{pageImageId}")
+    public ResponseEntity<Integer> markPageAsCorrectionCompleted(@PathVariable("pageImageId") final long pageImageId) {
+	int rowsAffected = ocrDataStoreService.markPageAsCorrectionCompleted(pageImageId);
+	return ResponseEntity.ok(rowsAffected);
     }
 
     @GetMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -107,19 +118,19 @@ public class OCRTrainingController {
 
 	Path savedEBookPath = fileSystemUtil.saveMultipartFileAsImage(eBookAsPdf);
 
-	imageProcessor.processEBookInPdf(Long.valueOf(bookIdAsString), eBookName, savedEBookPath);
+	int extractedPageCount = imageProcessor.processEBookInPdf(Long.valueOf(bookIdAsString), eBookName, savedEBookPath);
 
-	return ResponseEntity.ok(Integer.toString(-1));
+	return ResponseEntity.ok(Integer.toString(extractedPageCount));
     }
 
     @PutMapping(value = "/word", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<OcrCorrection> applyCorrectionToOcrWords(@RequestBody final List<OcrCorrectionDto> ocrWordsForCorrection) {
+    public Flux<Integer> applyCorrectionToOcrWords(@RequestBody final List<OcrCorrectionDto> ocrWordsForCorrection) {
 	return Flux.fromIterable(ocrWordsForCorrection)
 		.map(ocrWordForCorrection -> ocrDataStoreService.updateCorrectTextInOcrWord(ocrWordForCorrection.getOcrWordId(), ocrWordForCorrection.getCorrectedText()));
     }
 
     @PutMapping(value = "/word/ignore", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Flux<OcrWord> markOcrWordAsIgnored(@RequestBody final List<OcrWordId> wordsToIgnore) {
+    public Flux<Integer> markOcrWordAsIgnored(@RequestBody final List<OcrWordId> wordsToIgnore) {
 	return Flux.fromIterable(wordsToIgnore).map(ocrDataStoreService::markWordAsIgnored);
     }
 
