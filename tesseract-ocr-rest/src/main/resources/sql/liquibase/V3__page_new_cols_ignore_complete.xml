@@ -4,7 +4,16 @@
 	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-	<include file="V1__ocr_word_initial_schema.xml" relativeToChangelogFile="true" />
-	<include file="V2__hard-coded-books.xml" relativeToChangelogFile="true" />
-	<include file="V3__page_new_cols_ignore_complete.xml" relativeToChangelogFile="true" />
+	<changeSet author="Palash Ray" id="3">
+		<addColumn tableName="PAGE_IMAGE">
+			<column defaultValueBoolean="false" name="CORRECTION_COMPLETED"
+				type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+			<column defaultValueBoolean="false" name="IGNORED"
+				type="BOOLEAN">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>
