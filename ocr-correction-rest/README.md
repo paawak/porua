@@ -9,5 +9,8 @@
 
 ## REST Library Slim
 <http://www.slimframework.com/docs/v4/>
-<http://www.slimframework.com/docs/v3/tutorial/first-app.html>
+<http://www.slimframework.com/docs/v4/start/upgrade.html>
+
+## Dependency Injection with Pimple
+<https://pimple.symfony.com/>
 
