@@ -10,19 +10,18 @@ use Slim\Factory\AppFactory;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
-// the connection configuration
 $dbParams = array(
-    'driver'   => 'pdo_mysql',
-    'user'     => 'root',
+    'driver' => 'pdo_mysql',
+    'user' => 'root',
     'password' => 'root123',
-    'dbname'   => 'porua',
+    'dbname' => 'porua',
 );
 
 $isDevMode = true;
 $proxyDir = null;
 $cache = null;
 $useSimpleAnnotationReader = false;
-$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__."/com/swayam/ocr/porua/model"), $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
+$config = Setup::createAnnotationMetadataConfiguration(array(__DIR__ . "/com/swayam/ocr/porua/model"), $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
 
 $entityManager = EntityManager::create($dbParams, $config);
 
@@ -32,7 +31,7 @@ $book = $entityManager->find('com\swayam\ocr\porua\model\Book', 1);
 
 echo $book->getName();
 
-$app->get('/', function (Request $request, Response $response, $args) {    
+$app->get('/', function (Request $request, Response $response, $args) {
     $response->getBody()->write("Book: ");
     return $response;
 });
