@@ -162,6 +162,8 @@
 							<password>root123</password>
 							<driver>com.mysql.cj.jdbc.Driver</driver>
 							<changeLogFile>src/main/resources/sql/liquibase/master-change-log.xml</changeLogFile>
+							<outputChangeLogFile>schema.mysql.sql</outputChangeLogFile>
+							<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
 						</configuration>
 						<executions>
 							<execution>

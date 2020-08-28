@@ -87,9 +87,11 @@ Exporting the corrected words to a CSV file:
 
 Reference: <https://docs.liquibase.com/tools-integrations/maven/commands/home.html>
 
-## Generating liquibase changelog from existing DB
+## Generate Mysql SQL Schema from existing DB
 
-    mvn liquibase:generateChangeLog    
+In the *pom.xml* change the *outputChangeLogFile* property in the format *schema.<target_db>.sql*. For mysql, it is *schema.mysql.sql*.
+
+    mvn -P mysql liquibase:generateChangeLog   
 
 ## Applying liquibase changelog to MySQL DB
 
