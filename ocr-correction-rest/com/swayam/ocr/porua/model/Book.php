@@ -2,25 +2,29 @@
 
 namespace com\swayam\ocr\porua\model;
 
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\Column;
 
 /**
- * @ORM\Entity
- * @ORM\Table(name="book")
+ * @Entity
+ * @Table(name="book")
  */
 class Book {
 
     /**
-     * @ORM\Id
-     * @ORM\Column(type="bigint")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
+     * @Id
+     * @Column(type="bigint")
+     * @GeneratedValue(strategy="IDENTITY")
      */
     private $id;
 
-    /** @ORM\Column(type="string") */
+    /** @Column(type="string") */
     private $name;
 
-    /** @ORM\Column(type="string") */
+    /** @Column(type="string") */
     private $language;
 
     public function getId() {
