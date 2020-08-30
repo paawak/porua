@@ -11,6 +11,8 @@
 <http://www.slimframework.com/docs/v4/>
 <http://www.slimframework.com/docs/v4/start/upgrade.html>
 
-## Dependency Injection with Pimple
-<https://pimple.symfony.com/>
+## Dependency Injection with PHP-DI
+composer require php-di/slim-bridge
+<https://php-di.org/doc/frameworks/slim.html>
+<https://php-di.org/doc/container-configuration.html>
 

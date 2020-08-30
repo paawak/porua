@@ -1,53 +1,47 @@
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/com/swayam/ocr/porua/rest/IndexController.php';
 
-require_once __DIR__ . '/com/swayam/ocr/porua/model/Book.php';
-
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Factory\AppFactory;
+use DI\Bridge\Slim\Bridge;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
-use Pimple\Container;
+use DI\ContainerBuilder;
+use com\swayam\ocr\porua\rest\IndexController;
 
-$app = AppFactory::create();
+$builder = new ContainerBuilder();
+$container = $builder->build();
 
-$container = new Container();
+$app = Bridge::create($container);
 
-$container['logger'] = function($c) {
-    $logger = new Logger('ocr-correction-rest-logger');
-    $file_handler = new StreamHandler('../logs/ocr-correction-rest.log');
-    $logger->pushHandler($file_handler);
-    return $logger;
-};
+$container->set('logger', \DI\value(function() {
+            $logger = new Logger('ocr-correction-rest-logger');
+            $file_handler = new StreamHandler('../logs/ocr-correction-rest.log');
+            $logger->pushHandler($file_handler);
+            return $logger;
+        }));
 
-$container['entityManager'] = function($c) {
-    $dbParams = array(
-        'driver' => 'pdo_mysql',
-        'user' => 'root',
-        'password' => 'root123',
-        'dbname' => 'porua',
-    );
+$container->set('entityManager', \DI\value(function() {
+            $dbParams = array(
+                'driver' => 'pdo_mysql',
+                'user' => 'root',
+                'password' => 'root123',
+                'dbname' => 'porua',
+            );
 
-    $isDevMode = true;
-    $proxyDir = null;
-    $cache = null;
-    $useSimpleAnnotationReader = false;
-    $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__ . "/com/swayam/ocr/porua/model"), $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
+            $isDevMode = true;
+            $proxyDir = null;
+            $cache = null;
+            $useSimpleAnnotationReader = false;
+            $config = Setup::createAnnotationMetadataConfiguration(array(__DIR__ . "/com/swayam/ocr/porua/model"), $isDevMode, $proxyDir, $cache, $useSimpleAnnotationReader);
 
-    $entityManager = EntityManager::create($dbParams, $config);
-    return $entityManager;
-};
+            $entityManager = EntityManager::create($dbParams, $config);
+            return $entityManager;
+        }));
 
-$app->get('/', function (Request $request, Response $response) {
-    $container['logger']->addInfo("Welcome!!");
-    $book = $container['entityManager']->find('com\swayam\ocr\porua\model\Book', 1);
-    $response->getBody()->write("Book: " + $book->getName());
-    return $response;
-});
+$app->get('/', [IndexController::class, 'get']);
 
 $app->run();
 ?>
