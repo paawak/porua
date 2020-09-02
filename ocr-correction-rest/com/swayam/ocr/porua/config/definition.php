@@ -4,11 +4,12 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Setup;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 
 return [
     LoggerInterface::class => function () {
         $logger = new Logger('ocr-correction-rest-logger');
-        $file_handler = new StreamHandler('../logs/ocr-correction-rest.log');
+        $file_handler = new StreamHandler(__DIR__ . '/../../../../../../logs/ocr-correction-rest.log');
         $logger->pushHandler($file_handler);
         return $logger;
     },
