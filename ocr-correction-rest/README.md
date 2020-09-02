@@ -15,4 +15,4 @@
 composer require php-di/slim-bridge
 <https://php-di.org/doc/frameworks/slim.html>
 <https://php-di.org/doc/container-configuration.html>
-
+Demo: <https://github.com/PHP-DI/demo>

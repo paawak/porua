@@ -2,12 +2,15 @@
 
 namespace com\swayam\ocr\porua\rest;
 
-require_once '/kaaj/source/porua/ocr-correction-rest/com/swayam/ocr/porua/model/Book.php';
-
 use Doctrine\ORM\EntityManager;
+
+require_once __DIR__ . '/../model/Book.php';
 
 class IndexController {
 
+    /**
+     * @var EntityManager
+     */
     private $entityManager;
 
     public function __construct(EntityManager $entityManager) {
@@ -16,7 +19,8 @@ class IndexController {
 
     public function get($request, $response) {
         $book = $this->entityManager->find('com\swayam\ocr\porua\model\Book', 1);
-        $response->getBody()->write("Book: " + $book->getName());
+        $bookName = $book->getName();
+        $response->getBody()->write("Book: $bookName");
         return $response;
     }
 
