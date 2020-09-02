@@ -9,14 +9,8 @@ require_once __DIR__ . '/../model/Book.php';
 
 class IndexController {
 
-    /**
-     * @var EntityManager
-     */
     private $entityManager;
-    
-     /**
-     * @var LoggerInterface
-     */
+
     private $logger;
 
     public function __construct(EntityManager $entityManager, LoggerInterface $logger) {
