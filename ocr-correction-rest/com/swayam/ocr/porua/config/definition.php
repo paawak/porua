@@ -19,6 +19,8 @@ return [
             'user' => 'root',
             'password' => 'root123',
             'dbname' => 'porua',
+            'host' => 'localhost',
+            'charset' =>  'UTF8'
         );
 
         $isDevMode = true;
