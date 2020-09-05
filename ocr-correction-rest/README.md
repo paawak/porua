@@ -9,7 +9,7 @@
 
 ## REST Library Slim
 <http://www.slimframework.com/docs/v4/>
-<http://www.slimframework.com/docs/v4/start/upgrade.html>
+<http://www.slimframework.com/docs/v4/objects/request.html>
 
 ## Dependency Injection with PHP-DI
 composer require php-di/slim-bridge
