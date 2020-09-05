@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping\Column;
  * @Entity
  * @Table(name="book")
  */
-class Book {
+class Book implements \JsonSerializable {
 
     /**
      * @Id
@@ -49,6 +49,10 @@ class Book {
 
     public function setLanguage($language): void {
         $this->language = $language;
+    }
+
+    public function jsonSerialize() {
+        return get_object_vars($this);
     }
 
 }
