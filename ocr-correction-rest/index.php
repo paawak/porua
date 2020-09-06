@@ -29,8 +29,9 @@ $errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, false, false);
 $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
 $app->get('/', [IndexController::class, 'get']);
-$app->get('/train/book', [TrainingController::class, 'getAll']);
-$app->get('/train/book/{bookId}/page-count', [TrainingController::class, 'getOne']);
+$app->get('/train/book', [TrainingController::class, 'getAllBooks']);
+$app->get('/train/book/{bookId}/page-count', [TrainingController::class, 'getPageCount']);
+$app->get('/train/page', [TrainingController::class, 'getPages']);
 
 $app->run();
 ?>

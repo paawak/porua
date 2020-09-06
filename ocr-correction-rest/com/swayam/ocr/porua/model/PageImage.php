@@ -16,7 +16,7 @@ use com\swayam\ocr\porua\model\Book;
  * @Entity
  * @Table(name="page_image")
  */
-class PageImage {
+class PageImage implements \JsonSerializable {
 
     /**
      * @Id
@@ -89,6 +89,10 @@ class PageImage {
 
     public function setCorrectionCompleted($correctionCompleted): void {
         $this->correctionCompleted = $correctionCompleted;
+    }
+    
+    public function jsonSerialize() {
+        return get_object_vars($this);
     }
 
 }

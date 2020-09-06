@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping\Column;
  * @Entity
  * @Table(name="ocr_word")
  */
-class OcrWord {
+class OcrWord implements \JsonSerializable {
 
     /** @Column(name = "book_id", type="bigint") */
     private $bookId;
@@ -142,6 +142,10 @@ class OcrWord {
 
     public function setIgnored($ignored): void {
         $this->ignored = $ignored;
+    }
+    
+    public function jsonSerialize() {
+        return get_object_vars($this);
     }
 
 }
