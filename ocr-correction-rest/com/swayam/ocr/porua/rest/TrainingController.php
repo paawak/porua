@@ -73,42 +73,46 @@ class TrainingController {
                     'id' => $pageImageId
                 ))->getName();
 
-        $nameTokens = explode('.', $pageName);
-        $imageExtension = strtolower($nameTokens[count($nameTokens) - 1]);
+        $pageNameTokens = explode('.', $pageName);
+        $imageExtension = strtolower($pageNameTokens[count($pageNameTokens) - 1]);
 
         $ocrWord = $this->entityManager->getRepository(OcrWord::class)->findOneBy(array(
             'ocrWordId.bookId' => $bookId,
             'ocrWordId.pageImageId' => $pageImageId,
             'ocrWordId.wordSequenceId' => $wordSequenceId
         ));
+        
+        $wordImage = $this->getWordImageToWrite(self::IMAGE_STORE . $pageName, $ocrWord, $imageExtension);
 
+        $imageWriteFunctionName = "image" . $imageExtension;
+
+        $imageWriteFunctionName($wordImage);
+
+        imagedestroy($wordImage);
+
+        return $response->withHeader('Content-Type', "image/" . $imageExtension);
+    }
+
+    private function getWordImageToWrite(string $imageFullPath, OcrWord $ocrWord, string $imageExtension) {
         $sourceX = $ocrWord->getX1();
         $sourceY = $ocrWord->getY1();
         $width = $ocrWord->getX2() - $sourceX;
         $height = $ocrWord->getY2() - $sourceY;
 
-        $imageFullPath = self::IMAGE_STORE . $pageName;
         $imageReadFunctionName = "imagecreatefrom" . $imageExtension;
-        $imageWriteFunctionName = "image" . $imageExtension;
 
-        $this->logger->info("Reading image: {img}, with imageFunctions: {imgReadFunc}, {imgWriteFunc}",
+        $this->logger->info("Reading image: {img}, with imageFunction: {imgReadFunc}",
                 array(
                     'img' => $imageFullPath,
                     'imgReadFunc' => $imageReadFunctionName,
-                    'imgWriteFunc' => $imageWriteFunctionName,
                     $sourceX, $sourceY, $width, $height
         ));
 
         $imageSource = $imageReadFunctionName($imageFullPath);
         $imageDest = imagecreate($width, $height);
         imagecopyresampled($imageDest, $imageSource, 0, 0, $sourceX, $sourceY, $width, $height, $width, $height);
-        
-        $imageWriteFunctionName($imageDest);
-        
         imagedestroy($imageSource);
-        imagedestroy($imageDest);
-
-        return $response->withHeader('Content-Type', "image/" . $imageExtension);
+        return $imageDest;
     }
 
 }
