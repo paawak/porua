@@ -5,12 +5,14 @@ use Doctrine\ORM\Tools\Setup;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Monolog\Processor\PsrLogMessageProcessor;
 
 return [
     LoggerInterface::class => function () {
         $logger = new Logger('ocr-correction-rest-logger');
         $file_handler = new StreamHandler(__DIR__ . '/../../../../../../logs/ocr-correction-rest.log');
         $logger->pushHandler($file_handler);
+        $logger->pushProcessor(new PsrLogMessageProcessor);
         return $logger;
     },
     EntityManager::class => function () {

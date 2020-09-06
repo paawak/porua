@@ -76,15 +76,15 @@ class TrainingController {
         $nameTokens = explode('.', $pageName);
         $imageExtension = $nameTokens[count($nameTokens) - 1];
 
-        $imageFullPath = self::IMAGE_STORE . $pageName;
-
-        $imageStream = fopen($imageFullPath, 'rb');
-
         $ocrWord = $this->entityManager->getRepository(OcrWord::class)->findOneBy(array(
             'ocrWordId.bookId' => $bookId,
             'ocrWordId.pageImageId' => $pageImageId,
             'ocrWordId.wordSequenceId' => $wordSequenceId
         ));
+
+        $imageFullPath = self::IMAGE_STORE . $pageName;
+        
+        $this->logger->info("Reading image: {img}", array(img=>$imageFullPath));
 
         $image = imagecreatefrompng($imageFullPath);
 
