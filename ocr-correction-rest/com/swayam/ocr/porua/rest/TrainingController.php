@@ -61,5 +61,23 @@ class TrainingController {
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
+    
+    public function getWordImage(Request $request, Response $response) {
+        $queryParams = $request->getQueryParams();
+        $bookId = $queryParams["bookId"];
+        $pageImageId = $queryParams["pageImageId"];
+        $wordSequenceId = $queryParams["wordSequenceId"];
+        $page = $this->entityManager->getRepository(PageImage::class)->findOneBy(array(
+            'id' => $pageImageId
+        ));
+        $ocrWord = $this->entityManager->getRepository(OcrWord::class)->findOneBy(array(
+            'ocrWordId.bookId' => $bookId,
+            'ocrWordId.pageImageId' => $pageImageId,
+            'ocrWordId.wordSequenceId' => $wordSequenceId
+        ));
+        $payload = json_encode($ocrWord, JSON_PRETTY_PRINT);
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
 
 }

@@ -33,6 +33,7 @@ $app->get('/train/book', [TrainingController::class, 'getAllBooks']);
 $app->get('/train/book/{bookId}/page-count', [TrainingController::class, 'getPageCountInBook']);
 $app->get('/train/page', [TrainingController::class, 'getPagesInBook']);
 $app->get('/train/word', [TrainingController::class, 'getWordsInPage']);
+$app->get('/train/word/image', [TrainingController::class, 'getWordImage']);
 
 $app->run();
 ?>
