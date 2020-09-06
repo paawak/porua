@@ -1,7 +1,7 @@
 <?php
 
 require __DIR__ . '/com/swayam/ocr/porua/rest/IndexController.php';
-require __DIR__ . '/com/swayam/ocr/porua/rest/BookController.php';
+require __DIR__ . '/com/swayam/ocr/porua/rest/TrainingController.php';
 
 use DI\Bridge\Slim\Bridge;
 use Slim\Handlers\ErrorHandler;
@@ -9,7 +9,7 @@ use Slim\Factory\ServerRequestCreatorFactory;
 use Psr\Log\LoggerInterface;
 
 use com\swayam\ocr\porua\rest\IndexController;
-use com\swayam\ocr\porua\rest\BookController;
+use com\swayam\ocr\porua\rest\TrainingController;
 
 $container = require __DIR__ . '/com/swayam/ocr/porua/config/bootstrap.php';
 
@@ -29,8 +29,8 @@ $errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, false, false);
 $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
 $app->get('/', [IndexController::class, 'get']);
-$app->get('/train/book', [BookController::class, 'getAll']);
-$app->get('/train/book/{bookId}/page-count', [BookController::class, 'getOne']);
+$app->get('/train/book', [TrainingController::class, 'getAll']);
+$app->get('/train/book/{bookId}/page-count', [TrainingController::class, 'getOne']);
 
 $app->run();
 ?>

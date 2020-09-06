@@ -13,7 +13,7 @@ use com\swayam\ocr\porua\model\PageImage;
 require_once __DIR__ . '/../model/Book.php';
 require_once __DIR__ . '/../model/PageImage.php';
 
-class BookController {
+class TrainingController {
 
     private $entityManager;
     private $logger;
