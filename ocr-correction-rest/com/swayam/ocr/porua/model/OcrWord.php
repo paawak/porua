@@ -3,6 +3,8 @@
 namespace com\swayam\ocr\porua\model;
 
 use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Embeddable;
+use Doctrine\ORM\Mapping\Embedded;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Id;
@@ -14,22 +16,9 @@ use Doctrine\ORM\Mapping\Id;
 class OcrWord implements \JsonSerializable {
 
     /** 
-     * @Id
-     * @Column(name = "book_id", type="bigint") 
+     * @Embedded(class = "OcrWordId", columnPrefix=false) 
      */
-    private $bookId;
-
-    /** 
-     * @Id
-     * @Column(name = "page_image_id", type="bigint") 
-     */
-    private $pageImageId;
-
-    /** 
-     * @Id
-     * @Column(name = "word_sequence_id", type="integer") 
-     */
-    private $wordSequenceId;
+    private $ocrWordId;
 
     /** @Column(name = "raw_text") */
     private $rawText;
@@ -58,16 +47,8 @@ class OcrWord implements \JsonSerializable {
     /** @Column(type="boolean") */
     private $ignored;
 
-    public function getBookId() {
-        return $this->bookId;
-    }
-
-    public function getPageImageId() {
-        return $this->pageImageId;
-    }
-
-    public function getWordSequenceId() {
-        return $this->wordSequenceId;
+    public function getOcrWordId() {
+        return $this->ocrWordId;
     }
 
     public function getRawText() {
@@ -106,16 +87,8 @@ class OcrWord implements \JsonSerializable {
         return $this->ignored;
     }
 
-    public function setBookId($bookId): void {
-        $this->bookId = $bookId;
-    }
-
-    public function setPageImageId($pageImageId): void {
-        $this->pageImageId = $pageImageId;
-    }
-
-    public function setWordSequenceId($wordSequenceId): void {
-        $this->wordSequenceId = $wordSequenceId;
+    public function setOcrWordId($ocrWordId): void {
+        $this->ocrWordId = $ocrWordId;
     }
 
     public function setRawText($rawText): void {
@@ -153,7 +126,58 @@ class OcrWord implements \JsonSerializable {
     public function setIgnored($ignored): void {
         $this->ignored = $ignored;
     }
-    
+
+    public function jsonSerialize() {
+        return get_object_vars($this);
+    }
+
+}
+
+/** @Embeddable */
+class OcrWordId implements \JsonSerializable {
+
+    /**
+     * @Id
+     * @Column(name = "book_id", type="bigint") 
+     */
+    private $bookId;
+
+    /**
+     * @Id
+     * @Column(name = "page_image_id", type="bigint") 
+     */
+    private $pageImageId;
+
+    /**
+     * @Id
+     * @Column(name = "word_sequence_id", type="integer") 
+     */
+    private $wordSequenceId;
+
+    public function getBookId() {
+        return $this->bookId;
+    }
+
+    public function getPageImageId() {
+        return $this->pageImageId;
+    }
+
+    public function getWordSequenceId() {
+        return $this->wordSequenceId;
+    }
+
+    public function setBookId($bookId): void {
+        $this->bookId = $bookId;
+    }
+
+    public function setPageImageId($pageImageId): void {
+        $this->pageImageId = $pageImageId;
+    }
+
+    public function setWordSequenceId($wordSequenceId): void {
+        $this->wordSequenceId = $wordSequenceId;
+    }
+
     public function jsonSerialize() {
         return get_object_vars($this);
     }
