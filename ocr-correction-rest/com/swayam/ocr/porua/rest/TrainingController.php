@@ -73,46 +73,89 @@ class TrainingController {
                     'id' => $pageImageId
                 ))->getName();
 
-        $pageNameTokens = explode('.', $pageName);
-        $imageExtension = strtolower($pageNameTokens[count($pageNameTokens) - 1]);
-
         $ocrWord = $this->entityManager->getRepository(OcrWord::class)->findOneBy(array(
             'ocrWordId.bookId' => $bookId,
             'ocrWordId.pageImageId' => $pageImageId,
             'ocrWordId.wordSequenceId' => $wordSequenceId
         ));
-        
-        $wordImage = $this->getWordImageToWrite(self::IMAGE_STORE . $pageName, $ocrWord, $imageExtension);
 
-        $imageWriteFunctionName = "image" . $imageExtension;
+        $imageFullPath = self::IMAGE_STORE . $pageName;
+        $imageMimeType = $this->getImageMimeType($imageFullPath);
 
-        $imageWriteFunctionName($wordImage);
+        $wordImage = $this->getWordImageToWrite($imageFullPath, $ocrWord, $imageMimeType);
+
+        $this->writeImage($wordImage, $imageMimeType);
 
         imagedestroy($wordImage);
 
-        return $response->withHeader('Content-Type', "image/" . $imageExtension);
+        return $response->withHeader('Content-Type', $imageMimeType);
     }
 
-    private function getWordImageToWrite(string $imageFullPath, OcrWord $ocrWord, string $imageExtension) {
+    private function getWordImageToWrite(string $imageFullPath, OcrWord $ocrWord, string $imageMimeType) {
         $sourceX = $ocrWord->getX1();
         $sourceY = $ocrWord->getY1();
         $width = $ocrWord->getX2() - $sourceX;
         $height = $ocrWord->getY2() - $sourceY;
 
-        $imageReadFunctionName = "imagecreatefrom" . $imageExtension;
-
-        $this->logger->info("Reading image: {img}, with imageFunction: {imgReadFunc}",
+        $this->logger->info("Reading image: {img}",
                 array(
                     'img' => $imageFullPath,
-                    'imgReadFunc' => $imageReadFunctionName,
                     $sourceX, $sourceY, $width, $height
         ));
 
-        $imageSource = $imageReadFunctionName($imageFullPath);
+        $imageSource = $this->readImage($imageFullPath, $imageMimeType);
         $imageDest = imagecreate($width, $height);
         imagecopyresampled($imageDest, $imageSource, 0, 0, $sourceX, $sourceY, $width, $height, $width, $height);
         imagedestroy($imageSource);
         return $imageDest;
+    }
+
+    private function getImageMimeType($imageFullPath) {
+        $size = getimagesize($imageFullPath);
+        return strtolower($size['mime']);
+    }
+
+    private function readImage($imageFullPath, $imageMimeType) {
+        switch ($imageMimeType) {
+            case 'image/jpg':
+            case 'image/jpeg':
+                $this->checkImageTypeSupported(IMG_JPG);
+                return imagecreatefromjpeg($imageFullPath);
+            case 'image/gif':
+                $this->checkImageTypeSupported(IMG_GIF);
+                return imagecreatefromgif($imageFullPath);
+            case 'image/png':
+                $this->checkImageTypeSupported(IMG_PNG);
+                return imagecreatefrompng($imageFullPath);
+            default:
+                throw new Exception("This image type" . $imageMimeType . " is not supported, please use another file type", 1);
+        }
+    }
+
+    private function writeImage($imageToSave, $imageMimeType) {
+        switch ($imageMimeType) {
+            case 'image/jpg':
+            case 'image/jpeg':
+                $this->checkImageTypeSupported(IMG_JPG);
+                imagejpeg($imageToSave);
+                break;
+            case 'image/gif':
+                $this->checkImageTypeSupported(IMG_GIF);
+                imagegif($imageToSave);
+                break;
+            case 'image/png':
+                $this->checkImageTypeSupported(IMG_PNG);
+                imagepng($imageToSave);
+                break;
+            default:
+                throw new Exception("This image type" . $imageMimeType . " is not supported, please use another file type", 1);
+        }
+    }
+
+    private function checkImageTypeSupported($imgType) {
+        if (!(imagetypes() & $imgType)) {
+            throw new Exception("This image type" . $imgType . " is not supported", 1);
+        }
     }
 
 }
