@@ -48,14 +48,14 @@ class TrainingController {
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
-    
+
     public function getWordsInPage(Request $request, Response $response) {
         $queryParams = $request->getQueryParams();
         $bookId = $queryParams["bookId"];
-        $pageImgeId = $queryParams["pageImgeId"];
+        $pageImageId = $queryParams["pageImageId"];
         $words = $this->entityManager->getRepository(OcrWord::class)->findBy(array(
             'bookId' => $bookId,
-            'pageImgeId' => $pageImgeId
+            'pageImageId' => $pageImageId
         ));
         $payload = json_encode($words, JSON_PRETTY_PRINT);
         $response->getBody()->write($payload);

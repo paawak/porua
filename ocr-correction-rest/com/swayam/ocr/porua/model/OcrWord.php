@@ -5,6 +5,7 @@ namespace com\swayam\ocr\porua\model;
 use Doctrine\ORM\Mapping\Entity;
 use Doctrine\ORM\Mapping\Table;
 use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Id;
 
 /**
  * @Entity
@@ -12,13 +13,22 @@ use Doctrine\ORM\Mapping\Column;
  */
 class OcrWord implements \JsonSerializable {
 
-    /** @Column(name = "book_id", type="bigint") */
+    /** 
+     * @Id
+     * @Column(name = "book_id", type="bigint") 
+     */
     private $bookId;
 
-    /** @Column(name = "page_image_id", type="bigint") */
+    /** 
+     * @Id
+     * @Column(name = "page_image_id", type="bigint") 
+     */
     private $pageImageId;
 
-    /** @Column(name = "word_sequence_id", type="integer") */
+    /** 
+     * @Id
+     * @Column(name = "word_sequence_id", type="integer") 
+     */
     private $wordSequenceId;
 
     /** @Column(name = "raw_text") */
