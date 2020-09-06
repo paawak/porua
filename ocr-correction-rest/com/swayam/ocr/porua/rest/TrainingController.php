@@ -74,7 +74,7 @@ class TrainingController {
                 ))->getName();
 
         $nameTokens = explode('.', $pageName);
-        $imageExtension = $nameTokens[count($nameTokens) - 1];
+        $imageExtension = strtolower($nameTokens[count($nameTokens) - 1]);
 
         $ocrWord = $this->entityManager->getRepository(OcrWord::class)->findOneBy(array(
             'ocrWordId.bookId' => $bookId,
@@ -83,14 +83,17 @@ class TrainingController {
         ));
 
         $imageFullPath = self::IMAGE_STORE . $pageName;
+
+        $imageReadFunctionName = "imagecreatefrom" . $imageExtension;
+        $imageWriteFunctionName = "image" . $imageExtension;
+
+        $this->logger->info("Reading image: {img}, with imageFunctions: {imgReadFunc}, {imgWriteFunc}", array(img => $imageFullPath, imgReadFunc => $imageReadFunctionName, imgWriteFunc => $imageWriteFunctionName));
+
+        $image = $imageReadFunctionName($imageFullPath);
+
+        header("Content-Type: image/" . $imageExtension);
+        $imageWriteFunctionName($image);
         
-        $this->logger->info("Reading image: {img}", array(img=>$imageFullPath));
-
-        $image = imagecreatefrompng($imageFullPath);
-
-        header("Content-Type: image/png");
-
-        imagepng($image);
         imagedestroy($image);
     }
 
