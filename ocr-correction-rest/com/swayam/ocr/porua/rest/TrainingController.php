@@ -82,19 +82,33 @@ class TrainingController {
             'ocrWordId.wordSequenceId' => $wordSequenceId
         ));
 
-        $imageFullPath = self::IMAGE_STORE . $pageName;
+        $sourceX = $ocrWord->getX1();
+        $sourceY = $ocrWord->getY1();
+        $width = $ocrWord->getX2() - $sourceX;
+        $height = $ocrWord->getY2() - $sourceY;
 
+        $imageFullPath = self::IMAGE_STORE . $pageName;
         $imageReadFunctionName = "imagecreatefrom" . $imageExtension;
         $imageWriteFunctionName = "image" . $imageExtension;
 
-        $this->logger->info("Reading image: {img}, with imageFunctions: {imgReadFunc}, {imgWriteFunc}", array(img => $imageFullPath, imgReadFunc => $imageReadFunctionName, imgWriteFunc => $imageWriteFunctionName));
+        $this->logger->info("Reading image: {img}, with imageFunctions: {imgReadFunc}, {imgWriteFunc}",
+                array(
+                    'img' => $imageFullPath,
+                    'imgReadFunc' => $imageReadFunctionName,
+                    'imgWriteFunc' => $imageWriteFunctionName,
+                    $sourceX, $sourceY, $width, $height
+        ));
 
-        $image = $imageReadFunctionName($imageFullPath);
-
-        header("Content-Type: image/" . $imageExtension);
-        $imageWriteFunctionName($image);
+        $imageSource = $imageReadFunctionName($imageFullPath);
+        $imageDest = imagecreate($width, $height);
+        imagecopyresampled($imageDest, $imageSource, 0, 0, $sourceX, $sourceY, $width, $height, $width, $height);
         
-        imagedestroy($image);
+        $imageWriteFunctionName($imageDest);
+        
+        imagedestroy($imageSource);
+        imagedestroy($imageDest);
+
+        return $response->withHeader('Content-Type', "image/" . $imageExtension);
     }
 
 }
