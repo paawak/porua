@@ -8,9 +8,11 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use com\swayam\ocr\porua\model\Book;
 use com\swayam\ocr\porua\model\PageImage;
+use com\swayam\ocr\porua\model\OcrWord;
 
 require_once __DIR__ . '/../model/Book.php';
 require_once __DIR__ . '/../model/PageImage.php';
+require_once __DIR__ . '/../model/OcrWord.php';
 
 class TrainingController {
 
@@ -29,7 +31,7 @@ class TrainingController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function getPageCount(Request $request, Response $response, $bookId) {
+    public function getPageCountInBook(Request $request, Response $response, $bookId) {
         $pageCount = $this->entityManager->getRepository(PageImage::class)->count(array(
             'book' => $bookId
         ));
@@ -37,12 +39,25 @@ class TrainingController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function getPages(Request $request, Response $response) {
+    public function getPagesInBook(Request $request, Response $response) {
         $bookId = $request->getQueryParams()["bookId"];
         $pages = $this->entityManager->getRepository(PageImage::class)->findBy(array(
             'book' => $bookId
         ));
         $payload = json_encode($pages, JSON_PRETTY_PRINT);
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+    
+    public function getWordsInPage(Request $request, Response $response) {
+        $queryParams = $request->getQueryParams();
+        $bookId = $queryParams["bookId"];
+        $pageImgeId = $queryParams["pageImgeId"];
+        $words = $this->entityManager->getRepository(OcrWord::class)->findBy(array(
+            'bookId' => $bookId,
+            'pageImgeId' => $pageImgeId
+        ));
+        $payload = json_encode($words, JSON_PRETTY_PRINT);
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
     }
