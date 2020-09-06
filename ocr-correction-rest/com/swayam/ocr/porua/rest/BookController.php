@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Doctrine\ORM\EntityRepository;
 
 use com\swayam\ocr\porua\model\Book;
 use com\swayam\ocr\porua\model\PageImage;
@@ -25,8 +24,7 @@ class BookController {
     }
 
     public function getAll(Request $request, Response $response) {
-        $query = $this->entityManager->createQuery('SELECT b FROM ' . Book::class . ' b');
-        $books = $query->getResult();
+        $books = $this->entityManager->getRepository(Book::class)->findAll();
         $payload = json_encode($books, JSON_PRETTY_PRINT);
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
