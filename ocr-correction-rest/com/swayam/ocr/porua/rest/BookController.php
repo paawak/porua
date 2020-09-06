@@ -6,6 +6,7 @@ use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Doctrine\ORM\EntityRepository;
 
 use com\swayam\ocr\porua\model\Book;
 use com\swayam\ocr\porua\model\PageImage;
@@ -32,12 +33,10 @@ class BookController {
     }
 
     public function getOne(Request $request, Response $response, $bookId) {
-        $query = $this->entityManager->createQuery('SELECT COUNT(p) FROM ' . PageImage::class . ' p WHERE p.book = :bookId');
-        $query->setParameters(array(
-            'bookId' => $bookId
+        $pageCount = $this->entityManager->getRepository(PageImage::class)->count(array(
+            'book' => $bookId
         ));
-        $pageCount = $query->getResult();
-        $response->getBody()->write($pageCount[0][1]);
+        $response->getBody()->write("$pageCount");
         return $response->withHeader('Content-Type', 'application/json');
     }
 
