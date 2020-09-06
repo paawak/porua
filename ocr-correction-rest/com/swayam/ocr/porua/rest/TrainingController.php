@@ -81,8 +81,6 @@ class TrainingController {
 
         $imageFullPath = self::IMAGE_STORE . $pageName;
 
-//        echo '***' . $imageFullPath;
-
         $imageStream = fopen($imageFullPath, 'rb');
 
         $ocrWord = $this->entityManager->getRepository(OcrWord::class)->findOneBy(array(
@@ -91,26 +89,12 @@ class TrainingController {
             'ocrWordId.wordSequenceId' => $wordSequenceId
         ));
 
-        $im = imagecreatefrompng($imageFullPath);
+        $image = imagecreatefrompng($imageFullPath);
 
         header("Content-Type: image/png");
-        $image = @imagecreate(500, 500)
-                or die("Cannot Initialize new GD image stream");
 
-        imagecolorallocate($image, 0xff, 0, 0xff);
-        $text_color = imagecolorallocate($image, 0, 0, 0xee);
-
-        imagestring($image, 5, 5, 5, "Hello GD!!", $text_color);
         imagepng($image);
-//        $stream = Psr7\stream_for($image);
         imagedestroy($image);
-
-        $image1 = file_get_contents($imageFullPath);
-        if ($image1 === false) {
-            die("error getting image");
-        }
-//        $response->withBody(Psr7\stream_for($image1));
-        return $response->withHeader('Content-Type', 'image/png');
     }
 
 }
