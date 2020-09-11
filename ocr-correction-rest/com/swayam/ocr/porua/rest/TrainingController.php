@@ -95,13 +95,16 @@ class TrainingController {
     }
 
     public function applyCorrectionToOcrWords(Request $request, Response $response) {
-        $jsonArray = json_decode($request->getBody(), true);
-        foreach ($jsonArray as $value) {
+        $rawOcrCorrectionDtoAsArray = json_decode($request->getBody(), true);
+        $ocrCorrectionDtoList = array();
 
-            $ocrCorrectionDto = OcrCorrectionDto::fromJsonArray($value);
-            print_r($ocrCorrectionDto);
-
+        foreach ($rawOcrCorrectionDtoAsArray as $ocrCorrectionDtoAsArray) {
+            $ocrCorrectionDto = OcrCorrectionDto::fromJsonArray($ocrCorrectionDtoAsArray);
+            array_push($ocrCorrectionDtoList, $ocrCorrectionDto);
         }
+
+        print_r($ocrCorrectionDtoList);
+
         return $response->withHeader('Content-Type', "text/plain");
     }
 

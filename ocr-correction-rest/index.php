@@ -7,7 +7,6 @@ use DI\Bridge\Slim\Bridge;
 use Slim\Handlers\ErrorHandler;
 use Slim\Factory\ServerRequestCreatorFactory;
 use Psr\Log\LoggerInterface;
-
 use com\swayam\ocr\porua\rest\IndexController;
 use com\swayam\ocr\porua\rest\TrainingController;
 

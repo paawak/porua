@@ -13,7 +13,7 @@ use Doctrine\ORM\Mapping\Column;
  */
 class OcrWord implements \JsonSerializable {
 
-    /** 
+    /**
      * @Embedded(class = "OcrWordId", columnPrefix=false) 
      */
     private $ocrWordId;
