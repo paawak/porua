@@ -95,7 +95,7 @@ class TrainingController {
     }
 
     public function applyCorrectionToOcrWords(Request $request, Response $response) {
-        $rawOcrCorrectionDtoAsArray = json_decode($request->getBody(), true);
+        $rawOcrCorrectionDtoAsArray = $request->getParsedBody();
         $ocrCorrectionDtoList = array();
 
         foreach ($rawOcrCorrectionDtoAsArray as $ocrCorrectionDtoAsArray) {

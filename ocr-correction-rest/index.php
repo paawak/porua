@@ -24,7 +24,7 @@ $request = $serverRequestCreator->createServerRequestFromGlobals();
 $errorHandler = new ErrorHandler($callableResolver, $responseFactory, $logger);
 
 $app->addRoutingMiddleware();
-//$app->addBodyParsingMiddleware();
+$app->addBodyParsingMiddleware();
 $errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, false, false);
 $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
