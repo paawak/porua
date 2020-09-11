@@ -25,6 +25,7 @@ $request = $serverRequestCreator->createServerRequestFromGlobals();
 $errorHandler = new ErrorHandler($callableResolver, $responseFactory, $logger);
 
 $app->addRoutingMiddleware();
+//$app->addBodyParsingMiddleware();
 $errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, false, false);
 $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
@@ -34,6 +35,7 @@ $app->get('/train/book/{bookId}/page-count', [TrainingController::class, 'getPag
 $app->get('/train/page', [TrainingController::class, 'getPagesInBook']);
 $app->get('/train/word', [TrainingController::class, 'getWordsInPage']);
 $app->get('/train/word/image', [TrainingController::class, 'getWordImage']);
+$app->put('/train/word', [TrainingController::class, 'applyCorrectionToOcrWords']);
 
 $app->run();
 ?>

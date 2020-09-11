@@ -13,6 +13,7 @@ use com\swayam\ocr\porua\model\OcrWord;
 require_once __DIR__ . '/../model/Book.php';
 require_once __DIR__ . '/../model/PageImage.php';
 require_once __DIR__ . '/../model/OcrWord.php';
+require_once __DIR__ . '/../model/OcrWordId.php';
 
 class TrainingController {
 
@@ -89,6 +90,11 @@ class TrainingController {
         imagedestroy($wordImage);
 
         return $response->withHeader('Content-Type', $imageMimeType);
+    }
+
+    public function applyCorrectionToOcrWords(Request $request, Response $response) {
+        echo "-----" . $request->getBody();
+        return $response->withHeader('Content-Type', "text/plain");
     }
 
     private function getWordImageToWrite(string $imageFullPath, OcrWord $ocrWord, string $imageMimeType) {
