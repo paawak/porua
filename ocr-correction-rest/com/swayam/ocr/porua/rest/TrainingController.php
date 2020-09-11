@@ -9,11 +9,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use com\swayam\ocr\porua\model\Book;
 use com\swayam\ocr\porua\model\PageImage;
 use com\swayam\ocr\porua\model\OcrWord;
+use com\swayam\ocr\porua\dto\OcrCorrectionDto;
 
 require_once __DIR__ . '/../model/Book.php';
 require_once __DIR__ . '/../model/PageImage.php';
 require_once __DIR__ . '/../model/OcrWord.php';
 require_once __DIR__ . '/../model/OcrWordId.php';
+require_once __DIR__ . '/../dto/OcrCorrectionDto.php';
 
 class TrainingController {
 
@@ -93,7 +95,13 @@ class TrainingController {
     }
 
     public function applyCorrectionToOcrWords(Request $request, Response $response) {
-        echo "-----" . $request->getBody();
+        $jsonArray = json_decode($request->getBody(), true);
+        foreach ($jsonArray as $value) {
+
+            $ocrCorrectionDto = OcrCorrectionDto::fromJsonArray($value);
+            print_r($ocrCorrectionDto);
+
+        }
         return $response->withHeader('Content-Type', "text/plain");
     }
 
