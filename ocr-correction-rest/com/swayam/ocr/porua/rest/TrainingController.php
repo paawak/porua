@@ -56,6 +56,28 @@ class TrainingController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public function markPageAsIgnored(Request $request, Response $response, $pageImageId) {
+        $sql = "UPDATE " . PageImage::class . " page SET page.ignored = TRUE WHERE page.id = :pageImageId";
+        $updateQuery = $this->entityManager->createQuery($sql);
+        $updated = $updateQuery->execute(array(
+            'pageImageId' => $pageImageId
+        ));
+
+        $response->getBody()->write("$updated");
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    public function markPageAsCompleted(Request $request, Response $response, $pageImageId) {
+        $sql = "UPDATE " . PageImage::class . " page SET page.correctionCompleted = TRUE WHERE page.id = :pageImageId";
+        $updateQuery = $this->entityManager->createQuery($sql);
+        $updated = $updateQuery->execute(array(
+            'pageImageId' => $pageImageId
+        ));
+
+        $response->getBody()->write("$updated");
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     public function getWordsInPage(Request $request, Response $response) {
         $queryParams = $request->getQueryParams();
         $bookId = $queryParams["bookId"];

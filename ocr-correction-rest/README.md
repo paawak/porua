@@ -21,3 +21,23 @@ composer require php-di/slim-bridge
 <https://php-di.org/doc/frameworks/slim.html>
 <https://php-di.org/doc/container-configuration.html>
 Demo: <https://github.com/PHP-DI/demo>
+
+## Sample URLs
+
+curl -v -X PUT "http://localhost:8000/train/word" -H  "accept: application/json" -H  "Content-Type: application/json" -d "[{\"correctedText\":\"বিলাপ\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":24}},{\"correctedText\":\"গড়াগড়ি\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":26}},{\"correctedText\":\"ভিক্ষুকী,\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":39}},{\"correctedText\":\"করছিস।\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":44}}]"
+
+
+
+
+curl -v -X PUT "http://localhost:8000/train/word" -H  "accept: application/json" -H  "Content-Type: application/json" -d "[{\"correctedText\":\"বিলাপ\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":24}}]"
+
+
+curl -v -X PUT "http://localhost:8000/train/word/ignore" -H  "accept: application/json" -H  "Content-Type: application/json" -d "[{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":24}]"
+
+
+curl -v -X PUT "http://localhost:8000/train/word/ignore" -H  "accept: application/json" -H  "Content-Type: application/json" -d "[{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":24}]"
+
+curl -v -X PUT "http://localhost:8000/train/page/complete/40" 
+
+curl -v -X PUT "http://localhost:8000/train/page/ignore/41" 
+

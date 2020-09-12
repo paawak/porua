@@ -16,7 +16,6 @@ $app = Bridge::create($container);
 
 $logger = $container->get(LoggerInterface::class);
 
-$displayErrorDetails = true;
 $callableResolver = $app->getCallableResolver();
 $responseFactory = $app->getResponseFactory();
 $serverRequestCreator = ServerRequestCreatorFactory::create();
@@ -25,13 +24,15 @@ $errorHandler = new ErrorHandler($callableResolver, $responseFactory, $logger);
 
 $app->addRoutingMiddleware();
 $app->addBodyParsingMiddleware();
-$errorMiddleware = $app->addErrorMiddleware($displayErrorDetails, false, false);
+$errorMiddleware = $app->addErrorMiddleware(true, true, true);
 $errorMiddleware->setDefaultErrorHandler($errorHandler);
 
 $app->get('/', [IndexController::class, 'get']);
 $app->get('/train/book', [TrainingController::class, 'getAllBooks']);
 $app->get('/train/book/{bookId}/page-count', [TrainingController::class, 'getPageCountInBook']);
 $app->get('/train/page', [TrainingController::class, 'getPagesInBook']);
+$app->put('/train/page/ignore/{pageImageId}', [TrainingController::class, 'markPageAsIgnored']);
+$app->put('/train/page/complete/{pageImageId}', [TrainingController::class, 'markPageAsCompleted']);
 $app->get('/train/word', [TrainingController::class, 'getWordsInPage']);
 $app->get('/train/word/image', [TrainingController::class, 'getWordImage']);
 $app->put('/train/word', [TrainingController::class, 'applyCorrectionToOcrWords']);
