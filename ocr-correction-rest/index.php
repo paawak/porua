@@ -35,6 +35,7 @@ $app->get('/train/page', [TrainingController::class, 'getPagesInBook']);
 $app->get('/train/word', [TrainingController::class, 'getWordsInPage']);
 $app->get('/train/word/image', [TrainingController::class, 'getWordImage']);
 $app->put('/train/word', [TrainingController::class, 'applyCorrectionToOcrWords']);
+$app->put('/train/word/ignore', [TrainingController::class, 'markOcrWordsAsIgnored']);
 
 $app->run();
 ?>

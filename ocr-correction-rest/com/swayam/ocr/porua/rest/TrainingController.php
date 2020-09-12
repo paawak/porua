@@ -10,6 +10,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use com\swayam\ocr\porua\model\Book;
 use com\swayam\ocr\porua\model\PageImage;
 use com\swayam\ocr\porua\model\OcrWord;
+use \com\swayam\ocr\porua\model\OcrWordId;
 use com\swayam\ocr\porua\dto\OcrCorrectionDto;
 
 require_once __DIR__ . '/../model/Book.php';
@@ -115,6 +116,26 @@ class TrainingController {
         return $response->withHeader('Content-Type', 'application/json');
     }
 
+    public function markOcrWordsAsIgnored(Request $request, Response $response) {
+        $rawOcrWordIDsAsArray = $request->getParsedBody();
+
+        if (!is_array($rawOcrWordIDsAsArray)) {
+            throw new Exception('Invalid body: Could not decode JSON');
+        }
+
+        $updatedList = array();
+
+        foreach ($rawOcrWordIDsAsArray as $ocrWordIdAsArray) {
+            $ocrWordId = OcrWordId::fromJsonArray($ocrWordIdAsArray);
+            $updated = $this->updateWordAsIgnoredInRepository($ocrWordId);
+            array_push($updatedList, $updated);
+        }
+
+        $payload = json_encode($updatedList, JSON_PRETTY_PRINT);
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
     private function getWordImageToWrite(string $imageFullPath, OcrWord $ocrWord, string $imageMimeType) {
         $sourceX = $ocrWord->getX1();
         $sourceY = $ocrWord->getY1();
@@ -183,13 +204,24 @@ class TrainingController {
     }
 
     private function updateOcrWordInRepository(OcrCorrectionDto $ocrCorrectionDto) {
-        $sql = "UPDATE com\swayam\ocr\porua\model\OcrWord word SET word.correctedText = :correctedText WHERE word.ocrWordId.bookId = :bookId AND word.ocrWordId.pageImageId = :pageImageId AND word.ocrWordId.wordSequenceId = :wordSequenceId";
+        $sql = "UPDATE " . OcrWord::class . " word SET word.correctedText = :correctedText WHERE word.ocrWordId.bookId = :bookId AND word.ocrWordId.pageImageId = :pageImageId AND word.ocrWordId.wordSequenceId = :wordSequenceId";
         $updateQuery = $this->entityManager->createQuery($sql);
         $updated = $updateQuery->execute(array(
             'correctedText' => $ocrCorrectionDto->getCorrectedText(),
             'bookId' => $ocrCorrectionDto->getOcrWordId()->getBookId(),
             'pageImageId' => $ocrCorrectionDto->getOcrWordId()->getPageImageId(),
             'wordSequenceId' => $ocrCorrectionDto->getOcrWordId()->getWordSequenceId()
+        ));
+        return $updated;
+    }
+
+    private function updateWordAsIgnoredInRepository(OcrWordId $ocrWordId) {
+        $sql = "UPDATE " . OcrWord::class . " word SET word.ignored = TRUE WHERE word.ocrWordId.bookId = :bookId AND word.ocrWordId.pageImageId = :pageImageId AND word.ocrWordId.wordSequenceId = :wordSequenceId";
+        $updateQuery = $this->entityManager->createQuery($sql);
+        $updated = $updateQuery->execute(array(
+            'bookId' => $ocrWordId->getBookId(),
+            'pageImageId' => $ocrWordId->getPageImageId(),
+            'wordSequenceId' => $ocrWordId->getWordSequenceId()
         ));
         return $updated;
     }
