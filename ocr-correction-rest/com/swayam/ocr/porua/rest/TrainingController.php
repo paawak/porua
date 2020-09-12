@@ -96,16 +96,17 @@ class TrainingController {
 
     public function applyCorrectionToOcrWords(Request $request, Response $response) {
         $rawOcrCorrectionDtoAsArray = $request->getParsedBody();
-        $ocrCorrectionDtoList = array();
+        $updatedList = array();
 
         foreach ($rawOcrCorrectionDtoAsArray as $ocrCorrectionDtoAsArray) {
             $ocrCorrectionDto = OcrCorrectionDto::fromJsonArray($ocrCorrectionDtoAsArray);
-            array_push($ocrCorrectionDtoList, $ocrCorrectionDto);
+            $updated = $this->updateOcrWordInRepository($ocrCorrectionDto);
+            array_push($updatedList, $updated);
         }
 
-        print_r($ocrCorrectionDtoList);
-
-        return $response->withHeader('Content-Type', "text/plain");
+        $payload = json_encode($updatedList, JSON_PRETTY_PRINT);
+        $response->getBody()->write($payload);
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     private function getWordImageToWrite(string $imageFullPath, OcrWord $ocrWord, string $imageMimeType) {
@@ -173,6 +174,18 @@ class TrainingController {
         if (!(imagetypes() & $imgType)) {
             throw new Exception("This image type" . $imgType . " is not supported", 1);
         }
+    }
+
+    private function updateOcrWordInRepository(OcrCorrectionDto $ocrCorrectionDto) {
+        $sql = "UPDATE com\swayam\ocr\porua\model\OcrWord word SET word.correctedText = :correctedText WHERE word.ocrWordId.bookId = :bookId AND word.ocrWordId.pageImageId = :pageImageId AND word.ocrWordId.wordSequenceId = :wordSequenceId";
+        $updateQuery = $this->entityManager->createQuery($sql);
+        $updated = $updateQuery->execute(array(
+            'correctedText' => $ocrCorrectionDto->getCorrectedText(),
+            'bookId' => $ocrCorrectionDto->getOcrWordId()->getBookId(),
+            'pageImageId' => $ocrCorrectionDto->getOcrWordId()->getPageImageId(),
+            'wordSequenceId' => $ocrCorrectionDto->getOcrWordId()->getWordSequenceId()
+        ));
+        return $updated;
     }
 
 }
