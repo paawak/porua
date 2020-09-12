@@ -2,6 +2,7 @@
 
 namespace com\swayam\ocr\porua\rest;
 
+use \Exception as Exception;
 use Doctrine\ORM\EntityManager;
 use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -96,6 +97,11 @@ class TrainingController {
 
     public function applyCorrectionToOcrWords(Request $request, Response $response) {
         $rawOcrCorrectionDtoAsArray = $request->getParsedBody();
+
+        if (!is_array($rawOcrCorrectionDtoAsArray)) {
+            throw new Exception('Invalid body: Could not decode JSON');
+        }
+
         $updatedList = array();
 
         foreach ($rawOcrCorrectionDtoAsArray as $ocrCorrectionDtoAsArray) {
