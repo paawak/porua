@@ -17,10 +17,10 @@ return [
     },
     EntityManager::class => function () {
         $dbParams = array(
-            'driver' => 'pdo_mysql',
-            'user' => 'root',
-            'password' => 'root123',
-            'dbname' => 'porua',
+            'driver' => 'pdo_pgsql',
+            'user' => 'postgres',
+            'password' => 'postgres',
+            'dbname' => 'tesseract-porua',
             'host' => 'localhost',
             'charset' =>  'UTF8'
         );
