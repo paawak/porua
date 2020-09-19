@@ -84,7 +84,8 @@ class TrainingController {
         $pageImageId = $queryParams["pageImageId"];
         $words = $this->entityManager->getRepository(OcrWord::class)->findBy(array(
             'ocrWordId.bookId' => $bookId,
-            'ocrWordId.pageImageId' => $pageImageId
+            'ocrWordId.pageImageId' => $pageImageId,
+            'ignored' => false
         ));
         $payload = json_encode($words, JSON_PRETTY_PRINT);
         $response->getBody()->write($payload);
