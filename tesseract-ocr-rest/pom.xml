@@ -23,6 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>11</java.version>
+		<liquibase.maven.version>3.6.3</liquibase.maven.version>
 	</properties>
 
 	<build>
@@ -58,7 +59,7 @@
 						<goals>
 							<goal>build</goal>
 						</goals>
-					</execution>							
+					</execution>
 					<execution>
 						<id>push-docker-image</id>
 						<phase>install</phase>
@@ -72,7 +73,7 @@
 			<plugin>
 				<groupId>org.liquibase</groupId>
 				<artifactId>liquibase-maven-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>${liquibase.maven.version}</version>
 				<configuration>
 					<url>jdbc:hsqldb:file:./target/hsql-db/ocrdb;shutdown=true</url>
 					<username>SA</username>
@@ -90,10 +91,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -103,15 +104,15 @@
 
 		<dependency>
 			<groupId>org.bytedeco</groupId>
-            <artifactId>tesseract-platform</artifactId>
-            <version>4.1.1-1.5.3</version>
+			<artifactId>tesseract-platform</artifactId>
+			<version>4.1.1-1.5.3</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -122,28 +123,67 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
 			<version>2.0.19</version>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>jbig2-imageio</artifactId>
 			<version>3.0.0</version>
-		</dependency>		
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
- 		<dependency>
- 			<groupId>org.hsqldb</groupId>
- 			<artifactId>hsqldb</artifactId>
- 			<scope>test</scope>
- 		</dependency>		
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-	
+
+	<profiles>
+		<profile>
+			<id>mysql</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.liquibase</groupId>
+						<artifactId>liquibase-maven-plugin</artifactId>
+						<version>${liquibase.maven.version}</version>
+						<configuration>
+							<url>jdbc:mysql://localhost:3306/porua?useSSL=false</url>
+							<username>root</username>
+							<password>root123</password>
+							<driver>com.mysql.cj.jdbc.Driver</driver>
+							<changeLogFile>src/main/resources/sql/liquibase/master-change-log.xml</changeLogFile>
+							<outputChangeLogFile>schema.mysql.sql</outputChangeLogFile>
+							<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>update</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<dependencies>
+				<dependency>
+					<groupId>mysql</groupId>
+					<artifactId>mysql-connector-java</artifactId>
+					<version>8.0.16</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
 </project>

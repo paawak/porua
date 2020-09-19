@@ -11,4 +11,6 @@ output.txt
 /bangla-ocr/build/
 /bangla-ocr/dist/
 nbactions.xml
+vendor
+composer.lock
 

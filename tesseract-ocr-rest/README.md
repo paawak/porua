@@ -85,10 +85,18 @@ Exporting the corrected words to a CSV file:
     
 # DB Migration Utils with Liquibase
 
-## Generating liquibase changelog from existing DB
+Reference: <https://docs.liquibase.com/tools-integrations/maven/commands/home.html>
 
-    mvn liquibase:generateChangeLog    
-		
+## Generate Mysql SQL Schema from existing DB
+
+In the *pom.xml* change the *outputChangeLogFile* property in the format *schema.<target_db>.sql*. For mysql, it is *schema.mysql.sql*.
+
+    mvn -P mysql liquibase:generateChangeLog   
+
+## Applying liquibase changelog to MySQL DB
+
+    mvn -P mysql liquibase:update    
+				
 # Sources
 		
 <https://github.com/paawak/porua/tree/master/tesseract-ocr-rest>
