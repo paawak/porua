@@ -11,13 +11,13 @@ class OcrWordId implements \JsonSerializable {
 
     /**
      * @Id
-     * @Column(name = "book_id", type="bigint") 
+     * @Column(name = "book_id", type="integer") 
      */
     private $bookId;
 
     /**
      * @Id
-     * @Column(name = "page_image_id", type="bigint") 
+     * @Column(name = "page_image_id", type="integer") 
      */
     private $pageImageId;
 

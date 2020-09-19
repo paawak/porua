@@ -20,7 +20,7 @@ class PageImage implements \JsonSerializable {
 
     /**
      * @Id
-     * @Column(type="bigint")
+     * @Column(type="integer")
      * @GeneratedValue(strategy="IDENTITY")
      */
     private $id;

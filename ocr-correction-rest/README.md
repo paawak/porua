@@ -23,10 +23,17 @@ composer require php-di/slim-bridge
 Demo: <https://github.com/PHP-DI/demo>
 
 ## Sample URLs
+### Fetch Pages for a Book
+
+	curl -v -X GET "http://localhost:8000/train/page?bookId=1"
+
+### Ignore words
+
+        curl -v -X PUT "http://localhost:8000/train/word/ignore" -H  "accept: application/json" -H  "Content-Type: application/json" -d '[{"bookId":1,"pageImageId":47,"wordSequenceId":2}]'
+
+### Misc
 
 curl -v -X PUT "http://localhost:8000/train/word" -H  "accept: application/json" -H  "Content-Type: application/json" -d "[{\"correctedText\":\"বিলাপ\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":24}},{\"correctedText\":\"গড়াগড়ি\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":26}},{\"correctedText\":\"ভিক্ষুকী,\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":39}},{\"correctedText\":\"করছিস।\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":44}}]"
-
-
 
 
 curl -v -X PUT "http://localhost:8000/train/word" -H  "accept: application/json" -H  "Content-Type: application/json" -d "[{\"correctedText\":\"বিলাপ\",\"ocrWordId\":{\"bookId\":1,\"pageImageId\":505,\"wordSequenceId\":24}}]"
