@@ -48,9 +48,13 @@ class TrainingController {
 
     public function getPagesInBook(Request $request, Response $response) {
         $bookId = $request->getQueryParams()["bookId"];
-        $pages = $this->entityManager->getRepository(PageImage::class)->findBy(array(
-            'book' => $bookId
-        ));
+        $pages = $this->entityManager->getRepository(PageImage::class)->findBy(
+                array(
+                    'book' => $bookId,
+                    'ignored' => false
+                ),
+                array('pageNumber' => 'ASC')
+        );
         $payload = json_encode($pages, JSON_PRETTY_PRINT);
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
