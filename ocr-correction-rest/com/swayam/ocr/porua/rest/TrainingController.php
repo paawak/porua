@@ -82,11 +82,14 @@ class TrainingController {
         $queryParams = $request->getQueryParams();
         $bookId = $queryParams["bookId"];
         $pageImageId = $queryParams["pageImageId"];
-        $words = $this->entityManager->getRepository(OcrWord::class)->findBy(array(
-            'ocrWordId.bookId' => $bookId,
-            'ocrWordId.pageImageId' => $pageImageId,
-            'ignored' => false
-        ));
+        $words = $this->entityManager->getRepository(OcrWord::class)->findBy(
+                array(
+                    'ocrWordId.bookId' => $bookId,
+                    'ocrWordId.pageImageId' => $pageImageId,
+                    'ignored' => false
+                ),
+                array('ocrWordId.wordSequenceId' => 'ASC')
+        );
         $payload = json_encode($words, JSON_PRETTY_PRINT);
         $response->getBody()->write($payload);
         return $response->withHeader('Content-Type', 'application/json');
