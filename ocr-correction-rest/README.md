@@ -48,3 +48,10 @@ curl -v -X PUT "http://localhost:8000/train/page/complete/40"
 
 curl -v -X PUT "http://localhost:8000/train/page/ignore/41" 
 
+### URLs on deployed server
+
+curl "http://ocrservice.paawak.me/train/book"
+
+ curl "http://ocrservice.paawak.me/train/page?bookId=1"
+
+
