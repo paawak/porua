@@ -51,7 +51,16 @@ class PageSelectionPanel extends React.Component {
   }
 
   componentDidMount() {
-    fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/book`)
+    fetch(`${process.env.REACT_APP_REST_API_BASE_NAME}/train/book`, {
+      method: 'GET',
+      headers:{
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': "Bearer " + this.props.googleAccessToken
+      },
+      credentials: 'include'
+    }
+    )
       .then(rawData => rawData.json())
       .then(books => this.setState({ books: books }))
       .catch(() => this.setState({ hasErrors: true }));

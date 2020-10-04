@@ -28,10 +28,6 @@ class App extends React.Component {
   }
 
   render() {
-    if (process.env.REACT_APP_IS_LOCAL) {
-      return this.renderApplicationAfterLogin();
-    }
-
     if (this.state.isLoggedIn) {
       return this.renderApplicationAfterLogin();
     } else {
@@ -77,6 +73,7 @@ class App extends React.Component {
             });
           }
         }
+        googleAccessToken={this.state.googleAccessToken}
       />;
     } else if (this.state.displayMode === DisplayMode.IMAGE_UPLOADER) {
       panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight">
