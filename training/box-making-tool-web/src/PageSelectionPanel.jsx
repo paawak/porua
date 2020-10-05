@@ -56,7 +56,7 @@ class PageSelectionPanel extends React.Component {
       headers:{
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': "Bearer " + this.props.googleAccessToken
+        'Authorization': this.props.googleAccessToken
       },
       credentials: 'include'
     }

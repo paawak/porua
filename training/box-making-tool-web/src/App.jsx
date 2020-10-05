@@ -45,7 +45,7 @@ class App extends React.Component {
     if(response.accessToken){
       this.setState(state => ({
         isLoggedIn: true,
-        googleAccessToken: response.accessToken
+        googleAccessToken: response.tokenId
       }));
     }
   }
