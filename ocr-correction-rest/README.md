@@ -22,6 +22,9 @@ composer require php-di/slim-bridge
 <https://php-di.org/doc/container-configuration.html>
 Demo: <https://github.com/PHP-DI/demo>
 
+## Google Authentication
+<https://developers.google.com/identity/sign-in/web/backend-auth>
+
 ## Sample URLs
 ### Fetch Pages for a Book
 
