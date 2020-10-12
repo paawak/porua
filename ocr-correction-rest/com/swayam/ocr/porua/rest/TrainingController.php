@@ -32,6 +32,18 @@ class TrainingController {
     }
 
     public function getAllBooks(Request $request, Response $response) {
+
+        $CLIENT_ID = '955630342713-55eu6b3k5hmsg8grojjmk8mj1gi47g37.apps.googleusercontent.com';
+        $client = new \Google_Client(['client_id' => $CLIENT_ID]);
+        $idTokenArray = $request->getHeaders()['Authorization'];
+        $this->logger->info('------------- ', $idTokenArray);
+        $payload = $client->verifyIdToken($idTokenArray[0]);
+        if ($payload) {
+            $this->logger->info('****************** ', $payload);
+        } else {
+            $this->logger->info('$$$$$$$$$$$$$ Could NOT authenticate');
+        }
+
         $books = $this->entityManager->getRepository(Book::class)->findAll();
         $payload = json_encode($books, JSON_PRETTY_PRINT);
         $response->getBody()->write($payload);

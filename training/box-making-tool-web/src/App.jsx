@@ -2,6 +2,7 @@ import React from 'react';
 import OcrCorrectionPage from './OcrCorrectionPage'
 import ImageUploader from './ImageUploader'
 import PageSelectionPanel from './PageSelectionPanel'
+import GoogleSignInComponent from './GoogleSignInComponent';
 
 export const DisplayMode = {
       PAGE_SELECTION: 'PAGE_SELECTION',
@@ -14,14 +15,46 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      isLoggedIn: false,
+      googleAccessToken: null,
       displayMode: DisplayMode.PAGE_SELECTION,
       ocrWords: [],
       book: null,
       page: null
     };
+
+    this.loginSuccess = this.loginSuccess.bind(this);
+    this.handleLoginFailure = this.handleLoginFailure.bind(this);
   }
 
   render() {
+    if (this.state.isLoggedIn) {
+      return this.renderApplicationAfterLogin();
+    } else {
+      return this.renderLoginPage();
+    }    
+  }
+
+  renderLoginPage() {
+    return (
+      <GoogleSignInComponent loginSuccess={this.loginSuccess} handleLoginFailure={this.handleLoginFailure}/>
+    );
+  }
+
+  loginSuccess(response) {
+    if(response.accessToken){
+      this.setState(state => ({
+        isLoggedIn: true,
+        googleAccessToken: response.tokenId
+      }));
+    }
+  }
+
+  handleLoginFailure (response) {
+    alert('Failed to log in')
+  }
+
+  renderApplicationAfterLogin() {
     let panelToDisplay;
     const ocrWordsRecievedEvent = (ocrWordListData, page) => {
         this.setState({
@@ -40,6 +73,7 @@ class App extends React.Component {
             });
           }
         }
+        googleAccessToken={this.state.googleAccessToken}
       />;
     } else if (this.state.displayMode === DisplayMode.IMAGE_UPLOADER) {
       panelToDisplay = <div className="shadow mb-5 bg-white rounded p-2 bd-highlight">

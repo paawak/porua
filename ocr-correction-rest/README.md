@@ -22,6 +22,9 @@ composer require php-di/slim-bridge
 <https://php-di.org/doc/container-configuration.html>
 Demo: <https://github.com/PHP-DI/demo>
 
+## Google Authentication
+<https://developers.google.com/identity/sign-in/web/backend-auth>
+
 ## Sample URLs
 ### Fetch Pages for a Book
 
@@ -47,4 +50,11 @@ curl -v -X PUT "http://localhost:8000/train/word/ignore" -H  "accept: applicatio
 curl -v -X PUT "http://localhost:8000/train/page/complete/40" 
 
 curl -v -X PUT "http://localhost:8000/train/page/ignore/41" 
+
+### URLs on deployed server
+
+curl "http://ocrservice.paawak.me/train/book"
+
+ curl "http://ocrservice.paawak.me/train/page?bookId=1"
+
 

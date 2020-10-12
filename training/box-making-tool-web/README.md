@@ -52,4 +52,7 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 
     docker build -t box-making-tool-web:v0.1 .
     docker run -it --rm -p 3000:80 box-making-tool-web:v0.1
-    
+
+## Google Integration
+1. Integrate Google sign-in: <https://developers.google.com/identity/sign-in/web/sign-in>
+1. Google sign-in React component: <https://www.npmjs.com/package/react-google-login>
