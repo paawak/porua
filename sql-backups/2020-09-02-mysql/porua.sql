@@ -112,6 +112,9 @@ CREATE TABLE `ocr_word` (
   `IGNORED` bit(1) NOT NULL DEFAULT b'0'
 ) ENGINE=InnoDB;
 
+ALTER TABLE ocr_word MODIFY raw_text longtext CHARACTER SET utf8;
+ALTER TABLE ocr_word MODIFY corrected_text longtext CHARACTER SET utf8;
+
 --
 -- Dumping data for table `ocr_word`
 --
